@@ -27,6 +27,17 @@ This is a simple site created for the house Sis50 in the netherlands to coordina
     - [ ] Max limit of 5 announcements, oldest one gets discarded
 
 - [ ] Input sanitisation
+- [ ] A dark mode theme with automatic detection as well
+- [ ] A password-protected Admin panel
+    - [ ] With the ability to reset respective weeks completely
+
+
+- [ ] The ability for a user to change the background on their client side
+    - [ ] This being saved
+
+- [ ] Individual User authentication
+    - [ ] That persists for a month
+    - [ ] Only allows users to edit their respective column
 
 
 ## Technical Information

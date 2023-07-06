@@ -1,0 +1,31 @@
+
+#content-body {
+    height: 150%;
+}
+
+table, tbody {
+    font-size: 1.4rem;
+    width: 100%;
+}
+
+th {
+    width: 20%;
+}
+
+td, th {
+    border: 1px solid;
+}
+
+th {
+    height: 1.6rem;
+}
+
+td {
+    text-align: center;
+    font-size: 4rem;
+    height: 4.2rem;
+}
+
+.day {
+    font-size: 2rem;
+}
