@@ -61,7 +61,15 @@ body {
 }
 
 
-/* TODO: Desktop Styling is going to go here */
-@media only screen and (min-width: 480px) {
+@media only screen and (min-width: 640px) {
 
+    #bottom-navigation {
+        justify-content: center;
+    }
+
+    #bottom-navigation * {
+        margin: unset;
+        margin: auto 5% auto 5%;
+        max-width: 10%;
+    }
 }

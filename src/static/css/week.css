@@ -1,3 +1,7 @@
+body {
+    height: 125vh;
+}
+
 
 #content-body {
     height: 150%;
@@ -28,4 +32,12 @@ td {
 
 .day {
     font-size: 2rem;
+}
+
+@media only screen and (min-width: 640px) {
+
+    table {
+        width: 50%;
+        margin: auto;
+    }
 }
