@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strings"
 )
 
 func main() {
@@ -34,8 +33,19 @@ func main() {
 
 func MainRouteHandler(writer http.ResponseWriter, request *http.Request) {
 
-    requestPath := request.URL.Path
+    requestPath := request.URL.Path	
 
+	if requestPath == "/" {
 
+		http.Redirect(writer, request, "/koken", http.StatusSeeOther)
+	} else if requestPath == "/koken" || requestPath == "/bericht" || requestPath == "/comic" || requestPath == "/winkel" {
 
+		http.ServeFile(writer, request, "src/static/templates" + requestPath + ".html")
+
+		fmt.Println("Serving src/static/templates" + requestPath + ".html")
+	} else if requestPath == "/css/index.css" {
+		http.ServeFile(writer, request, "src/static/css/index.css")
+		fmt.Println("Serving index.css")
+
+	}
 }
