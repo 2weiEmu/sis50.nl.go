@@ -12,6 +12,7 @@ This is a simple site created for the house Sis50 in the netherlands to coordina
     - [ ] That resets at the end of every week
     - [ ] People have the ability to add small annotations to each day in case of special occurences
     - [ ] People can easily indicate if extra people will be eating at the house
+    - [ ] A small recipe section where people can pull up recipes of what will be cooked today if wanted
     - [ ] A next week calendar, where people can pre-plan / show when they are available next week
         - [ ] Automatic switching, so that the next-week schedule becomes the current weeks'
 - [ ] Simple Shopping list 
