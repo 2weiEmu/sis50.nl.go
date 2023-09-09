@@ -5,7 +5,27 @@ var next_week_table = document.getElementsByClassName("next-week")[0];
 var socket_conn = new WebSocket("ws://localhost:8000/koken-ws")
 
 socket_conn.onmessage = function(event) {
-	console.log(event.data)
+
+	var message = event.data
+
+	var arr = message.split("$")
+
+	var state, week, person, day;
+	
+	[state, week, person, day] = arr
+
+	console.log(state, week, person, day)
+
+	if (state == "E") { state = " " }
+
+	var week_table = document.getElementsByClassName(week + "-week")[0]
+
+
+
+	var element = week_table.getElementsByClassName(day)[0].getElementsByClassName(person)[0]
+
+	element.innerHTML = state;
+	
 }
 
 current_week_table.addEventListener("click", function(ev) {

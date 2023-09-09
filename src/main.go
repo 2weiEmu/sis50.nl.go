@@ -14,7 +14,14 @@ import (
 
 var grid = loadGrid()
 
+var personList = []string {"rick", "youri", "robert", "milan"}
+var dayList = []string {"mandaag", "dinsdag", "woensdag", "dondersdag", "vrijdag", "zaterdag", "zondag"}
+
+var gridStates = []string {"E", "X", "O", "?"} 
+
 var upgrader = websocket.Upgrader{}
+
+var socketPool []*websocket.Conn;
 
 func main() {
 	
@@ -91,6 +98,38 @@ func ParseBericht(message string) string {
 	return strings.Split(message, "$")[1]
 }
 
+func ModifyGrid(grid [][]string, week, person, day string) string {
+
+	row := 0
+
+	if week == "next" {
+		row += 7
+	}
+
+	row += findIndex(dayList, day)
+
+	col := findIndex(personList, person)
+
+	grid[row][col] = GetNextMark(grid[row][col])
+
+	return grid[row][col]
+}
+
+func GetNextMark(sy string) string {
+	return gridStates[(findIndex(gridStates, sy) + 1) % len(gridStates)]
+}
+
+func findIndex(arr []string, s string) int {	
+
+	for n, f := range arr {
+		if f == s {
+			return n;
+		}
+	}
+
+	return -1
+}
+
 
 func MainRouteHandler(writer http.ResponseWriter, request *http.Request) {
 
@@ -108,6 +147,8 @@ func MainRouteHandler(writer http.ResponseWriter, request *http.Request) {
 
 		socketConn, err := upgrader.Upgrade(writer, request, nil)
 
+		socketPool = append(socketPool, socketConn)
+
 		if err != nil {
 			log.Print("Failed to create websocket connection with error", err)
 		}
@@ -124,6 +165,12 @@ func MainRouteHandler(writer http.ResponseWriter, request *http.Request) {
 				week, person, day := ParseToggle(string(message))
 				fmt.Println(week, person, day)
 
+				newState := ModifyGrid(grid, week, person, day)
+
+				returnMessage := newState + "$" + week + "$" + person + "$" + day
+
+				socketConn.WriteMessage(mt, []byte(returnMessage))
+
 			} else if cmd == "post" {
 				content := ParseBericht(string(message))
 				fmt.Println(content)
@@ -135,9 +182,6 @@ func MainRouteHandler(writer http.ResponseWriter, request *http.Request) {
 				break
 			}
 
-			
-
-			err = socketConn.WriteMessage(mt, []byte("hi"))
 		}
 
 		saveGrid(grid)
