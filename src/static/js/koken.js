@@ -4,13 +4,17 @@ var next_week_table = document.getElementsByClassName("next-week")[0];
 
 var socket_conn = new WebSocket("ws://localhost:8000/koken-ws")
 
+socket_conn.onopen = function(event) {
+	socket_conn.send("open$")
+}
+
 socket_conn.onmessage = function(event) {
 
 	var message = event.data
-
 	var arr = message.split("$")
 
-	var state, week, person, day;
+	var state = arr[0]
+	var week, person, day;
 	
 	[state, week, person, day] = arr
 
@@ -19,12 +23,10 @@ socket_conn.onmessage = function(event) {
 	if (state == "E") { state = " " }
 
 	var week_table = document.getElementsByClassName(week + "-week")[0]
-
-
-
 	var element = week_table.getElementsByClassName(day)[0].getElementsByClassName(person)[0]
 
 	element.innerHTML = state;
+
 	
 }
 

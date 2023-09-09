@@ -185,6 +185,27 @@ func MainRouteHandler(writer http.ResponseWriter, request *http.Request) {
 				content := ParseBericht(string(message))
 				fmt.Println(content)
 
+			} else if cmd == "open" {
+				
+				for i := 0; i < len(grid); i++ {
+					for j := 0; j < len(grid[i]); j++ {
+
+						week := "next"
+						
+						if i < 7 {
+							week = "current"
+						}
+						
+						person := personList[j]
+						day := dayList[i % 7]
+
+						message := grid[i][j] + "$" + week + "$" + person + "$" + day
+
+						socketConn.WriteMessage(websocket.TextMessage, []byte(message))
+					}
+				}
+
+
 			}
 
 			if err != nil {
