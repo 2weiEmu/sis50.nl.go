@@ -35,14 +35,16 @@ func main() {
 func saveGrid(grid [][]string) {
 	_ = os.Truncate("./src/resources/grid", 0)
 
-	file, err := os.Open("./src/resources/grid")
+	file, err := os.OpenFile("./src/resources/grid", os.O_WRONLY, os.ModeAppend)
+
+	defer file.Close()
 
 	if err != nil {
 		fmt.Println("failed to open save file")
 	}
 
 	for _, arr := range grid {
-		_, err := file.WriteString(strings.Join(arr, "") + "\n")
+		_, err := file.WriteString(strings.Join(arr, ",") + "\n")
 
 		if err != nil {
 			log.Fatal("failed writing line with error", err)
