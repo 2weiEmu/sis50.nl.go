@@ -3,49 +3,38 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"net/http"
 )
 
+
 func main() {
-    fmt.Println("Starting the server...")
+	
 
-    deployFlag := flag.Bool("deploy", false, "Set the deployment mode with -deploy.")
+	var deployFlag = flag.Bool("deploy", false, "Enable the -deploy flag to actually deploy the server.")
 
-    flag.Parse()
+	flag.Parse()
 
-    http.HandleFunc("/", MainRouteHandler)
+	http.HandleFunc("/", MainRouteHandler)
 
-    var err error
-
-    if !*deployFlag {
-        err = http.ListenAndServe(":8000", nil)
-
-    } else {
-        err = http.ListenAndServe(":80", nil)
-
-    }
-
-    if err != nil {
-        log.Fatal("Something crashed with err...", err)
-    }
+	if *deployFlag {
+		http.ListenAndServe(":80", nil)
+	} else {
+		http.ListenAndServe(":8000", nil)
+	}
 }
 
 func MainRouteHandler(writer http.ResponseWriter, request *http.Request) {
 
-    requestPath := request.URL.Path	
+	var path = request.URL.Path
 
-	if requestPath == "/" {
+	fmt.Println("path:", path)
 
+	if path == "/" {
 		http.Redirect(writer, request, "/koken", http.StatusSeeOther)
-	} else if requestPath == "/koken" || requestPath == "/bericht" || requestPath == "/comic" || requestPath == "/winkel" {
-
-		http.ServeFile(writer, request, "src/static/templates" + requestPath + ".html")
-
-		fmt.Println("Serving src/static/templates" + requestPath + ".html")
-	} else if requestPath == "/css/index.css" {
-		http.ServeFile(writer, request, "src/static/css/index.css")
-		fmt.Println("Serving index.css")
-
+	} else if path == "/koken" || path == "/winkel" {
+		http.ServeFile(writer, request, "./src/static/templates" + path + ".html")
+	} else if path == "/js/koken.js" {
+		http.ServeFile(writer, request, "./src/static/js/koken.js")
 	}
+
 }

@@ -2,24 +2,29 @@
 
 <html>
 
+
 	<head>
-		<link rel="stylesheet" type="text/css" href="css/index.css">
+		<link rel="stylesheet" type="text/css" href="/css/index.css"> <!-- TODO: -->
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	</head>
 
-
 	<body>
+		<div id="header">
+			<a href="/koken">koken</a>
+			<a href="/winkel">winkel</a>
+		</div>
 
-		<nav>
-			<div><a href="koken">koken</a></div>
-			<div><a href="winkel">winkel</a></div>
-			<div><a href="comic">comic</a></div>
-			<div><a href="bericht">bericht</a></div>
-		</nav>
-
-		<div class="separator"></div>
-
-		<h1>Nodig</h1>
-
+		<div id="shopping-container">
+			<h1>nodig</h1>
+			<div id="item-enter-container">
+				<input id="item-enter" placeholder="enter new item..."></input>
+				<button>enter</button>
+			</div>
+			<div id="list-container">
+			</div>
+		</div>
 	</body>
 </html>
+
+
+<script src="/js/koken.js"></script>
