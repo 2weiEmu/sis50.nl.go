@@ -20,7 +20,6 @@ var dayList = []string {"mandaag", "dinsdag", "woensdag", "dondersdag", "vrijdag
 var gridStates = []string {"E", "X", "O", "?"} 
 
 var upgrader = websocket.Upgrader{}
-
 var socketPool []*websocket.Conn;
 
 func main() {

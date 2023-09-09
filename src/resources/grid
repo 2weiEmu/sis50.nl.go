@@ -1,8 +1,8 @@
-X,E,X,E
-X,O,O,X
-X,O,O,X
+X,E,O,X
+X,O,?,O
+X,O,?,?
 E,E,X,X
-X,?,O,O
+X,?,O,?
 X,X,X,O
 E,E,E,E
 E,E,E,E
