@@ -6,14 +6,15 @@ This is a simple site created for the house Sis50 in the netherlands to coordina
 
 ## Features
 
-- [ ] Weekly Cooking Table for each Weekday
-    - [ ] Has four options for what people have one that 
-        - [ ] You can switch between options simply by clicking
+- [x] Weekly Cooking Table for each Weekday
+    - [x] Has four options for what people have one that 
+        - [x] You can switch between options simply by clicking
+        - [ ] May add annotations for extra things that should happen
+        - [ ] Should be able to set specific meal (that can call up a recipe)
     - [ ] That resets at the end of every week
     - [ ] People have the ability to add small annotations to each day in case of special occurences
-    - [ ] People can easily indicate if extra people will be eating at the house
     - [ ] A small recipe section where people can pull up recipes of what will be cooked today if wanted
-    - [ ] A next week calendar, where people can pre-plan / show when they are available next week
+    - [x] A next week calendar, where people can pre-plan / show when they are available next week
         - [ ] Automatic switching, so that the next-week schedule becomes the current weeks'
 - [ ] Simple Shopping list 
     - [ ] Ability to add items to the shopping list
