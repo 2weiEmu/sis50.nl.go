@@ -130,6 +130,14 @@ func findIndex(arr []string, s string) int {
 	return -1
 }
 
+func Broadcast(message string) {
+
+	for _, socket := range socketPool {
+		socket.WriteMessage(websocket.TextMessage, []byte(message))
+	}
+
+}
+
 
 func MainRouteHandler(writer http.ResponseWriter, request *http.Request) {
 
@@ -157,7 +165,7 @@ func MainRouteHandler(writer http.ResponseWriter, request *http.Request) {
 
 
 		for {
-			mt, message, err := socketConn.ReadMessage()
+			_, message, err := socketConn.ReadMessage()
 
 			cmd := GetCmd(string(message))
 
@@ -169,7 +177,9 @@ func MainRouteHandler(writer http.ResponseWriter, request *http.Request) {
 
 				returnMessage := newState + "$" + week + "$" + person + "$" + day
 
-				socketConn.WriteMessage(mt, []byte(returnMessage))
+				// socketConn.WriteMessage(websocket.TextMessage, []byte(returnMessage))
+
+				Broadcast(returnMessage)
 
 			} else if cmd == "post" {
 				content := ParseBericht(string(message))
