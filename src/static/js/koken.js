@@ -34,24 +34,30 @@ socket_conn.onmessage = function(event) {
 }
 
 current_week_table.addEventListener("mousedown", function(ev) {
+	send_day_toggle(ev, "current")
+})
 
-	var target = ev.target
-	var person = ev.target.className
-	var day = ev.target.parentNode.className
+next_week_table.addEventListener("mousedown", function(ev) {
+	send_day_toggle(ev, "next")
+})
 
-	console.log(ev.button)
+function send_day_toggle(event, week) {
+
+	// var target = event.target
+	var person = event.target.className
+	var day = event.target.parentNode.className
 
 
-	if (ev.button != 0) { return }
+	if (event.button != 0) { return }
 
 	if (people.indexOf(person) == -1 || days.indexOf(day) == -1) {
 		return
 	} else {
 		console.log(person, day)
-		socket_conn.send("toggle$current$" + person + "$" + day)
+		socket_conn.send("toggle$" + week + "$" + person + "$" + day)
 	}
 
-})
+}
 
 document.addEventListener("keyup", function(ev) {
 	if (ev.key == "Escape") {
@@ -148,19 +154,3 @@ function getRelevantTableElement(week, person, day) {
 }
 
 
-next_week_table.addEventListener("mousedown", function(ev) {
-
-	var target = ev.target
-	var person = ev.target.className
-	var day = ev.target.parentNode.className
-
-
-	if (ev.button != 0) { return }
-
-	if (people.indexOf(person) == -1 || days.indexOf(day) == -1) {
-		return
-	} else {
-		console.log(person, day)
-		socket_conn.send("toggle$current$" + person + "$" + day)
-	}
-})
