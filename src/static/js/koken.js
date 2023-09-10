@@ -124,6 +124,22 @@ function add_new_note(name) {
 
 }
 
+function toggle_admin_panel(element) {
+	var display = element.parentNode.children[1].style.display
+
+	element.parentNode.children[1].style.display = display == "none" ? "flex" : "none"
+
+	console.log("toggled admin panel")
+}
+
+function remove_note() {
+
+}
+
+function edit_note() {
+
+}
+
 function getRelevantTableElement(week, person, day) {
 	var week_table = document.getElementsByClassName(week + "-week")[0]
 	var element = week_table.getElementsByClassName(day)[0].getElementsByClassName(person)[0]

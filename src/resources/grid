@@ -1,9 +1,9 @@
 X,E,O,X
 X,O,?,?
 X,O,?,O
-E,E,X,E
+E,E,X,O
 X,?,O,?
-X,X,X,O
+X,E,X,O
 E,E,E,E
 E,E,E,E
 E,E,X,E
