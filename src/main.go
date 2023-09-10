@@ -20,7 +20,10 @@ var dayList = []string {"mandaag", "dinsdag", "woensdag", "dondersdag", "vrijdag
 var gridStates = []string {"E", "X", "O", "?"} 
 
 var upgrader = websocket.Upgrader{}
-var socketPool []*websocket.Conn;
+var socketPool []*websocket.Conn
+
+var noteList []Note = loadNotes()
+
 
 func main() {
 	
@@ -43,11 +46,11 @@ func saveGrid(grid [][]string) {
 
 	file, err := os.OpenFile("./src/resources/grid", os.O_WRONLY, os.ModeAppend)
 
-	defer file.Close()
-
 	if err != nil {
 		fmt.Println("failed to open save file")
 	}
+
+	defer file.Close()
 
 	for _, arr := range grid {
 		_, err := file.WriteString(strings.Join(arr, ",") + "\n")
@@ -174,13 +177,20 @@ func MainRouteHandler(writer http.ResponseWriter, request *http.Request) {
 
 				newState := ModifyGrid(grid, week, person, day)
 
-				returnMessage := newState + "$" + week + "$" + person + "$" + day
+				returnMessage := "toggle$" + newState + "$" + week + "$" + person + "$" + day
 
 				// socketConn.WriteMessage(websocket.TextMessage, []byte(returnMessage))
 
 				Broadcast(returnMessage)
 
+			} else if cmd == "addnote" {
+				addedNote := ParseNote(string(message))
+				noteList = append(noteList, addedNote)
+
+				Broadcast(string(message))
+
 			} else if cmd == "post" {
+				// TODO: make bericht do something
 				content := ParseBericht(string(message))
 				fmt.Println(content)
 
@@ -198,10 +208,17 @@ func MainRouteHandler(writer http.ResponseWriter, request *http.Request) {
 						person := personList[j]
 						day := dayList[i % 7]
 
-						message := grid[i][j] + "$" + week + "$" + person + "$" + day
+						message := "toggle$" + grid[i][j] + "$" + week + "$" + person + "$" + day
 
 						socketConn.WriteMessage(websocket.TextMessage, []byte(message))
 					}
+				}
+
+				for _, note := range noteList {
+
+					message := "addnote$" + note.Content + "$" + note.Week + "$" + note.Person + "$" + note.Day
+
+					socketConn.WriteMessage(websocket.TextMessage, []byte(message))
 				}
 
 
@@ -214,6 +231,7 @@ func MainRouteHandler(writer http.ResponseWriter, request *http.Request) {
 
 		}
 
+		saveNotes(noteList)
 		saveGrid(grid)
 
 	}

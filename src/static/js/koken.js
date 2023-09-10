@@ -1,4 +1,3 @@
-
 var current_week_table = document.getElementsByClassName("current-week")[0];
 var next_week_table = document.getElementsByClassName("next-week")[0];
 
@@ -7,32 +6,68 @@ var days = ["mandaag", "dinsdag", "woensdag", "dondersdag", "vrijdag", "zaterdag
 
 var socket_conn = new WebSocket("ws://localhost:8000/koken-ws")
 
+var custom_context = document.getElementById("custom-context-menu")
+var add_note_button = document.getElementById("add-note-button")
+
+// websocket handling
 socket_conn.onopen = function(event) {
 	socket_conn.send("open$")
 }
 
 socket_conn.onmessage = function(event) {
-
+	console.log("event.data:", event.data)
 	var message = event.data
-	var arr = message.split("$")
 
-	var state = arr[0]
-	var week, person, day;
-	
-	[state, week, person, day] = arr
+	var command = get_command(message)
 
-	console.log(state, week, person, day)
+	if (command == "toggle") {
+		var arr = message.split("$")
 
-	if (state == "E") { state = "_" }
+		var state = arr[1]
+		var e, week, person, day;
+		
+		[e, state, week, person, day] = arr
 
-	var element = getRelevantTableElement(week, person, day)
+		console.log(state, week, person, day)
 
-	// for now we jankily replace the first character, as that is the only thing that should have to change
-	element.innerHTML = state + element.innerHTML.slice(1)
+		if (state == "E") { state = "_" }
 
-	
+		var element = getRelevantTableElement(week, person, day)
+
+		// for now we jankily replace the first character, as that is the only thing that should have to change
+		element.innerHTML = state + element.innerHTML.slice(1)
+
+	} else if (command == "addnote") {
+		var arr = message.split("$")	
+
+		var content, week, person, day
+
+		[_, content, week, person, day] = arr
+
+		var element = getRelevantTableElement(week, person, day)
+
+		// TODO: this can definitely be improved
+		element.innerHTML += `<div class="note">
+								<div class="main-note" onclick="revealNote(this)">
+									<div class="note-container" style="display: none;">
+										<div class="note-content">${content}</div>
+									</div>
+								</div>
+								<div class="note-close-button" style="display: none;" onclick="closeNote(this)">X</div>
+							  </div>`
+		
+
+	} else if (command == "post") {
+
+	}
+
 }
 
+function get_command(message) {
+	return message.split("$")[0]
+}
+
+// day toggling mechanisms
 current_week_table.addEventListener("mousedown", function(ev) {
 	send_day_toggle(ev, "current")
 })
@@ -59,25 +94,25 @@ function send_day_toggle(event, week) {
 
 }
 
+
+// key bindings
 document.addEventListener("keyup", function(ev) {
 	if (ev.key == "Escape") {
 		console.log("escape key pressed")
-		context_menu.style.display = "none"
+		custom_context.style.display = "none"
 	}
 })
 
-var context_menu = document.getElementById("custom-context-menu")
-var add_note_button = document.getElementById("add-note-button")
-
+// context menu
 current_week_table.addEventListener("contextmenu", function(ev) { // TODO: make the same for next week
 	ev.preventDefault()
 
 	console.log(ev.clientX);
 	console.log(ev.clientY);
 
-	context_menu.style.top = ev.clientY + "px"
-	context_menu.style.left = ev.clientX + "px"
-	context_menu.style.display = "inline-block";
+	custom_context.style.top = ev.clientY + "px"
+	custom_context.style.left = ev.clientX + "px"
+	custom_context.style.display = "inline-block";
 	
 	var person = ev.target.className
 	var day = ev.target.parentNode.className
@@ -87,6 +122,8 @@ current_week_table.addEventListener("contextmenu", function(ev) { // TODO: make 
 
 })
 
+
+// note handling
 function revealNote(element) {
 	element.children[0].style.display = "inline-block"
 
@@ -109,33 +146,15 @@ function add_new_note(name) {
 	[week, name, day] = name.split("$")
 
 	if (week == "" || name == "" || day == "") {
+		custom_context.style.display = "none"
 		return
 	}
 
 	console.log(week, name, day)
 
-	var element = getRelevantTableElement(week, name, day)
+	custom_context.style.display = "none"
 
-	// TODO: this can definitely be improved
-	element.innerHTML += `<div class="note">
-							<div class="main-note" onclick="revealNote(this)">
-								<div class="note-container" style="display: none;">
-									<div class="note-content">${new_note}</div>
-								</div>
-							</div>
-							<div class="note-close-button" style="display: none;" onclick="closeNote(this)">X</div>
-						  </div>`
-
-	context_menu.style.display = "none"
-
-}
-
-function toggle_admin_panel(element) {
-	var display = element.parentNode.children[1].style.display
-
-	element.parentNode.children[1].style.display = display == "none" ? "flex" : "none"
-
-	console.log("toggled admin panel")
+	socket_conn.send("addnote$" + new_note + "$" + week + "$" + name + "$" + day)
 }
 
 function remove_note() {
@@ -146,6 +165,16 @@ function edit_note() {
 
 }
 
+// admin panel
+function toggle_admin_panel(element) {
+	var display = element.parentNode.children[1].style.display
+
+	element.parentNode.children[1].style.display = display == "none" ? "flex" : "none"
+
+	console.log("toggled admin panel")
+}
+
+// utility
 function getRelevantTableElement(week, person, day) {
 	var week_table = document.getElementsByClassName(week + "-week")[0]
 	var element = week_table.getElementsByClassName(day)[0].getElementsByClassName(person)[0]

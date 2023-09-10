@@ -45,3 +45,20 @@ This is a simple site created for the house Sis50 in the netherlands to coordina
 
 
 ## Technical Information
+
+### Interacting with Websockets
+
+> note that currently websockets simply just send strings separated using $, this will eventually be replaced simply with JSON
+
+structure of a websocket request is as follows:
+
+COMMAND$further information...
+
+available commands and the further structure are:
+
+- toggle
+    - toggle$(state$)week$person$day
+- addnote
+    - addnote$content$week$person$day
+- post
+    - post$content

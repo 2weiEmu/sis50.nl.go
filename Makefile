@@ -1,2 +1,4 @@
-run: src/main.go
-	@go run src/main.go 
+objects = src/main.go src/notes.go
+
+run: $(objects)
+	@go run $(objects)
