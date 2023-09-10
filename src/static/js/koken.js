@@ -23,11 +23,12 @@ socket_conn.onmessage = function(event) {
 
 	console.log(state, week, person, day)
 
-	if (state == "E") { state = " " }
+	if (state == "E") { state = "_" }
 
 	var element = getRelevantTableElement(week, person, day)
 
-	element.innerHTML = state;
+	// for now we jankily replace the first character, as that is the only thing that should have to change
+	element.innerHTML = state + element.innerHTML.slice(1)
 
 	
 }
@@ -80,6 +81,17 @@ current_week_table.addEventListener("contextmenu", function(ev) { // TODO: make 
 
 })
 
+function revealNote(element) {
+	element.children[0].style.display = "inline-block"
+
+	element.parentNode.children[1].style.display = "inline-block"
+}
+
+function closeNote(element) {
+	element.parentNode.children[0].children[0].style.display = "none"
+	element.style.display = "none"
+}
+
 
 function add_new_note(name) {
 	console.log("added new note")
@@ -95,6 +107,18 @@ function add_new_note(name) {
 	}
 
 	console.log(week, name, day)
+
+	var element = getRelevantTableElement(week, name, day)
+
+	// TODO: this can definitely be improved
+	element.innerHTML += `<div class="note">
+							<div class="main-note" onclick="revealNote(this)">
+								<div class="note-container" style="display: none;">
+									<div class="note-content">${new_note}</div>
+								</div>
+							</div>
+							<div class="note-close-button" style="display: none;" onclick="closeNote(this)">X</div>
+						  </div>`
 
 	context_menu.style.display = "none"
 

@@ -9,7 +9,9 @@ This is a simple site created for the house Sis50 in the netherlands to coordina
 - [x] Weekly Cooking Table for each Weekday
     - [x] Has four options for what people have one that 
         - [x] You can switch between options simply by clicking
-        - [ ] May add annotations for extra things that should happen
+        - [x] May add annotations for extra things that should happen
+            - [ ] Should be able to edit these annotations
+            - [ ] Should be synced between users
         - [ ] Should be able to set specific meal (that can call up a recipe)
     - [ ] That resets at the end of every week
     - [ ] People have the ability to add small annotations to each day in case of special occurences
