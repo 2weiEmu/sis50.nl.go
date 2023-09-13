@@ -140,6 +140,10 @@ func Broadcast(message string) {
 
 }
 
+func RemoveIndex(list []Note, index int) []Note {
+    return append(list[:index], list[index+1:]...)
+}
+
 
 func MainRouteHandler(writer http.ResponseWriter, request *http.Request) {
 
@@ -186,6 +190,21 @@ func MainRouteHandler(writer http.ResponseWriter, request *http.Request) {
 			} else if cmd == "addnote" {
 				addedNote := ParseNote(string(message))
 				noteList = append(noteList, addedNote)
+
+				Broadcast(string(message))
+			} else if cmd == "deletenote" {
+				deletedNote := ParseNote(string(message))
+
+				removeIndex := -1
+
+				for x, note := range noteList {
+					if note == deletedNote {
+						removeIndex = x 
+						break
+					}
+				}
+
+				noteList = RemoveIndex(noteList, removeIndex)
 
 				Broadcast(string(message))
 

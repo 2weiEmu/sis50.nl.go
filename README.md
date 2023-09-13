@@ -58,7 +58,7 @@ available commands and the further structure are:
 
 - toggle
     - toggle$(state$)week$person$day
-- addnote
+- addnote / deletenote
     - addnote$content$week$person$day
 - post
     - post$content

@@ -8,6 +8,7 @@ var socket_conn = new WebSocket("ws://localhost:8000/koken-ws")
 
 var custom_context = document.getElementById("custom-context-menu")
 var add_note_button = document.getElementById("add-note-button")
+var delete_note_button = document.getElementById("remove-note-button")
 
 // websocket handling
 socket_conn.onopen = function(event) {
@@ -57,8 +58,27 @@ socket_conn.onmessage = function(event) {
 							  </div>`
 		
 
-	} else if (command == "post") {
+	} else if (command == "deletenote") {
+		var arr = message.split("$")	
 
+		var content, week, person, day
+
+		[_, content, week, person, day] = arr
+
+		var element = getRelevantTableElement(week, person, day)
+
+		var localNoteList = element.children.getElementsByClassName("note-content")
+
+		var removeNode
+
+		for (var i = 0; i < localNoteList.length; i++) {
+			if (localNoteList[i].innerHTML == content) {
+				removeNode = localNoteList[i]
+				break
+			}
+		}
+
+		element.removeChild(removeNode)
 	}
 
 }
@@ -119,6 +139,7 @@ current_week_table.addEventListener("contextmenu", function(ev) { // TODO: make 
 
 	console.log(person, day)
 	add_note_button.setAttribute("name", "current$" + person + "$" + day)
+	delete_note_button.setAttribute("name", "current$" + person + "$" + day)
 
 })
 
@@ -157,12 +178,30 @@ function add_new_note(name) {
 	socket_conn.send("addnote$" + new_note + "$" + week + "$" + name + "$" + day)
 }
 
-function remove_note() {
-
+function edit_note(name) {
+	// remove note then add note
 }
 
-function edit_note() {
+function delete_note(name) {
+	console.log("deleting note...")
 
+	var week, person, day;
+	[week, person, day] = name.split("$")
+
+	if (week == "" || person == "" || day == "") {
+		custom_context.style.display = "none"
+		console.log("remove note:", week, person, day)
+		console.log("invalid, aborting")
+		return
+	}
+
+	console.log("remove note:", week, person, day)
+
+	custom_context.style.display = "none"
+
+	var new_note = getRelevantTableElement(week, person, day).innerHTML
+
+	socket_conn.send("deletenote$" + new_note + "$" + week + "$" + person + "$" + day)
 }
 
 // admin panel
