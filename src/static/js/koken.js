@@ -14,7 +14,7 @@ var add_note_button = document.getElementById("add-note-button")
 var delete_note_button = document.getElementById("remove-note-button")
 
 // websocket handling
-socket_conn.onopen = function(event) {
+socket_conn.onopen = function() {
 	socket_conn.send(JSON.stringify({
 		command: "open"
 	}))
@@ -42,6 +42,7 @@ socket_conn.onmessage = function(event) {
 
 		// TODO: this can definitely be improved
 		// we have definitely reached the point where an ID would be easier
+		// we need to safely construct this message using javascript elements, instead of just a raw string
 		element.innerHTML += `<div class="note"> 
 								<div class="main-note" name="${message.week}$${message.day}$${message.person}" onclick="revealNote(this)">
 									<div class="note-container" style="display: none;">
@@ -146,89 +147,14 @@ current_week_table.addEventListener("contextmenu", function(ev) { // TODO: make 
 
 })
 
-
-// note handling
-function revealNote(element) {
-	element.children[0].style.display = "inline-block"
-
-	element.parentNode.children[1].style.display = "inline-block"
-}
-
-function closeNote(element) {
-	element.parentNode.children[0].children[0].style.display = "none"
-	element.style.display = "none"
-}
-
-
-function add_new_note(name) {
-	console.log("added new note")
-
-	var new_note = prompt("What should the note say")
-
-	var week, name, day;
-
-	[week, name, day] = name.split("$")
-
-	if (week == "" || name == "" || day == "") {
-		custom_context.style.display = "none"
-		return
-	}
-
-	console.log(week, name, day)
-
-	custom_context.style.display = "none"
-
-	socket_conn.send(JSON.stringify({
-		command: "addnote",
-		currentState: new_note,
-		week: week,
-		person: name,
-		day: day
-	}))
-}
-
-function edit_note(name) {
-	// remove note then add note
-}
-
-function delete_note(name) {
-	console.log("deleting note...")
-
-	var week, person, day;
-	[week, person, day] = name.split("$")
-
-	if (week == "" || person == "" || day == "") {
-		custom_context.style.display = "none"
-		console.log("remove note:", week, person, day)
-		console.log("invalid, aborting")
-		return
-	}
-
-	console.log("remove note:", week, person, day)
-
-	custom_context.style.display = "none"
-
-	var new_note = helper.getRelevantTableElement(week, person, day).innerHTML
-
-
-	socket_conn.send(JSON.stringify({
-		command: "deletenote",
-		currentState: new_note,
-		week: week,
-		person: person,
-		day: day
-	}))
-}
-
 // admin panel
-function toggle_admin_panel(element) {
-	var display = element.parentNode.children[1].style.display
+var admin_panel_toggle = document.getElementById("admin-panel-toggle")
+admin_panel_toggle.addEventListener("click", toggle_admin_panel)
 
-	element.parentNode.children[1].style.display = display == "none" ? "flex" : "none"
+function toggle_admin_panel() {
 
+	var display = admin_panel_toggle.parentNode.children[1].style.display
+	admin_panel_toggle.parentNode.children[1].style.display = display == "none" ? "flex" : "none"
 	console.log("toggled admin panel")
 }
-
-// utility
-
 

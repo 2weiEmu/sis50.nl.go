@@ -196,29 +196,6 @@ func MainRouteHandler(writer http.ResponseWriter, request *http.Request) {
 				}
 				Broadcast(returnM)
 
-			} else if cmd == "addnote" {
-				//addedNote := ParseNote(string(message))
-
-
-				//noteList = append(noteList, addedNote)
-
-				//Broadcast(string(message))
-			} else if cmd == "deletenote" {
-				//deletedNote := ParseNote(string(message))
-
-				removeIndex := -1
-
-				//for x, note := range noteList {
-					//if note == deletedNote {
-						//removeIndex = x 
-						//break
-					//}
-				//}
-
-				noteList = RemoveIndex(noteList, removeIndex)
-
-				//Broadcast(string(message))
-
 			} else if cmd == "post" {
 				// TODO: make bericht do something
 				//content := ParseBericht(string(message))
