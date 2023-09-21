@@ -15,34 +15,37 @@ var delete_note_button = document.getElementById("remove-note-button")
 
 // websocket handling
 socket_conn.onopen = function(event) {
-	socket_conn.send("open$")
+	socket_conn.send(JSON.stringify({
+		command: "open"
+	}))
 }
 
 socket_conn.onmessage = function(event) {
 	console.log("event.data:", event.data)
-	var message = event.data
 
-	var command = get_command(message)
+	var message = JSON.parse(event.data)
+	var command = message.command
 
 	if (command == "toggle") {
-		helper.handleToggleMessage(message)
+
+		if (message.currentState == "E" ) { 
+			message.currentState = "_" 
+		}
+
+		var element = helper.getRelevantTableElement(message.week, message.person, message.day)
+		element.innerHTML = message.currentState + element.innerHTML.slice(1)
 
 
 	} else if (command == "addnote") {
-		var arr = message.split("$")	
 
-		var e, content, week, person, day
-
-		[e, content, week, person, day] = arr
-
-		var element = helper.getRelevantTableElement(week, person, day)
+		var element = helper.getRelevantTableElement(message.week, message.person, message.day)
 
 		// TODO: this can definitely be improved
 		// we have definitely reached the point where an ID would be easier
 		element.innerHTML += `<div class="note"> 
-								<div class="main-note" name="${week}$${day}$${person}" onclick="revealNote(this)">
+								<div class="main-note" name="${message.week}$${message.day}$${message.person}" onclick="revealNote(this)">
 									<div class="note-container" style="display: none;">
-										<div class="note-content" name="${week}$${day}$${person}">${content}</div>
+										<div class="note-content" name="${message.week}$${message.day}$${message.person}">${message.currentState}</div>
 									</div>
 								</div>
 								<div class="note-close-button" style="display: none;" onclick="closeNote(this)">X</div>
@@ -100,7 +103,14 @@ function send_day_toggle(event, week) {
 		return
 	} else {
 	console.log(person, day)
-		socket_conn.send("toggle$" + week + "$" + person + "$" + day)
+		socket_conn.send(JSON.stringify({
+				command: "toggle",
+				currentState: "empty",
+				week: week,
+				person: person,
+				day: day
+			})
+		)
 	}
 
 }
@@ -168,7 +178,13 @@ function add_new_note(name) {
 
 	custom_context.style.display = "none"
 
-	socket_conn.send("addnote$" + new_note + "$" + week + "$" + name + "$" + day)
+	socket_conn.send(JSON.stringify({
+		command: "addnote",
+		currentState: new_note,
+		week: week,
+		person: name,
+		day: day
+	}))
 }
 
 function edit_note(name) {
@@ -194,7 +210,14 @@ function delete_note(name) {
 
 	var new_note = helper.getRelevantTableElement(week, person, day).innerHTML
 
-	socket_conn.send("deletenote$" + new_note + "$" + week + "$" + person + "$" + day)
+
+	socket_conn.send(JSON.stringify({
+		command: "deletenote",
+		currentState: new_note,
+		week: week,
+		person: person,
+		day: day
+	}))
 }
 
 // admin panel

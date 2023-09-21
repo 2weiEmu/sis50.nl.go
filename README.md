@@ -62,3 +62,27 @@ available commands and the further structure are:
     - addnote$content$week$person$day
 - post
     - post$content
+// gonna be making a move over to JSON right about now, so these are the new defintions: (more for self-reference)
+
+message:
+
+```json
+{
+    command: ...,
+    content: ...
+}
+```
+
+toggle:
+
+```json
+{
+    command: "toggle",
+    currentState: ("E"|"O"|"X"|"?"),
+    week: ("current"|"next"),
+    person: ("milan"| "rick"| "robert"|"youri")
+    day: ... all the days as listed above
+
+}
+```
+

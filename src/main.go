@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
@@ -24,6 +25,14 @@ var socketPool []*websocket.Conn
 
 var noteList []Note = loadNotes()
 
+
+type WSMessage struct {
+	Command string `json:"command"`
+	CurrentState string `json:"currentState"`
+	Week string `json:"week"`
+	Person string `json:"person"`
+	Day string `json:"day"`
+}
 
 func main() {
 	
@@ -132,10 +141,10 @@ func findIndex(arr []string, s string) int {
 	return -1
 }
 
-func Broadcast(message string) {
+func Broadcast(message []byte) {
 
 	for _, socket := range socketPool {
-		socket.WriteMessage(websocket.TextMessage, []byte(message))
+		socket.WriteMessage(websocket.TextMessage, message)
 	}
 
 }
@@ -172,47 +181,48 @@ func MainRouteHandler(writer http.ResponseWriter, request *http.Request) {
 
 
 		for {
-			_, message, err := socketConn.ReadMessage()
-
-			cmd := GetCmd(string(message))
+			var m WSMessage
+			socketConn.ReadJSON(&m)
+			fmt.Println(m)
+			cmd := m.Command	
 
 			if cmd == "toggle" {
-				week, person, day := ParseToggle(string(message))
-				fmt.Println(week, person, day)
+				newState := ModifyGrid(grid, m.Week, m.Person, m.Day)
+				m.CurrentState = newState
+				returnM, err := json.Marshal(m)
 
-				newState := ModifyGrid(grid, week, person, day)
-
-				returnMessage := "toggle$" + newState + "$" + week + "$" + person + "$" + day
-
-				// socketConn.WriteMessage(websocket.TextMessage, []byte(returnMessage))
-
-				Broadcast(returnMessage)
+				if err != nil {
+					// TODO:
+				}
+				Broadcast(returnM)
 
 			} else if cmd == "addnote" {
-				addedNote := ParseNote(string(message))
-				noteList = append(noteList, addedNote)
+				//addedNote := ParseNote(string(message))
 
-				Broadcast(string(message))
+
+				//noteList = append(noteList, addedNote)
+
+				//Broadcast(string(message))
 			} else if cmd == "deletenote" {
-				deletedNote := ParseNote(string(message))
+				//deletedNote := ParseNote(string(message))
 
 				removeIndex := -1
 
-				for x, note := range noteList {
-					if note == deletedNote {
-						removeIndex = x 
-						break
-					}
-				}
+				//for x, note := range noteList {
+					//if note == deletedNote {
+						//removeIndex = x 
+						//break
+					//}
+				//}
 
 				noteList = RemoveIndex(noteList, removeIndex)
 
-				Broadcast(string(message))
+				//Broadcast(string(message))
 
 			} else if cmd == "post" {
 				// TODO: make bericht do something
-				content := ParseBericht(string(message))
-				fmt.Println(content)
+				//content := ParseBericht(string(message))
+				//fmt.Println(content)
 
 			} else if cmd == "open" {
 				
@@ -228,17 +238,42 @@ func MainRouteHandler(writer http.ResponseWriter, request *http.Request) {
 						person := personList[j]
 						day := dayList[i % 7]
 
-						message := "toggle$" + grid[i][j] + "$" + week + "$" + person + "$" + day
+						n := WSMessage {
+							Command: "toggle",
+							CurrentState: grid[i][j],
+							Week: week,
+							Person: person,
+							Day: day,
+						}
+						
+						message, err := json.Marshal(n)
 
-						socketConn.WriteMessage(websocket.TextMessage, []byte(message))
+						if err != nil {
+							// TODO
+						}
+
+						socketConn.WriteMessage(websocket.TextMessage, message)
+
 					}
 				}
 
 				for _, note := range noteList {
 
-					message := "addnote$" + note.Content + "$" + note.Week + "$" + note.Person + "$" + note.Day
+					n := WSMessage {
+						Command: "addnote",
+						CurrentState: note.Content,
+						Week: note.Week,
+						Person: note.Person,
+						Day: note.Day,
+					}
 
-					socketConn.WriteMessage(websocket.TextMessage, []byte(message))
+					message, err := json.Marshal(n)
+
+					if err != nil {
+						// TODO
+					}
+
+					socketConn.WriteMessage(websocket.TextMessage, message)
 				}
 
 
