@@ -1,3 +1,6 @@
+import * as helper from "./koken-helper.js" 
+
+// variables
 var current_week_table = document.getElementsByClassName("current-week")[0];
 var next_week_table = document.getElementsByClassName("next-week")[0];
 
@@ -22,36 +25,24 @@ socket_conn.onmessage = function(event) {
 	var command = get_command(message)
 
 	if (command == "toggle") {
-		var arr = message.split("$")
+		helper.handleToggleMessage(message)
 
-		var state = arr[1]
-		var e, week, person, day;
-		
-		[e, state, week, person, day] = arr
-
-		console.log(state, week, person, day)
-
-		if (state == "E") { state = "_" }
-
-		var element = getRelevantTableElement(week, person, day)
-
-		// for now we jankily replace the first character, as that is the only thing that should have to change
-		element.innerHTML = state + element.innerHTML.slice(1)
 
 	} else if (command == "addnote") {
 		var arr = message.split("$")	
 
-		var content, week, person, day
+		var e, content, week, person, day
 
-		[_, content, week, person, day] = arr
+		[e, content, week, person, day] = arr
 
-		var element = getRelevantTableElement(week, person, day)
+		var element = helper.getRelevantTableElement(week, person, day)
 
 		// TODO: this can definitely be improved
-		element.innerHTML += `<div class="note">
-								<div class="main-note" onclick="revealNote(this)">
+		// we have definitely reached the point where an ID would be easier
+		element.innerHTML += `<div class="note"> 
+								<div class="main-note" name="${week}$${day}$${person}" onclick="revealNote(this)">
 									<div class="note-container" style="display: none;">
-										<div class="note-content">${content}</div>
+										<div class="note-content" name="${week}$${day}$${person}">${content}</div>
 									</div>
 								</div>
 								<div class="note-close-button" style="display: none;" onclick="closeNote(this)">X</div>
@@ -65,7 +56,7 @@ socket_conn.onmessage = function(event) {
 
 		[_, content, week, person, day] = arr
 
-		var element = getRelevantTableElement(week, person, day)
+		var element = helper.getRelevantTableElement(week, person, day)
 
 		var localNoteList = element.children.getElementsByClassName("note-content")
 
@@ -108,7 +99,7 @@ function send_day_toggle(event, week) {
 	if (people.indexOf(person) == -1 || days.indexOf(day) == -1) {
 		return
 	} else {
-		console.log(person, day)
+	console.log(person, day)
 		socket_conn.send("toggle$" + week + "$" + person + "$" + day)
 	}
 
@@ -137,9 +128,11 @@ current_week_table.addEventListener("contextmenu", function(ev) { // TODO: make 
 	var person = ev.target.className
 	var day = ev.target.parentNode.className
 
+	var delete_name = ev.target.name
+
 	console.log(person, day)
 	add_note_button.setAttribute("name", "current$" + person + "$" + day)
-	delete_note_button.setAttribute("name", "current$" + person + "$" + day)
+	delete_note_button.setAttribute("name", delete_name)
 
 })
 
@@ -199,7 +192,7 @@ function delete_note(name) {
 
 	custom_context.style.display = "none"
 
-	var new_note = getRelevantTableElement(week, person, day).innerHTML
+	var new_note = helper.getRelevantTableElement(week, person, day).innerHTML
 
 	socket_conn.send("deletenote$" + new_note + "$" + week + "$" + person + "$" + day)
 }
@@ -214,11 +207,5 @@ function toggle_admin_panel(element) {
 }
 
 // utility
-function getRelevantTableElement(week, person, day) {
-	var week_table = document.getElementsByClassName(week + "-week")[0]
-	var element = week_table.getElementsByClassName(day)[0].getElementsByClassName(person)[0]
-
-	return element
-}
 
 

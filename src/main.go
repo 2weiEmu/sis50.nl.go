@@ -155,8 +155,9 @@ func MainRouteHandler(writer http.ResponseWriter, request *http.Request) {
 		http.Redirect(writer, request, "/koken", http.StatusSeeOther)
 	} else if path == "/koken" || path == "/winkel" {
 		http.ServeFile(writer, request, "./src/static/templates" + path + ".html")
-	} else if path == "/js/koken.js" {
-		http.ServeFile(writer, request, "./src/static/js/koken.js")
+	} else if path == "/js/koken.js" || path == "/js/koken-helper.js"{
+		writer.Header().Set("Content-Type", "application/javascript")
+		http.ServeFile(writer, request, "./src/static" + path)
 	} else if path == "/koken-ws" {
 
 		socketConn, err := upgrader.Upgrade(writer, request, nil)
