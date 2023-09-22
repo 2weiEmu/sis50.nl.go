@@ -108,10 +108,11 @@ func MainRouteHandler(writer http.ResponseWriter, request *http.Request) {
 				}
 				Broadcast(returnM)
 
-			} else if cmd == "post" {
+			} else if cmd == "post-bericht" {
 				// TODO: make bericht do something
 				//content := ParseBericht(string(message))
 				//fmt.Println(content)
+
 
 			} else if cmd == "open" {
 				for i := 0; i < len(grid); i++ {

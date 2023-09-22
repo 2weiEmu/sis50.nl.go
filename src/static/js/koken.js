@@ -158,3 +158,18 @@ function toggle_admin_panel() {
 	console.log("toggled admin panel")
 }
 
+// berichte
+var new_bericht_field = document.getElementById("new-bericht-field")
+var post_bericht_button = document.getElementById("post-bericht-button")
+
+post_bericht_button.addEventListener("click", postBericht)
+
+function postBericht() {
+	var bericht = new_bericht_field.value
+	new_bericht_field.value = ""
+
+	socket_conn.send(JSON.stringify({
+		command: "post-bericht",
+		currentState: bericht
+	}))
+}
