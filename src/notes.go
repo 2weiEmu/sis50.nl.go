@@ -16,6 +16,7 @@ type Note struct {
 }
 
 func loadNotes() []Note {
+	fmt.Println("loading notes...")
 	file, err := os.Open("./src/resources/notes")
 
 	if err != nil {

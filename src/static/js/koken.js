@@ -13,6 +13,8 @@ var custom_context = document.getElementById("custom-context-menu")
 var add_note_button = document.getElementById("add-note-button")
 var delete_note_button = document.getElementById("remove-note-button")
 
+var berichte_list = document.getElementById("berichte-list")
+
 // websocket handling
 socket_conn.onopen = function() {
 	socket_conn.send(JSON.stringify({
@@ -34,7 +36,13 @@ socket_conn.onmessage = function(event) {
 
 		var element = helper.getRelevantTableElement(message.week, message.person, message.day)
 		element.innerHTML = message.currentState + element.innerHTML.slice(1)
+	} else if (command == "post-bericht") {
 
+		const para = document.createElement("p")
+		para.appendChild(document.createTextNode(message.currentState))
+
+		berichte_list.prepend(para)
+		
 
 	} else if (command == "addnote") {
 
@@ -76,10 +84,6 @@ socket_conn.onmessage = function(event) {
 		element.removeChild(removeNode)
 	}
 
-}
-
-function get_command(message) {
-	return message.split("$")[0]
 }
 
 // day toggling mechanisms

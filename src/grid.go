@@ -9,6 +9,7 @@ import (
 )
 
 func loadGrid() [][]string {
+	fmt.Println("loading grid...")
 	file, err := os.Open("./src/resources/grid")
 
 	if err != nil {

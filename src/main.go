@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -8,17 +9,35 @@ import (
 	"net/http"
 
 	"github.com/gorilla/websocket"
+	"github.com/mattn/go-sqlite3"
 )
 
-var personList = []string {"rick", "youri", "robert", "milan"}
-var dayList = []string {"mandaag", "dinsdag", "woensdag", "dondersdag", "vrijdag", "zaterdag", "zondag"}
-var gridStates = []string {"E", "X", "O", "?"} 
 
-var upgrader = websocket.Upgrader{}
-var socketPool []*websocket.Conn
+var (
+	db *sql.DB 
+	sqlite3Conn sqlite3.SQLiteConn
 
-var noteList []Note = loadNotes()
-var grid = loadGrid()
+	personList = []string {"rick", "youri", "robert", "milan"}
+	dayList = []string {"mandaag", "dinsdag", "woensdag", "dondersdag", "vrijdag", "zaterdag", "zondag"}
+	gridStates = []string {"E", "X", "O", "?"} 
+
+	upgrader = websocket.Upgrader{}
+	socketPool []*websocket.Conn
+
+	noteList []Note = loadNotes()
+	grid = loadGrid()
+
+	berichte []BerichtQuery;
+
+
+	insertBerichtStatement *sql.Stmt
+	removeBerichtStatementById *sql.Stmt
+	updateGridStatement *sql.Stmt
+
+	selectAllBerichte *sql.Stmt
+	selectAllGrid *sql.Stmt
+	selectAllNotes *sql.Stmt
+)
 
 type WSMessage struct {
 	Command string `json:"command"`
@@ -28,18 +47,56 @@ type WSMessage struct {
 	Day string `json:"day"`
 }
 
+// TODO: actual logging, because that is useful
+
 func main() {
+
+	fmt.Println("starting...")
 	
 	var deployFlag = flag.Bool("deploy", false, "Enable the -deploy flag to actually deploy the server.")
-
 	flag.Parse()
+
+	var err error
+	db, err = sql.Open("sqlite3", "file:./resources/DATABASE?cache=shared")
+
+	defer db.Close()
+
+	if err != nil {
+		// TODO:
+		log.Fatal("failed to open db with error ", err)
+	}
+
+	if err = db.Ping(); err != nil {
+		log.Fatal("failed to ping db with error ", err)
+	}
+
+	// creating prepared statements
+	// insert bericht, remove bericht, change state
+	insertBerichtStatement, err = db.Prepare(`INSERT INTO berichte(content) VALUES ( ? )`)
+	removeBerichtStatementById, err = db.Prepare(`DELETE FROM berichte AS b WHERE b.id= ?`)
+	updateGridStatement, err = db.Prepare(`UPDATE days AS d SET d.state = ? WHERE week = ? AND person = ? AND day = ?`)
+
+	selectAllBerichte, err = db.Prepare(`SELECT * FROM berichte`) // TODO: would prob be fine not being a prepared statement
+	selectAllGrid, err = db.Prepare(`SELECT * FROM days`)
+	selectAllNotes, err = db.Prepare(`SELECT * FROM notes`)
+
+	defer insertBerichtStatement.Close()
+	defer removeBerichtStatementById.Close()
+	defer updateGridStatement.Close()
+	defer selectAllBerichte.Close()
+	defer selectAllGrid.Close()
+	defer selectAllNotes.Close()
+
+	berichte = GetBerichtePrepared(selectAllBerichte)
 
 	http.HandleFunc("/", MainRouteHandler)
 
 	if *deployFlag {
 		http.ListenAndServe(":80", nil)
+		fmt.Println("started http server...")
 	} else {
 		http.ListenAndServe(":8000", nil)
+		fmt.Println("started local http server...")
 	}
 
 }
@@ -109,9 +166,18 @@ func MainRouteHandler(writer http.ResponseWriter, request *http.Request) {
 				Broadcast(returnM)
 
 			} else if cmd == "post-bericht" {
-				// TODO: make bericht do something
-				//content := ParseBericht(string(message))
-				//fmt.Println(content)
+				newBericht := BerichtQuery {
+					Id: 0,
+					Content: m.CurrentState,
+				}
+
+				berichte = append(berichte, newBericht)
+				broadcast, err := json.Marshal(m)
+
+				if err != nil {
+					// TODO
+				}
+				Broadcast(broadcast)
 
 
 			} else if cmd == "open" {
@@ -154,6 +220,16 @@ func MainRouteHandler(writer http.ResponseWriter, request *http.Request) {
 					if err != nil {
 						// TODO
 					}
+					socketConn.WriteMessage(websocket.TextMessage, message)
+				}
+
+				for _, bericht := range berichte {
+					message, err := json.Marshal(bericht)
+
+					if err != nil {
+						// TODO:
+					}
+
 					socketConn.WriteMessage(websocket.TextMessage, message)
 				}
 			}

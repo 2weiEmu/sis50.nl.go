@@ -86,3 +86,30 @@ toggle:
 }
 ```
 
+### The Database
+
+
+```sql
+CREATE TABLE days (
+    week VARCHAR(8) NOT NULL,
+    person VARCHAR(16) NOT NULL,
+    day VARCHAR(16) NOT NULL,
+    state INTEGER NOT NULL,
+    PRIMARY KEY (week, person, day)
+);
+
+CREATE TABLE berichte (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    content VARCHAR(512)
+);
+
+CREATE TABLE notes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    week VARCHAR(8) NOT NULL,
+    person VARCHAR(16) NOT NULL,
+    day VARCHAR(16) NOT NULL,
+    content VARCHAR(512) NOT NULL,
+    FOREIGN KEY (week, person, day) REFERENCES days(week, person, day)
+);
+
+```
