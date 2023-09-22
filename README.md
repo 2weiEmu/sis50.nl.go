@@ -38,6 +38,8 @@ This is a simple site created for the house Sis50 in the netherlands to coordina
 
 - [ ] The ability for a user to change the background on their client side
     - [ ] This being saved
+- [ ] Ability for user to be able to remove headers (to unobstruct background)
+    - [ ] all headers should have an outline that semi-guarantee visibility on any background
 
 - [ ] Individual User authentication
     - [ ] That persists for a month

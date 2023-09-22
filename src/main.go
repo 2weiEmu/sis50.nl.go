@@ -1,5 +1,10 @@
 package main
 
+/*
+There is an idea that we can add some state thing and simply make a note a combination of a bericht and a day, but I feell ike
+while that is possible we don't need that, and it would be more work than it would be worth
+*/
+
 import (
 	"database/sql"
 	"encoding/json"

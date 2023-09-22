@@ -40,7 +40,6 @@ socket_conn.onmessage = function(event) {
 
 		const para = document.createElement("p")
 		para.appendChild(document.createTextNode(message.currentState))
-
 		berichte_list.prepend(para)
 		
 
