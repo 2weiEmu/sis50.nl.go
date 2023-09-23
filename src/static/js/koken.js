@@ -41,8 +41,21 @@ socket_conn.onmessage = function(event) {
 		const para = document.createElement("p")
 		para.appendChild(document.createTextNode(message.currentState))
 		berichte_list.prepend(para)
-		
 
+		// if there are more than 5 berichte, we must remove the most bottom one
+		// this is just part of the functionality
+		if (berichte_list.children.length > 5) {
+			socket_conn.send(JSON.stringify({
+				command: "del-bericht"
+			}))
+		}
+		
+	} else if (command == "del-bericht") {
+
+		console.log("removing bericht...")
+		var remove_child = berichte_list.childNodes[berichte_list.children.length - 1]
+		console.log(remove_child)
+		berichte_list.removeChild(remove_child)
 	} else if (command == "addnote") {
 
 		var element = helper.getRelevantTableElement(message.week, message.person, message.day)

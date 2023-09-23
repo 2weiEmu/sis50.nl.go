@@ -78,7 +78,7 @@ func main() {
 	// creating prepared statements
 	// insert bericht, remove bericht, change state
 	insertBerichtStatement, err = db.Prepare(`INSERT INTO berichte(content) VALUES ( ? )`)
-	removeBerichtStatementById, err = db.Prepare(`DELETE FROM berichte AS b WHERE b.id= ?`)
+	removeBerichtStatementById, err = db.Prepare(`DELETE FROM berichte`)
 	updateGridStatement, err = db.Prepare(`UPDATE days AS d SET d.state = ? WHERE week = ? AND person = ? AND day = ?`)
 
 	selectAllBerichte, err = db.Prepare(`SELECT * FROM berichte`) // TODO: would prob be fine not being a prepared statement
@@ -183,6 +183,17 @@ func MainRouteHandler(writer http.ResponseWriter, request *http.Request) {
 					// TODO
 				}
 				Broadcast(broadcast)
+			} else if cmd == "del-bericht" {
+
+				broadcast, err := json.Marshal(m)
+
+				if err != nil {
+					// TODO:
+				}
+
+				berichte = berichte[1:] // removing the first element from the list
+
+				Broadcast(broadcast)
 
 
 			} else if cmd == "open" {
@@ -229,7 +240,12 @@ func MainRouteHandler(writer http.ResponseWriter, request *http.Request) {
 				}
 
 				for _, bericht := range berichte {
-					message, err := json.Marshal(bericht)
+					m := WSMessage {
+						Command: "post-bericht",
+						CurrentState: bericht.Content,
+					}
+
+					message, err := json.Marshal(m)
 
 					if err != nil {
 						// TODO:
@@ -244,6 +260,8 @@ func MainRouteHandler(writer http.ResponseWriter, request *http.Request) {
 				break
 			}
 		}
+		writeBerichte(berichte)
+
 		saveNotes(noteList)
 		saveGrid(grid)
 	}
