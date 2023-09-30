@@ -40,6 +40,7 @@ This is a simple site created for the house Sis50 in the netherlands to coordina
     - [ ] This being saved
 - [ ] Ability for user to be able to remove headers (to unobstruct background)
     - [ ] all headers should have an outline that semi-guarantee visibility on any background
+- [ ] Ability for users to remove otherwise visible backgrounds from the main elements of the site
 
 - [ ] Individual User authentication
     - [ ] That persists for a month
