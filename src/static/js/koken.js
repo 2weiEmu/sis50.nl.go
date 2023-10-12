@@ -62,6 +62,8 @@ socket_conn.onmessage = function(event) {
 
 
 	} else if (command == "deletenote") {
+		remove_note_element(message.currentState)
+
 
 	}
 
@@ -85,6 +87,14 @@ function add_note(element, id, currentState) {
 }
 
 function remove_note(id) {
+
+	socket_conn.send(JSON.stringify({
+		command: "deletenote",
+		currentState: id
+	}))
+}
+
+function remove_note_element(id) {
 	var button = document.getElementById(id)
 	var div = document.getElementById(`n${id}`)
 

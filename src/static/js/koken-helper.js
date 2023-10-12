@@ -31,7 +31,7 @@ export function send_day_toggle(window, socket_conn, event, week) {
 		// present note adding interface
 		var note_content = present_note_adding(window, event.target)
 
-		if (note_content != "") {
+		if (note_content.trim() != "") {
 			socket_conn.send(JSON.stringify({
 				command: "addnote",
 				currentState: note_content,

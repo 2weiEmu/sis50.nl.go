@@ -36,6 +36,14 @@ func loadNotes(db *sql.DB) []Note {
     return result
 }
 
+func removeNoteById(db *sql.DB, id int) {
+	_, err := db.Exec(`DELETE FROM notes WHERE id = ?`, id)
+	if err != nil {
+		// TODO:
+		fmt.Println("Error here (3)...", err)
+	}
+}
+
 func saveNoteGetID(db *sql.DB, note Note) int {
 	_, err := db.Exec(`INSERT INTO notes (week, person, day, content) VALUES (?, ?, ?, ?)`, note.Week, note.Person, note.Day, note.Content)
 	if err != nil {

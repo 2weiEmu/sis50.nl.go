@@ -196,7 +196,6 @@ func MainRouteHandler(writer http.ResponseWriter, request *http.Request) {
 
 
 			} else if cmd == "addnote" {
-
 				newNote := Note {
 					m.CurrentState,
 					m.Week,
@@ -209,6 +208,19 @@ func MainRouteHandler(writer http.ResponseWriter, request *http.Request) {
 
 				// send this back to the client
 				m.OptID = strconv.Itoa(id)
+				broadcast, err := json.Marshal(m)
+				if err != nil {
+					// TODO:
+				}
+				Broadcast(broadcast)
+
+
+			} else if cmd == "deletenote" {
+				id, err := strconv.Atoi(m.CurrentState)
+				if err != nil {
+					// TODO:
+				}
+				removeNoteById(db, id)
 				broadcast, err := json.Marshal(m)
 				if err != nil {
 					// TODO:
@@ -257,6 +269,8 @@ func updateUserOnOpen(socketConn *websocket.Conn) {
 			socketConn.WriteMessage(websocket.TextMessage, message)
 		}
 	}
+
+	noteList := loadNotes(db)
 
 	for _, note := range noteList {
 		// TODO: load the notes directly from the db
