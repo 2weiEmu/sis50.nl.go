@@ -13,6 +13,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gorilla/websocket"
 	"github.com/mattn/go-sqlite3"
@@ -94,7 +95,7 @@ func main() {
 	defer selectAllGrid.Close()
 	defer selectAllNotes.Close()
 
-	berichte = GetBerichtePrepared(selectAllBerichte)
+	berichte = GetAllBerichte(db)
 
 	noteList = loadNotes(db)
 
@@ -173,16 +174,17 @@ func MainRouteHandler(writer http.ResponseWriter, request *http.Request) {
 
 
 			} else if cmd == "post-bericht" {
-				newBericht := BerichtQuery {
-					Id: 0,
-					Content: m.CurrentState,
+				bericht := BerichtQuery {
+					0,
+					m.CurrentState,
 				}
-				berichte = append(berichte, newBericht)
+				id := WriteNewBerichtGetId(db, bericht)
+				m.OptID = strconv.Itoa(id)
+				
 				broadcast, err := json.Marshal(m)
 				if err != nil {
-					// TODO
+					// TODO:
 				}
-				
 				Broadcast(broadcast)
 
 			} else if cmd == "del-bericht" {
@@ -190,8 +192,13 @@ func MainRouteHandler(writer http.ResponseWriter, request *http.Request) {
 				if err != nil {
 					// TODO:
 				}
-
-				berichte = berichte[1:] // removing the first element from the list
+	
+				str, _ := strings.CutPrefix(m.OptID, "b")
+				id, err := strconv.Atoi(str)
+				if err != nil {
+					// TODO:
+				}
+				RemoveBerichtById(db, id)
 				Broadcast(broadcast)
 
 
@@ -237,7 +244,6 @@ func MainRouteHandler(writer http.ResponseWriter, request *http.Request) {
 				break
 			}
 		}
-		WriteBerichte(berichte)
 		saveGrid(grid)
 	}
 }
@@ -290,6 +296,7 @@ func updateUserOnOpen(socketConn *websocket.Conn) {
 		socketConn.WriteMessage(websocket.TextMessage, message)
 	}
 
+	berichte := GetAllBerichte(db)
 	for _, bericht := range berichte {
 		m := WSMessage {
 			Command: "post-bericht",

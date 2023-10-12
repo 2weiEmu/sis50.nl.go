@@ -8,9 +8,6 @@ import {
 
 var socket_conn = new WebSocket("ws://localhost:8000/koken-ws")
 
-var custom_context = document.getElementById("custom-context-menu")
-var add_note_button = document.getElementById("add-note-button")
-var delete_note_button = document.getElementById("remove-note-button")
 var berichte_list = document.getElementById("berichte-list")
 
 // websocket handling
@@ -37,6 +34,7 @@ socket_conn.onmessage = function(event) {
 
 	} else if (command == "post-bericht") {
 		const para = document.createElement("p")
+		para.id = 'b' + message.optid
 		para.appendChild(document.createTextNode(message.currentState))
 		berichte_list.prepend(para)
 
@@ -44,17 +42,15 @@ socket_conn.onmessage = function(event) {
 		// this is just part of the functionality
 		if (berichte_list.children.length > 5) {
 			socket_conn.send(JSON.stringify({
-				command: "del-bericht"
+				command: "del-bericht",
+				optid: berichte_list.children[berichte_list.children.length - 1].id
 			}))
 		}
 		
 
 	} else if (command == "del-bericht") {
-		console.log("removing bericht...")
-		var remove_child = berichte_list.childNodes[berichte_list.children.length - 1]
-		console.log(remove_child)
-		berichte_list.removeChild(remove_child)
-
+		var to_remove = document.getElementById(message.optid)
+		to_remove.parentNode.removeChild(to_remove)
 
 	} else if (command == "addnote") {
 		var elem = getRelevantTableElement(message.week, message.person, message.day)	
