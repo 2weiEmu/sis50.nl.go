@@ -11,24 +11,28 @@ This is a simple site created for the house Sis50 in the Netherlands to coordina
         - [x] You can switch between options simply by clicking
         - [x] May add annotations for extra things that should happen
             - [ ] Should be able to edit these annotations
-            - [ ] Should be synced between users
+            - [x] Should be synced between users
         - [ ] Should be able to set specific meal (that can call up a recipe)
     - [ ] That resets at the end of every week
     - [ ] People have the ability to add small annotations to each day in case of special occurrences
     - [ ] A small recipe section where people can pull up recipes of what will be cooked today if wanted
     - [x] A next week calendar, where people can pre-plan / show when they are available next week
         - [ ] Automatic switching, so that the next-week schedule becomes the current weeks'
+
 - [ ] Simple Shopping list 
     - [ ] Ability to add items to the shopping list
     - [ ] Easily delete items off the shopping list
     - [ ] Edit Items on the shopping list 
         - [ ] Have this edit feature be fancy
+
 - [ ] Small Mini-game
+
 - [ ] Daily Comic
     - [ ] Have the server decide on a daily comic (XKCD)
         - [ ] Transfer this comics title and link to the original
-- [ ] Small Announcement Section
-    - [ ] Max limit of 5 announcements, the oldest one gets discarded
+
+- [x] Small Announcement Section
+    - [x] Max limit of 5 announcements, the oldest one gets discarded
 
 - [ ] Input sanitization
 - [ ] A dark mode theme with automatic detection as well
