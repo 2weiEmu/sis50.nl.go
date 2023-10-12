@@ -1,11 +1,8 @@
 package main
 
 import (
-	"bufio"
+	"database/sql"
 	"fmt"
-	"log"
-	"os"
-	"strings"
 )
 
 type Note struct {
@@ -13,79 +10,50 @@ type Note struct {
 	Week string;
 	Day string;
 	Person string;
+	Id string
 }
 
-func loadNotes() []Note {
-	fmt.Println("loading notes...")
-	file, err := os.Open("./src/resources/notes")
+func loadNotes(db *sql.DB) []Note {
+    rows, err := db.Query(`SELECT * FROM notes`)
+    defer rows.Close()
 
-	if err != nil {
-		log.Fatal("Failed to load notes with error", err)
-	}
+    if err != nil {
+        fmt.Println("Prepared statement failed to execute with error:", err)
+		return nil
+    }
+    var result []Note;
 
-	defer file.Close()
+    for rows.Next() {
+        var note Note;
+        err = rows.Scan(&note.Id, &note.Week, &note.Person, &note.Day, &note.Content)
 
-	var result []Note;
-
-	scanner := bufio.NewScanner(file)
-
-	for scanner.Scan() {
-		line := scanner.Text()
-
-		note := ParseNote(line)
-
-		result = append(result, note)
-	}
-
-	fmt.Println(result)
-
-	return result
+        if err != nil {
+            fmt.Println("Failed to retrieve row:", rows, "With the error:", err)
+			return nil
+        }
+        result = append(result, note)
+    }
+    return result
 }
 
-func saveNotes(notes []Note) {
-
-	err := os.Truncate(".src/resource/notes", 0)
-
+func saveNoteGetID(db *sql.DB, note Note) int {
+	_, err := db.Exec(`INSERT INTO notes (week, person, day, content) VALUES (?, ?, ?, ?)`, note.Week, note.Person, note.Day, note.Content)
 	if err != nil {
 		// TODO:
+		fmt.Println("Error here (1)...", err)
 	}
 
-	file, err := os.OpenFile("./src/resources/notes", os.O_WRONLY, os.ModeAppend)
-
+	// this is by far not optimal
+	row, err := db.Query(`SELECT id FROM notes WHERE week = ? AND person = ? AND day = ? AND content = ?`, note.Week, note.Person, note.Day, note.Content)
+	defer row.Close()
 	if err != nil {
-		fmt.Println("failed to open save file...")
+		// TODO:
+		fmt.Println("Error here (2)...", err)
 	}
+	row.Next()
 
-	defer file.Close()
+	var result int
+	row.Scan(&result)
+	return result
 
-	for _, note := range notes {
-
-		_, err := file.WriteString(NoteString(note))
-
-		if err != nil {
-			fmt.Println("failed writling line with error", err)
-
-		}
-	}
-
-	fmt.Println("finished saving notes to file")
-}
-
-func NoteString(note Note) string {
-	return "_$" + note.Content + "$" + note.Week +"$" + note.Person + "$" + note.Day
-}
-
-func ParseNote(message string) Note {
-
-	// note message: notecmd$content$week$person$day 
-	// TODO: make everything Json based I guess, so that content can include dollar signs
-
-	arr := strings.Split(message, "$")
-
-	return Note {
-		Content: arr[1],
-		Week: arr[2],
-		Day: arr[4],
-		Person: arr[3],
-	}
 }

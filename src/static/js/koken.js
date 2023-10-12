@@ -57,6 +57,9 @@ socket_conn.onmessage = function(event) {
 
 
 	} else if (command == "addnote") {
+		var elem = getRelevantTableElement(message.week, message.person, message.day)	
+		add_note(elem, message.optid, message.currentState)
+
 
 	} else if (command == "deletenote") {
 
@@ -64,44 +67,38 @@ socket_conn.onmessage = function(event) {
 
 }
 
+
+function add_note(element, id, currentState) {
+	var note_div = document.createElement('div')
+	note_div.style.backgroundColor = "yellow"
+	note_div.innerText = currentState
+	note_div.id = `n${id}`
+
+	var note_button = document.createElement('button')
+	note_button.innerText = "X"
+	note_button.id = `${id}`
+
+	note_button.addEventListener("click", () => { remove_note(id) })
+
+	element.appendChild(note_div)
+	element.appendChild(note_button)
+}
+
+function remove_note(id) {
+	var button = document.getElementById(id)
+	var div = document.getElementById(`n${id}`)
+
+	button.parentNode.removeChild(button)
+	div.parentNode.removeChild(div)
+}
+
 // day toggling mechanisms
 current_week_table.addEventListener("mousedown", function(ev) {
-	send_day_toggle(socket_conn, ev, "current")
+	send_day_toggle(window, socket_conn, ev, "current")
 })
 
 next_week_table.addEventListener("mousedown", function(ev) {
-	send_day_toggle(socket_conn, ev, "next")
-})
-
-// key bindings
-document.addEventListener("keyup", function(ev) {
-	if (ev.key == "Escape") {
-		console.log("escape key pressed")
-		custom_context.style.display = "none"
-
-	}
-})
-
-// context menu
-current_week_table.addEventListener("contextmenu", function(ev) { // TODO: make the same for next week
-	ev.preventDefault()
-
-	console.log(ev.clientX);
-	console.log(ev.clientY);
-
-	custom_context.style.top = ev.clientY + "px"
-	custom_context.style.left = ev.clientX + "px"
-	custom_context.style.display = "inline-block";
-	
-	var person = ev.target.className
-	var day = ev.target.parentNode.className
-
-	var delete_name = ev.target.name
-
-	console.log(person, day)
-	add_note_button.setAttribute("name", "current$" + person + "$" + day)
-	delete_note_button.setAttribute("name", delete_name)
-
+	send_day_toggle(window, socket_conn, ev, "next")
 })
 
 // admin panel

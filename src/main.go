@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/websocket"
 	"github.com/mattn/go-sqlite3"
@@ -29,7 +30,7 @@ var (
 	upgrader = websocket.Upgrader{}
 	socketPool []*websocket.Conn
 
-	noteList []Note = loadNotes()
+	noteList []Note;
 	grid = loadGrid()
 
 	berichte []BerichtQuery;
@@ -50,6 +51,7 @@ type WSMessage struct {
 	Week string `json:"week"`
 	Person string `json:"person"`
 	Day string `json:"day"`
+	OptID string `json:"optid"`
 }
 
 // TODO: actual logging, because that is useful
@@ -94,6 +96,8 @@ func main() {
 
 	berichte = GetBerichtePrepared(selectAllBerichte)
 
+	noteList = loadNotes(db)
+
 	http.HandleFunc("/", MainRouteHandler)
 
 	if *deployFlag {
@@ -129,24 +133,22 @@ func RemoveIndex(list []Note, index int) []Note {
 
 
 func MainRouteHandler(writer http.ResponseWriter, request *http.Request) {
-
 	var path = request.URL.Path
-
 	fmt.Println("path:", path)
 
 	if path == "/" {
 		http.Redirect(writer, request, "/koken", http.StatusSeeOther)
+
 	} else if path == "/koken" || path == "/winkel" {
 		http.ServeFile(writer, request, "./src/static/templates" + path + ".html")
+
 	} else if path == "/js/koken.js" || path == "/js/koken-helper.js"{
 		writer.Header().Set("Content-Type", "application/javascript")
 		http.ServeFile(writer, request, "./src/static" + path)
+
 	} else if path == "/koken-ws" {
-
 		socketConn, err := upgrader.Upgrade(writer, request, nil)
-
 		socketPool = append(socketPool, socketConn)
-
 		if err != nil {
 			log.Print("Failed to create websocket connection with error", err)
 		}
@@ -164,95 +166,58 @@ func MainRouteHandler(writer http.ResponseWriter, request *http.Request) {
 				newState := ModifyGrid(grid, m.Week, m.Person, m.Day)
 				m.CurrentState = newState
 				returnM, err := json.Marshal(m)
-
 				if err != nil {
 					// TODO:
 				}
 				Broadcast(returnM)
+
 
 			} else if cmd == "post-bericht" {
 				newBericht := BerichtQuery {
 					Id: 0,
 					Content: m.CurrentState,
 				}
-
 				berichte = append(berichte, newBericht)
 				broadcast, err := json.Marshal(m)
-
 				if err != nil {
 					// TODO
 				}
+				
 				Broadcast(broadcast)
+
 			} else if cmd == "del-bericht" {
-
 				broadcast, err := json.Marshal(m)
-
 				if err != nil {
 					// TODO:
 				}
 
 				berichte = berichte[1:] // removing the first element from the list
+				Broadcast(broadcast)
 
+
+			} else if cmd == "addnote" {
+
+				newNote := Note {
+					m.CurrentState,
+					m.Week,
+					m.Day,
+					m.Person,
+					"0",
+				}
+				// add the note to the db
+				id := saveNoteGetID(db, newNote)
+
+				// send this back to the client
+				m.OptID = strconv.Itoa(id)
+				broadcast, err := json.Marshal(m)
+				if err != nil {
+					// TODO:
+				}
 				Broadcast(broadcast)
 
 
 			} else if cmd == "open" {
-				for i := 0; i < len(grid); i++ {
-					for j := 0; j < len(grid[i]); j++ {
-
-						week := "next"
-						
-						if i < 7 {
-							week = "current"
-						}
-						person := personList[j]
-						day := dayList[i % 7]
-
-						n := WSMessage {
-							Command: "toggle",
-							CurrentState: grid[i][j],
-							Week: week,
-							Person: person,
-							Day: day,
-						}
-						message, err := json.Marshal(n)
-						if err != nil {
-							// TODO
-						}
-						socketConn.WriteMessage(websocket.TextMessage, message)
-					}
-				}
-
-				for _, note := range noteList {
-					n := WSMessage {
-						Command: "addnote",
-						CurrentState: note.Content,
-						Week: note.Week,
-						Person: note.Person,
-						Day: note.Day,
-					}
-					message, err := json.Marshal(n)
-
-					if err != nil {
-						// TODO
-					}
-					socketConn.WriteMessage(websocket.TextMessage, message)
-				}
-
-				for _, bericht := range berichte {
-					m := WSMessage {
-						Command: "post-bericht",
-						CurrentState: bericht.Content,
-					}
-
-					message, err := json.Marshal(m)
-
-					if err != nil {
-						// TODO:
-					}
-
-					socketConn.WriteMessage(websocket.TextMessage, message)
-				}
+				updateUserOnOpen(socketConn)
 			}
 
 			if err != nil {
@@ -261,8 +226,68 @@ func MainRouteHandler(writer http.ResponseWriter, request *http.Request) {
 			}
 		}
 		WriteBerichte(berichte)
-
-		saveNotes(noteList)
 		saveGrid(grid)
+	}
+}
+
+func updateUserOnOpen(socketConn *websocket.Conn) {
+
+	for i := 0; i < len(grid); i++ {
+		for j := 0; j < len(grid[i]); j++ {
+
+			week := "next"
+			
+			if i < 7 {
+				week = "current"
+			}
+			person := personList[j]
+			day := dayList[i % 7]
+
+			n := WSMessage {
+				Command: "toggle",
+				CurrentState: grid[i][j],
+				Week: week,
+				Person: person,
+				Day: day,
+			}
+			message, err := json.Marshal(n)
+			if err != nil {
+				// TODO
+			}
+			socketConn.WriteMessage(websocket.TextMessage, message)
+		}
+	}
+
+	for _, note := range noteList {
+		// TODO: load the notes directly from the db
+		n := WSMessage {
+			Command: "addnote",
+			CurrentState: note.Content,
+			Week: note.Week,
+			Person: note.Person,
+			Day: note.Day,
+			OptID: note.Id,
+		}
+		message, err := json.Marshal(n)
+
+		if err != nil {
+			// TODO
+		}
+		socketConn.WriteMessage(websocket.TextMessage, message)
+	}
+
+	for _, bericht := range berichte {
+		m := WSMessage {
+			Command: "post-bericht",
+			CurrentState: bericht.Content,
+		}
+
+		message, err := json.Marshal(m)
+
+		if err != nil {
+			// TODO:
+		}
+
+		socketConn.WriteMessage(websocket.TextMessage, message)
 	}
 }
