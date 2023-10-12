@@ -14,8 +14,6 @@ This is a simple site created for the house Sis50 in the Netherlands to coordina
             - [x] Should be synced between users
         - [ ] Should be able to set specific meal (that can call up a recipe)
     - [ ] That resets at the end of every week
-    - [ ] People have the ability to add small annotations to each day in case of special occurrences
-    - [ ] A small recipe section where people can pull up recipes of what will be cooked today if wanted
     - [x] A next week calendar, where people can pre-plan / show when they are available next week
         - [ ] Automatic switching, so that the next-week schedule becomes the current weeks'
 
