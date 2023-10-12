@@ -79,14 +79,7 @@ func main() {
 	// insert bericht, remove bericht, change state
 	updateGridStatement, err = db.Prepare(`UPDATE days AS d SET d.state = ? WHERE week = ? AND person = ? AND day = ?`)
 
-	selectAllBerichte, err = db.Prepare(`SELECT * FROM berichte`) // TODO: would prob be fine not being a prepared statement
-	selectAllGrid, err = db.Prepare(`SELECT * FROM days`)
-	selectAllNotes, err = db.Prepare(`SELECT * FROM notes`)
-
 	defer updateGridStatement.Close()
-	defer selectAllBerichte.Close()
-	defer selectAllGrid.Close()
-	defer selectAllNotes.Close()
 
 	berichte = GetAllBerichte(db)
 
