@@ -1,18 +1,16 @@
-import * as helper from "./koken-helper.js" 
+import { 
+	getRelevantTableElement, current_week_table, next_week_table, people, days,
+	send_day_toggle
+
+} from "./koken-helper.js" 
 
 // variables
-var current_week_table = document.getElementsByClassName("current-week")[0];
-var next_week_table = document.getElementsByClassName("next-week")[0];
-
-var people = ["rick", "youri", "robert", "milan"]
-var days = ["mandaag", "dinsdag", "woensdag", "dondersdag", "vrijdag", "zaterdag", "zondag"]
 
 var socket_conn = new WebSocket("ws://localhost:8000/koken-ws")
 
 var custom_context = document.getElementById("custom-context-menu")
 var add_note_button = document.getElementById("add-note-button")
 var delete_note_button = document.getElementById("remove-note-button")
-
 var berichte_list = document.getElementById("berichte-list")
 
 // websocket handling
@@ -29,15 +27,15 @@ socket_conn.onmessage = function(event) {
 	var command = message.command
 
 	if (command == "toggle") {
-
 		if (message.currentState == "E" ) { 
 			message.currentState = "_" 
 		}
 
-		var element = helper.getRelevantTableElement(message.week, message.person, message.day)
+		var element = getRelevantTableElement(message.week, message.person, message.day)
 		element.innerHTML = message.currentState + element.innerHTML.slice(1)
-	} else if (command == "post-bericht") {
 
+
+	} else if (command == "post-bericht") {
 		const para = document.createElement("p")
 		para.appendChild(document.createTextNode(message.currentState))
 		berichte_list.prepend(para)
@@ -50,94 +48,37 @@ socket_conn.onmessage = function(event) {
 			}))
 		}
 		
-	} else if (command == "del-bericht") {
 
+	} else if (command == "del-bericht") {
 		console.log("removing bericht...")
 		var remove_child = berichte_list.childNodes[berichte_list.children.length - 1]
 		console.log(remove_child)
 		berichte_list.removeChild(remove_child)
+
+
 	} else if (command == "addnote") {
 
-		var element = helper.getRelevantTableElement(message.week, message.person, message.day)
-
-		// TODO: this can definitely be improved
-		// we have definitely reached the point where an ID would be easier
-		// we need to safely construct this message using javascript elements, instead of just a raw string
-		element.innerHTML += `<div class="note"> 
-								<div class="main-note" name="${message.week}$${message.day}$${message.person}" onclick="revealNote(this)">
-									<div class="note-container" style="display: none;">
-										<div class="note-content" name="${message.week}$${message.day}$${message.person}">${message.currentState}</div>
-									</div>
-								</div>
-								<div class="note-close-button" style="display: none;" onclick="closeNote(this)">X</div>
-							  </div>`
-		
-
 	} else if (command == "deletenote") {
-		var arr = message.split("$")	
 
-		var content, week, person, day
-
-		[_, content, week, person, day] = arr
-
-		var element = helper.getRelevantTableElement(week, person, day)
-
-		var localNoteList = element.children.getElementsByClassName("note-content")
-
-		var removeNode
-
-		for (var i = 0; i < localNoteList.length; i++) {
-			if (localNoteList[i].innerHTML == content) {
-				removeNode = localNoteList[i]
-				break
-			}
-		}
-
-		element.removeChild(removeNode)
 	}
 
 }
 
 // day toggling mechanisms
 current_week_table.addEventListener("mousedown", function(ev) {
-	send_day_toggle(ev, "current")
+	send_day_toggle(socket_conn, ev, "current")
 })
 
 next_week_table.addEventListener("mousedown", function(ev) {
-	send_day_toggle(ev, "next")
+	send_day_toggle(socket_conn, ev, "next")
 })
-
-function send_day_toggle(event, week) {
-
-	// var target = event.target
-	var person = event.target.className
-	var day = event.target.parentNode.className
-
-
-	if (event.button != 0) { return }
-
-	if (people.indexOf(person) == -1 || days.indexOf(day) == -1) {
-		return
-	} else {
-	console.log(person, day)
-		socket_conn.send(JSON.stringify({
-				command: "toggle",
-				currentState: "empty",
-				week: week,
-				person: person,
-				day: day
-			})
-		)
-	}
-
-}
-
 
 // key bindings
 document.addEventListener("keyup", function(ev) {
 	if (ev.key == "Escape") {
 		console.log("escape key pressed")
 		custom_context.style.display = "none"
+
 	}
 })
 

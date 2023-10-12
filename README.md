@@ -2,7 +2,7 @@
 
 ## What is this site?
 
-This is a simple site created for the house Sis50 in the netherlands to coordinate cooking schedules, share funny memes, and create a community shopping list. This site's backend is written in Go, and the design is focused on a mobile-first experience.
+This is a simple site created for the house Sis50 in the Netherlands to coordinate cooking schedules, share funny memes, and create a community shopping list. This site's backend is written in Go, and the design is focused on a mobile-first experience.
 
 ## Features
 
@@ -14,7 +14,7 @@ This is a simple site created for the house Sis50 in the netherlands to coordina
             - [ ] Should be synced between users
         - [ ] Should be able to set specific meal (that can call up a recipe)
     - [ ] That resets at the end of every week
-    - [ ] People have the ability to add small annotations to each day in case of special occurences
+    - [ ] People have the ability to add small annotations to each day in case of special occurrences
     - [ ] A small recipe section where people can pull up recipes of what will be cooked today if wanted
     - [x] A next week calendar, where people can pre-plan / show when they are available next week
         - [ ] Automatic switching, so that the next-week schedule becomes the current weeks'
@@ -23,14 +23,14 @@ This is a simple site created for the house Sis50 in the netherlands to coordina
     - [ ] Easily delete items off the shopping list
     - [ ] Edit Items on the shopping list 
         - [ ] Have this edit feature be fancy
-- [ ] Small Minigame
+- [ ] Small Mini-game
 - [ ] Daily Comic
     - [ ] Have the server decide on a daily comic (XKCD)
         - [ ] Transfer this comics title and link to the original
 - [ ] Small Announcement Section
-    - [ ] Max limit of 5 announcements, oldest one gets discarded
+    - [ ] Max limit of 5 announcements, the oldest one gets discarded
 
-- [ ] Input sanitisation
+- [ ] Input sanitization
 - [ ] A dark mode theme with automatic detection as well
 - [ ] A password-protected Admin panel
     - [ ] With the ability to reset respective weeks completely
@@ -38,7 +38,7 @@ This is a simple site created for the house Sis50 in the netherlands to coordina
 
 - [ ] The ability for a user to change the background on their client side
     - [ ] This being saved
-- [ ] Ability for user to be able to remove headers (to unobstruct background)
+- [ ] Ability for user to be able to remove headers (to create unobstructed a background)
     - [ ] all headers should have an outline that semi-guarantee visibility on any background
 - [ ] Ability for users to remove otherwise visible backgrounds from the main elements of the site
 
@@ -49,15 +49,15 @@ This is a simple site created for the house Sis50 in the netherlands to coordina
 
 ## Technical Information
 
-### Interacting with Websockets
+### Interacting with Web sockets
 
-> note that currently websockets simply just send strings separated using $, this will eventually be replaced simply with JSON
+> note that currently web sockets simply just send strings separated using $, this will eventually be replaced simply with JSON
 
-structure of a websocket request is as follows:
+structure of a web socket request is as follows:
 
 COMMAND$further information...
 
-available commands and the further structure are:
+Available commands and the further structure are:
 
 - toggle
     - toggle$(state$)week$person$day
@@ -65,7 +65,7 @@ available commands and the further structure are:
     - addnote$content$week$person$day
 - post
     - post$content
-// gonna be making a move over to JSON right about now, so these are the new defintions: (more for self-reference)
+// Going to be making a move over to JSON right about now, so these are the new definitions: (more for self-reference)
 
 message:
 

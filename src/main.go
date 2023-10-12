@@ -260,7 +260,7 @@ func MainRouteHandler(writer http.ResponseWriter, request *http.Request) {
 				break
 			}
 		}
-		writeBerichte(berichte)
+		WriteBerichte(berichte)
 
 		saveNotes(noteList)
 		saveGrid(grid)

@@ -32,4 +32,6 @@ func GetBerichtePrepared(preparedStatement *sql.Stmt) []BerichtQuery {
 	return berichte
 }
 
+func WriteBerichte(berichte []BerichtQuery) {
 
+}
