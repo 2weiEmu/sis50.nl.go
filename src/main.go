@@ -26,21 +26,16 @@ var (
 
 	personList = []string {"rick", "youri", "robert", "milan"}
 	dayList = []string {"mandaag", "dinsdag", "woensdag", "dondersdag", "vrijdag", "zaterdag", "zondag"}
-	gridStates = []string {"E", "X", "O", "?"} 
+	gridStates = []string {"E", "X", "O", "P", "?"} 
 
 	upgrader = websocket.Upgrader{}
 	socketPool []*websocket.Conn
 
 	noteList []Note;
 	grid = loadGrid()
-
+	updateGridStatement *sql.Stmt
 	berichte []BerichtQuery;
 
-	updateGridStatement *sql.Stmt
-
-	selectAllBerichte *sql.Stmt
-	selectAllGrid *sql.Stmt
-	selectAllNotes *sql.Stmt
 )
 
 type WSMessage struct {
@@ -55,7 +50,6 @@ type WSMessage struct {
 // TODO: actual logging, because that is useful
 
 func main() {
-
 	fmt.Println("starting...")
 	
 	var deployFlag = flag.Bool("deploy", false, "Enable the -deploy flag to actually deploy the server.")
@@ -63,9 +57,7 @@ func main() {
 
 	var err error
 	db, err = sql.Open("sqlite3", "file:./resources/DATABASE?cache=shared")
-
 	defer db.Close()
-
 	if err != nil {
 		// TODO:
 		log.Fatal("failed to open db with error ", err)
@@ -75,18 +67,16 @@ func main() {
 		log.Fatal("failed to ping db with error ", err)
 	}
 
-	// creating prepared statements
-	// insert bericht, remove bericht, change state
 	updateGridStatement, err = db.Prepare(`UPDATE days AS d SET d.state = ? WHERE week = ? AND person = ? AND day = ?`)
-
 	defer updateGridStatement.Close()
+	if err != nil {
+		// TODO:
+	}
 
 	berichte = GetAllBerichte(db)
-
 	noteList = loadNotes(db)
 
 	http.HandleFunc("/", MainRouteHandler)
-
 	if *deployFlag {
 		http.ListenAndServe(":80", nil)
 		fmt.Println("started http server...")
@@ -108,7 +98,7 @@ func findIndex(arr []string, s string) int {
 }
 
 func Broadcast(message []byte) {
-
+	fmt.Println("make run", string(message))
 	for _, socket := range socketPool {
 		socket.WriteMessage(websocket.TextMessage, message)
 	}
@@ -135,12 +125,12 @@ func MainRouteHandler(writer http.ResponseWriter, request *http.Request) {
 
 	} else if path == "/koken-ws" {
 		socketConn, err := upgrader.Upgrade(writer, request, nil)
+		defer socketConn.Close()
 		socketPool = append(socketPool, socketConn)
 		if err != nil {
 			log.Print("Failed to create websocket connection with error", err)
 		}
 
-		defer socketConn.Close()
 
 
 		for {
@@ -235,12 +225,10 @@ func MainRouteHandler(writer http.ResponseWriter, request *http.Request) {
 }
 
 func updateUserOnOpen(socketConn *websocket.Conn) {
-
 	for i := 0; i < len(grid); i++ {
 		for j := 0; j < len(grid[i]); j++ {
 
 			week := "next"
-			
 			if i < 7 {
 				week = "current"
 			}
@@ -254,6 +242,7 @@ func updateUserOnOpen(socketConn *websocket.Conn) {
 				Person: person,
 				Day: day,
 			}
+
 			message, err := json.Marshal(n)
 			if err != nil {
 				// TODO
@@ -263,7 +252,6 @@ func updateUserOnOpen(socketConn *websocket.Conn) {
 	}
 
 	noteList := loadNotes(db)
-
 	for _, note := range noteList {
 		// TODO: load the notes directly from the db
 		n := WSMessage {
@@ -294,7 +282,6 @@ func updateUserOnOpen(socketConn *websocket.Conn) {
 		if err != nil {
 			// TODO:
 		}
-
 		socketConn.WriteMessage(websocket.TextMessage, message)
 	}
 }
