@@ -1,9 +1,6 @@
 package main
 
 import (
-	"crypto/hmac"
-	"crypto/sha512"
-	"encoding/base64"
 	"fmt"
 	"net/http"
 	"crypto/rand"
@@ -11,9 +8,13 @@ import (
 	"github.com/gorilla/mux"
 )
 
+var secretKey []byte;
+
+var testUserName = "temp"
+
 func main() {
 
-	secretKey := make([]byte, 32)
+	secretKey = make([]byte, 32)
 	length, err := rand.Read(secretKey)
 
 	if err != nil {
@@ -30,6 +31,8 @@ func main() {
 	mux.HandleFunc("/css/{style}", GetCSSStyle)
 	mux.HandleFunc("/js/{script}", GetJavaScript)
 	mux.HandleFunc("/recipe/{recipe}", GetRecipeArticle)
+	mux.HandleFunc("/cookies/handout-test", handoutCookieTest)
+	mux.HandleFunc("/cookies/validate-test", validateCookieTest)
 
 	fmt.Println("Listening...")
 	err = http.ListenAndServe(":8000", mux)
@@ -38,6 +41,22 @@ func main() {
 		fmt.Println("An error occured with the server:", err)
 	}
 }
+
+func handoutCookieTest(writer http.ResponseWriter, request *http.Request) {
+	cookie := GenerateLoginCookie("temp", secretKey)
+
+	http.SetCookie(writer, &cookie)
+
+	fmt.Println("Cookie Set")
+	writer.Write([]byte("Set the cookie " + (cookie.Name) + " for the user temp. The cookie value is as follows:" + string(cookie.Value) + "\n"))
+}
+
+func validateCookieTest(writer http.ResponseWriter, request *http.Request) {
+	if ValidateLoginCookie(request, "temp", secretKey, "temp") {
+		fmt.Print("===================\nCookie was validated wooooooo\n===================\n")
+	}
+}
+
 
 // TODO: this _could_ be done better, for both the CSS and JS but explicit is good in this case
 func GetCSSStyle(writer http.ResponseWriter, request *http.Request) {
@@ -56,80 +75,6 @@ func GetJavaScript(writer http.ResponseWriter, request *http.Request) {
 
 func GetMainPage(writer http.ResponseWriter, request *http.Request) {
 	http.ServeFile(writer, request, "src/static/templates/index.html")
-}
-
-func ValidateLoginCookie(request *http.Request, name string, secret []byte, username string) bool {
-	cookie, err := request.Cookie(name)
-
-	if err != nil {
-		// TODO:
-		return false
-	}
-
-	value, err := base64.URLEncoding.DecodeString(cookie.Value)
-	if err != nil {
-		// TODO:
-		return false
-	}
-
-	// now we have the value of the cookie
-	if len(value) < sha512.Size {
-		// TODO:
-		return false
-	}
-
-	signature := value[:sha512.Size]
-	_ = value[sha512.Size:]
-
-	// recalculate the HMAC
-	mac := hmac.New(sha512.New, secret)
-	mac.Write([]byte(name))
-	mac.Write([]byte(username))
-	expected := mac.Sum(nil)
-
-	if !hmac.Equal([]byte(signature), expected) {
-		// TODO:
-		return false
-	}
-
-	// this also means the value checks out
-
-	return true
-}
-
-/*
-	This function generates a cookie validating the login of the given user
-*/
-func GenerateLoginCookie(user string, secretKey []byte) http.Cookie {
-	/*
-		In order to provide at least some resistance to people just using funky cookie editors
-		we are going to attach a hash (together with a secretKey and also the name is included 
-		generated on each server start, that not even I know)
-		together with the original value of the cookie
-	*/
-
-	username := base64.URLEncoding.EncodeToString([]byte(user))
-	cookieName := "login" + username
-
-	cookie := http.Cookie {
-		Name: cookieName,
-		Value: username,
-		Path: "/",
-		MaxAge: 120, // NOTE: AGE OF 120 for TESTING
-		HttpOnly: true,
-		Secure: true,
-		SameSite: http.SameSiteLaxMode,
-	}
-
-	mac := hmac.New(sha512.New, secretKey)
-	mac.Write([]byte(cookieName)) // the name of the cookie
-	mac.Write([]byte(username)) // the value of the cookie
-	hmac := mac.Sum(nil)
-
-	cookie.Value = string(hmac) + cookie.Value
-
-	return cookie
-
 }
 
 func GetRecipeArticle(writer http.ResponseWriter, request *http.Request) {

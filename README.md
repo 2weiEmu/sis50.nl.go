@@ -118,3 +118,6 @@ CREATE TABLE notes (
 );
 
 ```
+
+Also I just want to thank this blog article:
+https://www.alexedwards.net/blog/working-with-cookies-in-go
