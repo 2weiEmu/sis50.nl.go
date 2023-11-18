@@ -8,47 +8,47 @@ import (
 	"net/http"
 )
 
-func ValidateLoginCookie(request *http.Request, name string, secret []byte, username string) bool {
+func ValidateLoginCookie(request *http.Request, name string, secret []byte, username string) (bool, string) {
 	cookie, err := request.Cookie(name)
 
 	if err != nil {
 		// TODO:
 		fmt.Println("Failed to get cookie", err)
-		return false
+		return false, ""
 	}
 
 	value, err := base64.URLEncoding.DecodeString(cookie.Value)
 	if err != nil {
 		// TODO:
 		fmt.Println("Failed to decode cookie", err)
-		return false
+		return false, ""
 	}
 
 	// now we have the value of the cookie
 	if len(value) < sha512.Size {
 		// TODO:
 		fmt.Println("Cookie too short")
-		return false
+		return false, ""
 	}
 
 	signature := value[:sha512.Size]
-	_ = value[sha512.Size:]
+	val := value[sha512.Size:]
 
 	// recalculate the HMAC
 	mac := hmac.New(sha512.New, secret)
-	mac.Write([]byte(name))
-	mac.Write([]byte(username))
+	mac.Write([]byte(val))
+	mac.Write([]byte(val))
 	expected := mac.Sum(nil)
 
 	if !hmac.Equal([]byte(signature), expected) {
 		// TODO:
 		fmt.Println("Signatures and inequal")
-		return false
+		return false, ""
 	}
 
 	// this also means the value checks out
 
-	return true
+	return true, string(val)
 }
 
 /*
@@ -63,7 +63,7 @@ func GenerateLoginCookie(user string, secretKey []byte) http.Cookie {
 	*/
 
 	cookie := http.Cookie {
-		Name: user,
+		Name: "sis50.nl.login.validation",
 		Value: user,
 		Path: "/",
 		MaxAge: 120, // NOTE: AGE OF 120 for TESTING

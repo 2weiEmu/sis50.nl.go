@@ -52,8 +52,8 @@ func handoutCookieTest(writer http.ResponseWriter, request *http.Request) {
 }
 
 func validateCookieTest(writer http.ResponseWriter, request *http.Request) {
-	if ValidateLoginCookie(request, "temp", secretKey, "temp") {
-		fmt.Print("===================\nCookie was validated wooooooo\n===================\n")
+	if val, user := ValidateLoginCookie(request, "sis50.nl.login.validation", secretKey, "temp"); val {
+		fmt.Print("===================\nCookie was validated for user:", user ,"\n===================\n")
 	}
 }
 
