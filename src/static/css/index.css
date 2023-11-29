@@ -16,3 +16,18 @@
 	src: url('/fonts/NotoSansMultani-Regular.ttf')
 }
 
+body {
+	background-color: var(--bg-col);
+}
+
+h1, h2 {
+	color: var(--acc-col);
+}
+
+p, a {
+	color: var(--text-col);
+}
+
+.primary-button {
+
+}
