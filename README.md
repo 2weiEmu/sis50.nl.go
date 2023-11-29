@@ -46,51 +46,23 @@ This is a simple site created for the house Sis50 in the Netherlands to coordina
 
 - **Feature Set** (Recipe Stage)
 - [ ]
-- [ ]
-- [ ]
-- [ ]
-- [ ]
 
 - **Feature Set** (Minesweeper Stage)
-- [ ]
-- [ ]
-- [ ]
-- [ ]
 - [ ]
 
 - **Feature Set** (Pull up Leaderboard)
 - [ ]
-- [ ]
-- [ ]
-- [ ]
-- [ ]
 
 - **Feature Set** ("Avalex" Stage)
-- [ ]
-- [ ]
-- [ ]
-- [ ]
 - [ ]
 
 - **Feature Set** (Generic HTTP API Stage)
 - [ ]
-- [ ]
-- [ ]
-- [ ]
-- [ ]
 
 - **Feature Set** (Terminal Program Stage)
 - [ ]
-- [ ]
-- [ ]
-- [ ]
-- [ ]
 
 - **Feature Set** (Android Program Stage)
-- [ ]
-- [ ]
-- [ ]
-- [ ]
 - [ ]
 
 
