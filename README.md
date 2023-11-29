@@ -26,6 +26,7 @@ This is a simple site created for the house Sis50 in the Netherlands to coordina
     - [ ] Add
 - [ ] Notification / Notices Page
     - [ ] Ability to post new Announcement with bold highlighting
+- [ ] Addition of a basic favicon for the website
 
 ### **Feature Set** (User Customisation Stage)
 
