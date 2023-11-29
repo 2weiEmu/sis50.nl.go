@@ -8,6 +8,8 @@ This is a simple site created for the house Sis50 in the Netherlands to coordina
 
 (I could have used GitHub Issues for this, but now I already wrote them down)
 
+(In-between stages I will wait for user feedback and add requested features)
+
 ### **Feature Set** (Replacement Stage)
 - [ ] A basic calendar for each person in the house.
 - [ ] The current day being highlighted on the calendar
@@ -35,12 +37,12 @@ This is a simple site created for the house Sis50 in the Netherlands to coordina
 - [ ] A basic help page
 - [ ] The ability to set a background photo
 
-- **Feature Set** (Improved Calendar Stage)
-- [ ]
-- [ ]
-- [ ]
-- [ ]
-- [ ]
+### **Feature Set** (Improved Calendar Stage)
+- [ ] There will be 2 calendars, one for the current week, another for the next week
+- [ ] There will be dates associated with each calendar
+- [ ] The next week calendar replaces the current week calendar once the weeks change
+- [ ] Add the ability to add, edit and remove annotations from the calendar, on each cell
+- [ ] More advanced admin panel controls for the calendar
 
 - **Feature Set** (Recipe Stage)
 - [ ]
