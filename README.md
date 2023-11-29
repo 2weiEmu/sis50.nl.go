@@ -8,7 +8,7 @@ This is a simple site created for the house Sis50 in the Netherlands to coordina
 
 (I could have used GitHub Issues for this, but now I already wrote them down)
 
-- **Feature Set** (Replacement Stage)
+### **Feature Set** (Replacement Stage)
 - [ ] A basic calendar for each person in the house.
 - [ ] The current day being highlighted on the calendar
 - [ ] Each calendar cell has 6 possible stages:
@@ -25,7 +25,8 @@ This is a simple site created for the house Sis50 in the Netherlands to coordina
 - [ ] Notification / Notices Page
     - [ ] Ability to post new Announcement with bold highlighting
 
-- **Feature Set** (User Customisation Stage)
+### **Feature Set** (User Customisation Stage)
+
 - [ ] The ability to register for new users
 - [ ] The ability to login to be a user
 - [ ] The ability to post a message as that user
