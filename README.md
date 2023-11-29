@@ -10,6 +10,7 @@ This is a simple site created for the house Sis50 in the Netherlands to coordina
 
 - **Feature Set** (Replacement Stage)
 - [ ] A basic calendar for each person in the house.
+- [ ] The current day being highlighted on the calendar
 - [ ] Each calendar cell has 6 possible stages:
     - [ ] Present
     - [ ] Maybe present
@@ -25,11 +26,13 @@ This is a simple site created for the house Sis50 in the Netherlands to coordina
     - [ ] Ability to post new Announcement with bold highlighting
 
 - **Feature Set** (User Customisation Stage)
-- [ ]
-- [ ]
-- [ ]
-- [ ]
-- [ ]
+- [ ] The ability to register for new users
+- [ ] The ability to login to be a user
+- [ ] The ability to post a message as that user
+- [ ] A basic admin account
+- [ ] A basic admin panel
+- [ ] A basic help page
+- [ ] The ability to set a background photo
 
 - **Feature Set** (Improved Calendar Stage)
 - [ ]
