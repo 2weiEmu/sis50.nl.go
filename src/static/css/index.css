@@ -1,0 +1,18 @@
+:root {
+
+	--text-col: #FDE7E7;
+	--bg-col: #050505;
+	--bg-col-light: #1A1A1A;
+	--pri-col: #323E57;
+	--sec-col: #141438;
+	--acc-col: #88EBE9;
+	--acc-col-low-op: rgba(136, 235, 233, 0.7);
+	--success-col: #47D76F;
+	--error-col: #E94E4E;
+}
+
+@font-face {
+	font-family: "NotoSansMultani"
+	src: url('/fonts/NotoSansMultani-Regular.ttf')
+}
+
