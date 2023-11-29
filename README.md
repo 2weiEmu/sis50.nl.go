@@ -6,47 +6,86 @@ This is a simple site created for the house Sis50 in the Netherlands to coordina
 
 ## Features
 
-- [x] Weekly Cooking Table for each Weekday
-    - [x] Has four options for what people have one that 
-        - [x] You can switch between options simply by clicking
-        - [x] May add annotations for extra things that should happen
-            - [ ] Should be able to edit these annotations
-            - [x] Should be synced between users
-        - [ ] Should be able to set specific meal (that can call up a recipe)
-    - [ ] That resets at the end of every week
-    - [x] A next week calendar, where people can pre-plan / show when they are available next week
-        - [ ] Automatic switching, so that the next-week schedule becomes the current weeks'
+(I could have used GitHub Issues for this, but now I already wrote them down)
 
-- [ ] Simple Shopping list 
-    - [ ] Ability to add items to the shopping list
-    - [ ] Easily delete items off the shopping list
-    - [ ] Edit Items on the shopping list 
-        - [ ] Have this edit feature be fancy
+- **Feature Set** (Replacement Stage)
+- [ ] A basic calendar for each person in the house.
+- [ ] Each calendar cell has 6 possible stages:
+    - [ ] Present
+    - [ ] Maybe present
+    - [ ] Present but cannot cook
+    - [ ] Maybe cooking
+    - [ ] Cooking
+    - [ ] Not there
+- [ ] A basic shopping list with 3 options:
+    - [ ] Remove
+    - [ ] Edit
+    - [ ] Add
+- [ ] Notification / Notices Page
+    - [ ] Ability to post new Announcement with bold highlighting
 
-- [ ] Small Mini-game
+- **Feature Set** (User Customisation Stage)
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+- [ ]
 
-- [ ] Daily Comic
-    - [ ] Have the server decide on a daily comic (XKCD)
-        - [ ] Transfer this comics title and link to the original
+- **Feature Set** (Improved Calendar Stage)
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+- [ ]
 
-- [x] Small Announcement Section
-    - [x] Max limit of 5 announcements, the oldest one gets discarded
+- **Feature Set** (Recipe Stage)
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+- [ ]
 
-- [ ] Input sanitization
-- [ ] A dark mode theme with automatic detection as well
-- [ ] A password-protected Admin panel
-    - [ ] With the ability to reset respective weeks completely
+- **Feature Set** (Minesweeper Stage)
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+- [ ]
 
+- **Feature Set** (Pull up Leaderboard)
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+- [ ]
 
-- [ ] The ability for a user to change the background on their client side
-    - [ ] This being saved
-- [ ] Ability for user to be able to remove headers (to create unobstructed a background)
-    - [ ] all headers should have an outline that semi-guarantee visibility on any background
-- [ ] Ability for users to remove otherwise visible backgrounds from the main elements of the site
+- **Feature Set** ("Avalex" Stage)
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+- [ ]
 
-- [ ] Individual User authentication
-    - [ ] That persists for a month
-    - [ ] Only allows users to edit their respective column
+- **Feature Set** (Generic HTTP API Stage)
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+
+- **Feature Set** (Terminal Program Stage)
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+
+- **Feature Set** (Android Program Stage)
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+- [ ]
 
 
 ## Technical Information
