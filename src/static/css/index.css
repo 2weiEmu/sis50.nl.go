@@ -12,8 +12,8 @@
 }
 
 @font-face {
-	font-family: "NotoSansMultani"
-	src: url('/fonts/NotoSansMultani-Regular.ttf')
+	font-family: "NotoSansMultani";
+	src: url('/fonts/NotoSansMultani-Regular.ttf');
 }
 
 body {
@@ -29,5 +29,11 @@ p, a {
 }
 
 .primary-button {
-
+	color: var(--text-col);
+	background-color: var(--pri-col);
+	border-radius: 15px;
+	padding: 15px 30px 15px 30px;
+	font-size: 14px;
+	outline: none;
+	border: none;
 }

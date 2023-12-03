@@ -26,6 +26,7 @@ func main() {
 	mux := mux.NewRouter().StrictSlash(true)
 
 	mux.HandleFunc("/", GetMainPage)
+	mux.HandleFunc("/admin", GetAdminPage)
 	mux.HandleFunc("/css/{style}", GetCSSStyle)
 	mux.HandleFunc("/js/{script}", GetJavaScript)
 	mux.HandleFunc("/fonts/{font}", GetFontface)
@@ -80,5 +81,9 @@ func GetFontface(writer http.ResponseWriter, request *http.Request) {
 
 func GetMainPage(writer http.ResponseWriter, request *http.Request) {
 	http.ServeFile(writer, request, "src/static/templates/index.html")
+}
+
+func GetAdminPage(writer http.ResponseWriter, request *http.Request) {
+	http.ServeFile(writer, request, "src/static/templates/admin.html")
 }
 
