@@ -10,12 +10,12 @@ import (
 
 // Basically defining an enum
 const (
-	Present = iota
-	PossiblyPresent
-	PresentNoCook
-	MaybeCooking
-	Cooking
-	NotPresent
+	Present = iota		// 0
+	PossiblyPresent		// 1
+	PresentNoCook		// 2
+	MaybeCooking		// 3
+	Cooking				// 4
+	NotPresent			// 5
 )
 
 type CalendarMessage struct {
@@ -46,15 +46,18 @@ func CalendarWebsocket(writer http.ResponseWriter, request *http.Request) {
 			fmt.Println("Closing websocket:", err)
 			break
 		}
-		calendar_message.State = (calendar_message.State + 1) % 6
-		// update the database
 
-		websocket.WriteJSON(calendar_message)
+		// update the database
+		calendar_message.State = (calendar_message.State + 1) % 6
+
+		// broadcast the message
+		BroadcastMessageJSON(calendar_message)
 	}
+
+	RemoveWebsocketConnection(websocket)
 }
 
 func RemoveWebsocketConnection(websocket *websocket.Conn) error {
-	// finding the websocket by index
 	index := -1
 	for i := 0; i < len(websocket_list); i++ {
 		if websocket_list[i] == websocket {
@@ -63,10 +66,15 @@ func RemoveWebsocketConnection(websocket *websocket.Conn) error {
 	}
 
 	if index == -1 {
-		// TODO:
 		return errors.New("Failed to find a websocket to disconnect.")
 	} else {
 		websocket_list = append(websocket_list[:index], websocket_list[index + 1:]...)
 		return nil
+	}
+}
+
+func BroadcastMessageJSON(message interface{}) {
+	for i := 0; i < len(websocket_list); i++ {
+		websocket_list[i].WriteJSON(message)
 	}
 }

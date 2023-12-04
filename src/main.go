@@ -14,6 +14,7 @@ var err error
 var upgrader = websocket.Upgrader{}
 var websocket_list []*websocket.Conn
 
+
 func main() {
 
 // 	secretKey = make([]byte, 32)
