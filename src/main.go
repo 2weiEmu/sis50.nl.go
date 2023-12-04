@@ -5,10 +5,14 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/gorilla/websocket"
 )
 
 // var secretKey []byte;
 var err error
+
+var upgrader = websocket.Upgrader{}
+var websocket_list []*websocket.Conn
 
 func main() {
 
@@ -27,6 +31,7 @@ func main() {
 
 	mux.HandleFunc("/", GetMainPage)
 	mux.HandleFunc("/admin", GetAdminPage)
+	mux.HandleFunc("/ws-calendar", CalendarWebsocket)
 	mux.HandleFunc("/css/{style}", GetCSSStyle)
 	mux.HandleFunc("/js/{script}", GetJavaScript)
 	mux.HandleFunc("/fonts/{font}", GetFontface)
