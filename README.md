@@ -42,6 +42,7 @@ This is a simple site created for the house Sis50 in the Netherlands to coordina
 - [ ] A basic admin panel
 - [ ] A basic help page
 - [ ] The ability to set a background photo
+- [ ] The ability to modify the basic colours of the page
 
 ### **Feature Set** (Improved Calendar Stage)
 - [ ] The calendar will be focused on one day, where the days will be shifting, with you being able to see the 2 previous days and 4 of the upcoming days.
