@@ -44,9 +44,8 @@ This is a simple site created for the house Sis50 in the Netherlands to coordina
 - [ ] The ability to set a background photo
 
 ### **Feature Set** (Improved Calendar Stage)
-- [ ] There will be 2 calendars, one for the current week, another for the next week
+- [ ] The calendar will be focused on one day, where the days will be shifting, with you being able to see the 2 previous days and 4 of the upcoming days.
 - [ ] There will be dates associated with each calendar
-- [ ] The next week calendar replaces the current week calendar once the weeks change
 - [ ] Add the ability to add, edit and remove annotations from the calendar, on each cell
 - [ ] More advanced admin panel controls for the calendar
 
