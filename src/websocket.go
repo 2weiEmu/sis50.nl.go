@@ -38,9 +38,7 @@ func CalendarWebsocket(writer http.ResponseWriter, request *http.Request) {
 
 	var calendar_message CalendarMessage
 	for {
-		err := websocket.ReadJSON(&calendar_message);
-		fmt.Println("Message received.")
-
+		err := websocket.ReadJSON(&calendar_message)
 		if err != nil {
 			// TODO:
 			fmt.Println("Closing websocket:", err)

@@ -27,8 +27,11 @@ This is a simple site created for the house Sis50 in the Netherlands to coordina
 - [ ] Notification / Notices Page
     - [ ] Ability to post new Announcement with bold highlighting
 - [ ] Addition of a basic favicon for the website
+- [ ] Saving the calendar in a downloadable CSV
 - [ ] A link to the local supermarket's site
 - [ ] Add mobile design (basic)
+- [ ] There is a basic help page
+- [ ] Make sure there is favicon for the website
 
 ### **Feature Set** (User Customisation Stage)
 
