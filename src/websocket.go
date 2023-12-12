@@ -10,18 +10,18 @@ import (
 
 // Basically defining an enum
 const (
-	Present = iota		// 0
-	PossiblyPresent		// 1
-	PresentNoCook		// 2
-	MaybeCooking		// 3
-	Cooking				// 4
-	NotPresent			// 5
+	Present         = iota // 0
+	PossiblyPresent        // 1
+	PresentNoCook          // 2
+	MaybeCooking           // 3
+	Cooking                // 4
+	NotPresent             // 5
 )
 
 type CalendarMessage struct {
 	Person string `json:"person"`
-	Day string `json:"day"`
-	State int `json:"calendar_state"`
+	Day    string `json:"day"`
+	State  int    `json:"calendar_state"`
 }
 
 func CalendarWebsocket(writer http.ResponseWriter, request *http.Request) {
@@ -30,7 +30,6 @@ func CalendarWebsocket(writer http.ResponseWriter, request *http.Request) {
 		// TODO:
 	}
 	defer websocket.Close()
-
 
 	websocket_list = append(websocket_list, websocket)
 
@@ -66,7 +65,7 @@ func RemoveWebsocketConnection(websocket *websocket.Conn) error {
 	if index == -1 {
 		return errors.New("Failed to find a websocket to disconnect.")
 	} else {
-		websocket_list = append(websocket_list[:index], websocket_list[index + 1:]...)
+		websocket_list = append(websocket_list[:index], websocket_list[index+1:]...)
 		return nil
 	}
 }

@@ -14,19 +14,18 @@ var err error
 var upgrader = websocket.Upgrader{}
 var websocket_list []*websocket.Conn
 
-
 func main() {
 
-// 	secretKey = make([]byte, 32)
-// 	length, err := rand.Read(secretKey)
-// 
-// 	if err != nil {
-// 		// TODO:
-// 	}
-// 	
-// 	if length != 32 {
-// 		// TODO:
-// 	}
+	// 	secretKey = make([]byte, 32)
+	// 	length, err := rand.Read(secretKey)
+	//
+	// 	if err != nil {
+	// 		// TODO:
+	// 	}
+	//
+	// 	if length != 32 {
+	// 		// TODO:
+	// 	}
 
 	mux := mux.NewRouter().StrictSlash(true)
 
@@ -49,40 +48,39 @@ func main() {
 
 // func handoutCookieTest(writer http.ResponseWriter, request *http.Request) {
 // 	cookie := GenerateLoginCookie("temp", secretKey)
-// 
+//
 // 	http.SetCookie(writer, &cookie)
-// 
+//
 // 	fmt.Println("Cookie Set")
 // 	writer.Write([]byte("Set the cookie " + (cookie.Name) + " for the user temp. The cookie value is as follows:" + string(cookie.Value) + "\n"))
 // }
-// 
+//
 // func validateCookieTest(writer http.ResponseWriter, request *http.Request) {
 // 	if val, user := ValidateLoginCookie(request, "sis50.nl.login.validation", secretKey, "temp"); val {
 // 		fmt.Print("===================\nCookie was validated for user:", user ,"\n===================\n")
 // 	}
 // }
 
-
 // TODO: this _could_ be done better, for both the CSS and JS but explicit is good in this case
 func GetCSSStyle(writer http.ResponseWriter, request *http.Request) {
 	vars := mux.Vars(request)
 	style := vars["style"]
-	
-	http.ServeFile(writer, request, "src/static/css/" + style)
+
+	http.ServeFile(writer, request, "src/static/css/"+style)
 }
 
 func GetJavaScript(writer http.ResponseWriter, request *http.Request) {
 	vars := mux.Vars(request)
 	script := vars["script"]
 
-	http.ServeFile(writer, request, "src/static/js/" + script)
+	http.ServeFile(writer, request, "src/static/js/"+script)
 }
 
 func GetFontface(writer http.ResponseWriter, request *http.Request) {
 	vars := mux.Vars(request)
 	font := vars["script"]
 
-	http.ServeFile(writer, request, "src/static/fonts/" + font)
+	http.ServeFile(writer, request, "src/static/fonts/"+font)
 }
 
 func GetMainPage(writer http.ResponseWriter, request *http.Request) {
@@ -92,4 +90,3 @@ func GetMainPage(writer http.ResponseWriter, request *http.Request) {
 func GetAdminPage(writer http.ResponseWriter, request *http.Request) {
 	http.ServeFile(writer, request, "src/static/templates/admin.html")
 }
-
