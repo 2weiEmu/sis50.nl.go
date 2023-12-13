@@ -5,38 +5,27 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/gorilla/websocket"
 )
 
 // var secretKey []byte;
 var err error
 
-var upgrader = websocket.Upgrader{}
-var websocket_list []*websocket.Conn
+var ctx Context
 
 func main() {
 
-	// 	secretKey = make([]byte, 32)
-	// 	length, err := rand.Read(secretKey)
-	//
-	// 	if err != nil {
-	// 		// TODO:
-	// 	}
-	//
-	// 	if length != 32 {
-	// 		// TODO:
-	// 	}
+	ctx, err := CreateInitialContext("file:src/DATABASE?cache=shared")
+	if err != nil {
+		// TODO
+	}
 
 	mux := mux.NewRouter().StrictSlash(true)
-
 	mux.HandleFunc("/", GetMainPage)
 	mux.HandleFunc("/admin", GetAdminPage)
-	mux.HandleFunc("/ws-calendar", CalendarWebsocket)
+	mux.HandleFunc("/ws-calendar", ctx.CalendarWebsocket)
 	mux.HandleFunc("/css/{style}", GetCSSStyle)
 	mux.HandleFunc("/js/{script}", GetJavaScript)
 	mux.HandleFunc("/fonts/{font}", GetFontface)
-	//mux.HandleFunc("/cookies/handout-test", handoutCookieTest)
-	//mux.HandleFunc("/cookies/validate-test", validateCookieTest)
 
 	fmt.Println("Listening...")
 	err = http.ListenAndServe(":8000", mux)
@@ -44,6 +33,8 @@ func main() {
 	if err != nil {
 		fmt.Println("An error occured with the server:", err)
 	}
+
+	CleanupContext(ctx)
 }
 
 // func handoutCookieTest(writer http.ResponseWriter, request *http.Request) {
@@ -78,7 +69,7 @@ func GetJavaScript(writer http.ResponseWriter, request *http.Request) {
 
 func GetFontface(writer http.ResponseWriter, request *http.Request) {
 	vars := mux.Vars(request)
-	font := vars["script"]
+	font := vars["font"]
 
 	http.ServeFile(writer, request, "src/static/fonts/"+font)
 }

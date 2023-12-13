@@ -24,14 +24,14 @@ type CalendarMessage struct {
 	State  int    `json:"calendar_state"`
 }
 
-func CalendarWebsocket(writer http.ResponseWriter, request *http.Request) {
-	websocket, err := upgrader.Upgrade(writer, request, nil)
+func (ctx Context) CalendarWebsocket(writer http.ResponseWriter, request *http.Request) {
+	websocket, err := ctx.Upgrader.Upgrade(writer, request, nil)
 	if err != nil {
 		// TODO:
 	}
 	defer websocket.Close()
 
-	websocket_list = append(websocket_list, websocket)
+	ctx.Websocket_List = append(ctx.Websocket_List, websocket)
 
 	// Reading and writing messages
 
@@ -56,8 +56,8 @@ func CalendarWebsocket(writer http.ResponseWriter, request *http.Request) {
 
 func RemoveWebsocketConnection(websocket *websocket.Conn) error {
 	index := -1
-	for i := 0; i < len(websocket_list); i++ {
-		if websocket_list[i] == websocket {
+	for i := 0; i < len(ctx.Websocket_List); i++ {
+		if ctx.Websocket_List[i] == websocket {
 			index = i
 		}
 	}
@@ -65,13 +65,13 @@ func RemoveWebsocketConnection(websocket *websocket.Conn) error {
 	if index == -1 {
 		return errors.New("Failed to find a websocket to disconnect.")
 	} else {
-		websocket_list = append(websocket_list[:index], websocket_list[index+1:]...)
+		ctx.Websocket_List = append(ctx.Websocket_List[:index], ctx.Websocket_List[index+1:]...)
 		return nil
 	}
 }
 
 func BroadcastMessageJSON(message interface{}) {
-	for i := 0; i < len(websocket_list); i++ {
-		websocket_list[i].WriteJSON(message)
+	for i := 0; i < len(ctx.Websocket_List); i++ {
+		ctx.Websocket_List[i].WriteJSON(message)
 	}
 }
