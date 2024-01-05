@@ -65,6 +65,7 @@ body {
 	height: 600px;
 	margin-left: auto;
 	margin-right: auto;
+	padding: 3px;
 
 	display: grid;
 	grid-template-rows: repeat(8, calc(100% / 8));
@@ -82,7 +83,9 @@ body {
 }
 
 .outer-cook-table div p {
-	margin-bottom: auto;
+	margin: 0;
+	margin-top: 8%;
+	height: 50%;
 }
 
 .outer-cook-table div img {
