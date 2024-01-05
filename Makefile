@@ -1,5 +1,5 @@
-objects = src/*.go 
+OBJECTS = src/*.go 
+CMD = go
 
-run: $(objects)
-	@go run $(objects)
-
+default: $(OBJECTS)
+	$(CMD) run $(OBJECTS)

@@ -1,39 +1,91 @@
 :root {
-
-	--text-col: #FDE7E7;
-	--bg-col: #050505;
-	--bg-col-light: #1A1A1A;
-	--pri-col: #323E57;
-	--sec-col: #141438;
-	--acc-col: #88EBE9;
-	--acc-col-low-op: rgba(136, 235, 233, 0.7);
-	--success-col: #47D76F;
-	--error-col: #E94E4E;
+	--text: #F4DFDD;
+	--bg: #0B0403;
+	--sec-bg: #120B0A;
+	--primary: #E69A94;
+	--second: #7B352E;
+	--second-lo: rgba(123, 53, 46, 0.5);
+	--accent: #90AE72;
+	--success: #47D76F;
+	--error: #E94E4E;
 }
 
 @font-face {
-	font-family: "NotoSansMultani";
-	src: url('/fonts/NotoSansMultani-Regular.ttf');
+	src: url("/fonts/IBMPlexSerif-Regular.ttf");
+	font-family: IBS-Regular;
+}
+
+* {
+	font-family: IBS-Regular, Serif;
 }
 
 body {
-	background-color: var(--bg-col);
+	background-color: var(--bg);
 }
 
-h1, h2 {
-	color: var(--acc-col);
+.std-header {
+	display: flex;
+	column-gap: 20px;
+	padding: 12px 10% 24px 10%;
+	border-bottom: 2px solid var(--primary);
 }
 
-p, a {
-	color: var(--text-col);
+.std-header a {
+	font-size: 1.5rem;
+	color: var(--primary);
 }
 
-.primary-button {
-	color: var(--text-col);
-	background-color: var(--pri-col);
-	border-radius: 15px;
-	padding: 15px 30px 15px 30px;
-	font-size: 14px;
-	outline: none;
-	border: none;
+.std-content {
+	padding: 24px 20% 24px 20%;
 }
+
+.message-notif {
+	display: flex;
+	background-color: var(--second-lo);
+	border: 1px solid var(--second);
+	border-radius: 5px;
+	padding: 9px 5px 5px 5px;
+	margin: 0 0 20px 0;
+}
+
+.message-notif p {
+	margin: 0;
+	padding: 0 20px 0 20px;
+}
+
+.msg-icon {
+	height: 24px;
+}
+
+.outer-cook-table {
+	margin: 40px 0 40px 0;
+	background-color: var(--second-lo);
+	border: 1px solid var(--second);
+	aspect-ratio: 8 / 5;
+	height: 600px;
+	margin-left: auto;
+	margin-right: auto;
+
+	display: grid;
+	grid-template-rows: repeat(8, calc(100% / 8));
+	grid-template-columns: repeat(5, calc(100% / 5));
+	border-radius: 5px;
+}
+
+.bg {
+	background-color: var(--bg);
+}
+
+.outer-cook-table div {
+	font-size: 2rem;
+	text-align: center;
+}
+
+.outer-cook-table div p {
+	margin-bottom: auto;
+}
+
+.outer-cook-table div img {
+	margin: auto;
+}
+
