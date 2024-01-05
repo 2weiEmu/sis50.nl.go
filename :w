@@ -72,5 +72,5 @@ func GetAdmin(writer http.ResponseWriter, request *http.Request) {
 func GetPage(writer http.ResponseWriter, request *http.Request) {
 	vars := mux.Vars(request)
 	page := vars["page"]
-	http.ServeFile(writer, request, "src/static/templates/" + page + ".html")
+	http.ServeFile(writer, request, "src/static/templates" + page + ".html")
 }
