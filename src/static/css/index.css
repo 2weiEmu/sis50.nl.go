@@ -171,3 +171,7 @@ form button {
 	width: 12%;
 	color: var(--text);
 }
+
+a {
+	color: var(--primary);
+}
