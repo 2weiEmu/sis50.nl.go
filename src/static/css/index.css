@@ -82,6 +82,16 @@ body {
 	text-align: center;
 }
 
+
+.outer-cook-table div:nth-child(1n + 1) {
+	border-right: 1px solid var(--primary);
+}
+
+.outer-cook-table div:nth-child(5n) {
+	border-right: none;
+}
+
+
 .outer-cook-table div p {
 	margin: 0;
 	margin-top: 8%;
@@ -92,3 +102,72 @@ body {
 	margin: auto;
 }
 
+h1 {
+	color: var(--primary);
+	text-decoration: underline;
+}
+
+form {
+	font-size: 1.5rem;
+	display: flex;
+	justify-content: space-evenly;
+}
+
+form input {
+	width: 70%;
+	font-size: 1.75rem;
+	color: var(--primary);
+	text-decoration: underline;
+	background-color: var(--second-lo);
+	border: 2px solid var(--second);
+	border-radius: 5px;
+	padding: 5px;
+}
+
+form button {
+	width: 25%;
+	font-size: 1.75rem;
+	background-color: var(--primary);
+	color: var(--bg);
+	outline: none;
+	border: none;
+	border-radius: 5px;
+	padding: 5px;
+}
+
+.shopping-list {
+	width: calc(100% - 82px);
+	border: 1px solid var(--second);
+	margin: 40px 0 40px 0;
+	border-radius: 5px;
+	display: flex;
+	flex-direction: row;
+	height: 400px;
+	padding: 10px 40px 10px 40px;
+
+}
+
+.shopping-item {
+	display: flex;
+	justify-content: space-evenly;
+	width: 100%;
+	height: min-content;
+}
+
+.shopping-item * {
+	margin: 5px;
+	font-size: 1.5rem;
+	background-color: var(--sec-bg);
+	padding: 10px;
+	border-radius: 5px;
+}
+
+.shopping-item p {
+	width: 70%;
+}
+
+.shopping-item button {
+	border: none;
+	width: 12%;
+	color: var(--text);
+}
