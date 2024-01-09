@@ -176,3 +176,10 @@ form button {
 a {
 	color: var(--primary);
 }
+
+@media only screen and (max-width: 640px) {
+	html, body {
+		width: 100vw;
+		min-height: 100vh;
+	}
+}
