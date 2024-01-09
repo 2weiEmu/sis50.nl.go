@@ -3,7 +3,7 @@ console.log("Loaded index.js")
 const weekdayList = ["zo", "ma", "di", "wo", "do", "vr", "za"]
 const date = new Date()
 
-setWeekday(date)
+setInterval(setWeekday(date), 600000);
 
 
 
