@@ -209,3 +209,8 @@ a {
 		width: 20%;
 	}
 }
+
+.selected {
+	color: var(--accent);
+	font-weight: bold;
+}

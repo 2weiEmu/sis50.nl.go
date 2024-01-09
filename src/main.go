@@ -51,7 +51,7 @@ func GetStyle(writer http.ResponseWriter, request *http.Request) {
 func GetScript(writer http.ResponseWriter, request *http.Request) {
 	vars := mux.Vars(request)
 	script := vars["script"]
-	http.ServeFile(writer, request, "src/static/css/" + script)
+	http.ServeFile(writer, request, "src/static/js/" + script)
 }
 
 func GetImage(writer http.ResponseWriter, request *http.Request) {
