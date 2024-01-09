@@ -178,8 +178,34 @@ a {
 }
 
 @media only screen and (max-width: 640px) {
-	html, body {
-		width: 100vw;
-		min-height: 100vh;
+	.std-content {
+		padding: 24px 10px 24px 10px;
+	}
+
+	.outer-cook-table {
+		aspect-ratio: unset;
+		grid-template-rows: repeat(8, calc(100% / 8));
+		grid-template-columns: repeat(5, calc(100% / 5));
+	}
+
+	.shopping-list {
+		padding: 10px 2px 10px 2px;
+		width: calc(100% - 82px + 38px + 38px);
+	}
+
+	.outer-cook-table div {
+		font-size: 1.25rem;
+	}
+
+	.shopping-item * {
+		font-size: 1rem;
+	}
+
+	.shopping-item p {
+		width: 40%;
+	}
+
+	.shopping-item button {
+		width: 20%;
 	}
 }
