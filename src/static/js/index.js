@@ -1,5 +1,14 @@
 console.log("Loaded index.js")
 
+// NOTE: getting arguments, setting state
+//		 --------------------------------
+
+var arguments = document.currentScript.getAttribute("args")
+var argv = arguments.split(" ")
+
+var WS_BASE = argv[0]
+console.log(`WS_BASE: ${WS_BASE}`)
+
 // NOTE: weekday section
 //       ---------------
 const weekdayList = ["zo", "ma", "di", "wo", "do", "vr", "za"]
@@ -23,7 +32,8 @@ function setWeekday(date) {
 
 var stateList = ["present", "absent", "cooking", "uncertain", "maybe-cooking", "cant-cook"]
 
-var dayWebsocket = new WebSocket("ws://localhost:8000/dayWS", "echo-protocol")
+console.log(`${WS_BASE}/dayWS`)
+var dayWebsocket = new WebSocket(`${WS_BASE}/dayWS`, "echo-protocol")
 
 dayWebsocket.onopen = (event) => {
 	// TODO:

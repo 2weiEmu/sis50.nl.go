@@ -3,11 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
+	"html/template"
 	"net/http"
 	"strconv"
 
-	"golang.org/x/net/websocket"
 	"github.com/gorilla/mux"
+	"golang.org/x/net/websocket"
 )
 
 type MessageStruct struct {
@@ -20,11 +21,13 @@ type MessageStruct struct {
 var stateList = []string{"present", "absent", "cooking", "uncertain", "maybe-cooking", "cant-cook"}
 
 var websocket_connections []*websocket.Conn
+var p_ws_conn *string
 
 func main() {
 
 	p_deploy := flag.Bool("d", false, "A flag specifying the deploy mode of the server.")
 	p_port := flag.Int("p", 8000, "The port the server should be deployed on.")
+	p_ws_conn = flag.String("ws", "ws://localhost:8000", "The websocket base")
 	flag.Parse()
 
 	router := mux.NewRouter()
@@ -50,7 +53,16 @@ func main() {
 }
 
 func IndexPage(writer http.ResponseWriter, request *http.Request) {
-	http.ServeFile(writer ,request, "src/static/templates/index.html")
+	index := "src/static/templates/index.html"
+	tmpl, err := template.ParseFiles(index)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	err = tmpl.Execute(writer, p_ws_conn)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 func GetStyle(writer http.ResponseWriter, request *http.Request) {
