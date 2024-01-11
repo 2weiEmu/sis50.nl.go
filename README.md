@@ -11,15 +11,16 @@ This is a simple site created for the house Sis50 in the Netherlands to coordina
 (In-between stages I will wait for user feedback and add requested features)
 
 ### **Feature Set** (Replacement Stage)
-- [ ] A basic calendar for each person in the house.
-- [ ] The current day being highlighted on the calendar
-- [ ] Each calendar cell has 6 possible stages:
-    - [ ] Present
-    - [ ] Maybe present
-    - [ ] Present but cannot cook
-    - [ ] Maybe cooking
-    - [ ] Cooking
-    - [ ] Not there
+- [x] A basic calendar for each person in the house.
+- [x] The current day being highlighted on the calendar
+- [x] Each calendar cell has 6 possible stages:
+    - [x] Present
+    - [x] Maybe present
+    - [x] Present but cannot cook
+    - [x] Maybe cooking
+    - [x] Cooking
+    - [x] Not there
+- [ ] Calendar will be saved
 - [ ] A basic shopping list with 3 options:
     - [ ] Remove
     - [ ] Edit
