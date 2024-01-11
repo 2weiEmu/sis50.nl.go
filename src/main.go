@@ -128,8 +128,10 @@ func DayWebsocketHandler(conn *websocket.Conn) {
 }
 
 func BroadcastToConnections(conn *websocket.Conn, message MessageStruct) {
+	fmt.Println("[BROADCAST STARTING]")
 	for i := 0; i < len(websocket_connections); i++ {
-		err := websocket.JSON.Send(conn, message)
+		fmt.Println("[WS] Sending to: ", websocket_connections[i])
+		err := websocket.JSON.Send(websocket_connections[i], message)
 		if err != nil {
 			fmt.Println(err)
 		}
