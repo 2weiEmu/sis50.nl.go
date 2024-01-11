@@ -21,7 +21,9 @@ function setWeekday(date) {
 // person: string 
 // state: string
 
-var dayWebsocket = new Websocket("localhost:8000/day-ws")
+var stateList = ["present", "absent", "cooking", "uncertain", "maybe-cooking", "cant-cook"]
+
+var dayWebsocket = new WebSocket("ws://localhost:8000/dayWS", "echo-protocol")
 
 dayWebsocket.onopen = (event) => {
 	// TODO:
@@ -37,8 +39,12 @@ for (var i = 0; i < gridElList.length; i++) {
 	gridElList[i].addEventListener("click", function (event) {
 		var day, person, state
 
-		day = this.classList
+		day = this.getAttribute("data-day")
+		person = this.getAttribute("data-person")
+		state = this.childNodes[0].getAttribute("data-state")
 
+		console.log("Sending message...")
+		console.log(day, person, state)
 		dayWebsocket.send(JSON.stringify({
 			"day": day,
 			"person": person,
@@ -47,11 +53,13 @@ for (var i = 0; i < gridElList.length; i++) {
 	})
 }
 
-// NOTE: helper functions
-// 	     ----------------
+dayWebsocket.onmessage = function(event) {
+	console.log("Received Message")
+	var message = JSON.parse(event.data)
+	console.log(message)
 
-function findDayFromList(classList, dayList) {
-
+	var el = document.getElementsByClassName(`${message.person} ${message.day}`)[0]
+	console.log(el)
+	el.childNodes[0].setAttribute("data-state", message.state) 
+	el.childNodes[0].src = "/images/" + message.state + ".svg"
 }
-
-function findPersonFromDayList
