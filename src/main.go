@@ -123,11 +123,11 @@ func DayWebsocketHandler(conn *websocket.Conn) {
 			}
 		}
 		message.State = stateList[(currentState + 1) % len(stateList)]
-		BroadcastToConnections(conn, message)
+		BroadcastToConnections(message)
 	}
 }
 
-func BroadcastToConnections(conn *websocket.Conn, message MessageStruct) {
+func BroadcastToConnections(message MessageStruct) {
 	fmt.Println("[BROADCAST STARTING]")
 	for i := 0; i < len(websocket_connections); i++ {
 		fmt.Println("[WS] Sending to: ", websocket_connections[i])
