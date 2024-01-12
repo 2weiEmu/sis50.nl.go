@@ -17,6 +17,10 @@ const date = new Date()
 setInterval(setWeekday(date), 600000);
 function setWeekday(date) {
 	var day = weekdayList[date.getDay()]
+	var old_day = weekdayList[Math.abs(date.getDay() - 7)]
+	var old_el = document.getElementsByClassName(`day ${old_day}`)[0]
+	old_el.classList.remove("selecteled")
+
 	console.log(`Got day: ${day}`)
 	var el = document.getElementsByClassName(`day ${day}`)[0]
 	el.classList.add("selected")
@@ -61,6 +65,8 @@ for (var i = 0; i < gridElList.length; i++) {
 			"state": state,
 		}))
 	})
+
+	gridElList[i].childNodes[0].setAttribute("draggable", false)
 }
 
 dayWebsocket.onmessage = function(event) {

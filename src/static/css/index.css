@@ -92,6 +92,9 @@ body {
 	border-right: none;
 }
 
+.outer-cook-table * {
+	user-select: none;
+}
 
 .outer-cook-table div p {
 	margin: 0;

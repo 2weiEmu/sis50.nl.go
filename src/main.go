@@ -18,10 +18,9 @@ type MessageStruct struct {
 }
 
 
-var stateList = []string{"present", "absent", "cooking", "uncertain", "maybe-cooking", "cant-cook"}
-
 var websocket_connections []*websocket.Conn
 var p_ws_conn *string
+var cal = InitCalendarDefault()
 
 func main() {
 
@@ -105,7 +104,6 @@ func DayWebsocketHandler(conn *websocket.Conn) {
 	fmt.Println(websocket_connections)
 
 	var message MessageStruct
-	currentState := 0
 	for {
 		err := websocket.JSON.Receive(conn, &message)
 		if err != nil {
@@ -116,13 +114,7 @@ func DayWebsocketHandler(conn *websocket.Conn) {
 
 		fmt.Println("Message received: ", message)
 
-		for i, s := range stateList {
-			if message.State == s {
-				currentState = i
-				break
-			}
-		}
-		message.State = stateList[(currentState + 1) % len(stateList)]
+		message.State = UpdateCalendar(cal, message)
 		BroadcastToConnections(message)
 	}
 }
