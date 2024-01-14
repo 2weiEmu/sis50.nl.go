@@ -23,15 +23,14 @@ This is a simple site created for the house Sis50 in the Netherlands to coordina
 - [x] Calendar will be saved
 - [x] A basic shopping list with 3 options:
     - [x] Remove
-    - [ ] Edit
+    - [x] Edit
     - [x] Add
 - [ ] Notification / Notices Page
     - [ ] Ability to post new Announcement with bold highlighting
-- [ ] Addition of a basic favicon for the website
+- [x] Addition of a basic favicon for the website
 - [ ] A link to the local supermarket's site
 - [x] Add mobile design (basic)
-- [ ] There is a basic help page
-- [ ] Make sure there is favicon for the website
+- [x] There is a basic help page
 
 ### **Feature Set** (User Customisation Stage)
 
