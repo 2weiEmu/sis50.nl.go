@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/benlubar/htmlcleaner"
 	"github.com/gorilla/mux"
 	"golang.org/x/net/websocket"
 )
@@ -18,9 +19,12 @@ type MessageStruct struct {
 }
 
 
-var websocket_connections []*websocket.Conn
+var websocket_day_connections []*websocket.Conn
+var websocket_shop_connections []*websocket.Conn
 var p_ws_conn *string
 var cal = ReadCalendar(InitCalendarDefault())
+var shoppingList []ShoppingItem
+var id_count int
 
 func main() {
 
@@ -32,6 +36,7 @@ func main() {
 	router := mux.NewRouter()
 
 	router.Handle("/dayWS", websocket.Handler(DayWebsocketHandler))
+	router.Handle("/shopWS", websocket.Handler(ShoppingListWebsocketHandler))
 	router.HandleFunc("/", IndexPage)
 	router.HandleFunc("/{page}", GetPage)
 	router.HandleFunc("/css/{style}", GetStyle)
@@ -100,8 +105,8 @@ func GetPage(writer http.ResponseWriter, request *http.Request) {
 func DayWebsocketHandler(conn *websocket.Conn) {
 	fmt.Println("Activating WebSocket handler...")
 
-	websocket_connections = append(websocket_connections, conn)
-	fmt.Println(websocket_connections)
+	websocket_day_connections = append(websocket_day_connections, conn)
+	fmt.Println(websocket_day_connections)
 
 	var message MessageStruct
 	for {
@@ -134,15 +139,76 @@ func DayWebsocketHandler(conn *websocket.Conn) {
 			}
 		}
 	}
+}
 
-	WriteCalendar(cal)
+
+func ShoppingListWebsocketHandler(shop_conn *websocket.Conn) {
+	fmt.Println("[INFO] Activating Shopping Handler")
+
+	websocket_shop_connections = append(websocket_shop_connections, shop_conn)
+	fmt.Println(websocket_shop_connections)
+
+	var message ShoppingItem
+	for {
+		err := websocket.JSON.Receive(shop_conn, &message)
+		if err != nil {
+			// TODO:
+			fmt.Println(err)
+			break
+		}
+		fmt.Println("Message received: ", message)
+
+		message.Content = htmlcleaner.Clean(nil, message.Content)
+
+		if message.Action != "open-shopping" {
+			// Broadcast to all connections, the item that was added
+			if message.Action == "remove" {
+				fmt.Println("[INFO] Removing", message.Id)
+				err := RemoveShoppingItemById(message.Id)
+				if err != nil {
+					// TODO:
+					fmt.Println(err)
+				}
+			} else if message.Action == "add" {
+				message.Id = id_count
+				id_count++
+				shoppingList = append(shoppingList, message)
+
+			} else if message.Action == "edit" {
+				err := EditMessageById(message.Id, message.Content)
+				if err != nil {
+					// TODO:
+					fmt.Println(err)
+				}
+			}
+
+			for _, ws_conn := range websocket_shop_connections {
+				err := websocket.JSON.Send(ws_conn, message)
+				if err != nil {
+					// TODO:
+					fmt.Println(err)
+				}
+			}
+		} else {
+			fmt.Println("Opening")
+			for _, si := range shoppingList {
+				// NOTE: thought we had to make the actions be "add" manually -
+				// but everything that gets added to the list already has "add"
+				err := websocket.JSON.Send(shop_conn, si)
+				if err != nil {
+					// TODO:
+					fmt.Println(err)
+				}
+			}
+		}
+	}
 }
 
 func BroadcastToConnections(message MessageStruct) {
 	fmt.Println("[BROADCAST STARTING]")
-	for i := 0; i < len(websocket_connections); i++ {
-		fmt.Println("[WS] Sending to: ", websocket_connections[i])
-		err := websocket.JSON.Send(websocket_connections[i], message)
+	for i := 0; i < len(websocket_day_connections); i++ {
+		fmt.Println("[WS] Sending to: ", websocket_day_connections[i])
+		err := websocket.JSON.Send(websocket_day_connections[i], message)
 		if err != nil {
 			fmt.Println(err)
 		}

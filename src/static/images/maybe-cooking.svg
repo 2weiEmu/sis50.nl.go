@@ -24,10 +24,10 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      inkscape:zoom="35.235663"
-     inkscape:cx="3.3914504"
-     inkscape:cy="7.2511763"
-     inkscape:window-width="1888"
-     inkscape:window-height="1025"
+     inkscape:cx="3.3914503"
+     inkscape:cy="7.2653663"
+     inkscape:window-width="1868"
+     inkscape:window-height="1000"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
@@ -56,7 +56,7 @@
        id="text12"><tspan
          sodipodi:role="line"
          id="tspan12"
-         style="stroke-width:0.133"
+         style="stroke:#bebebe;stroke-width:0.133;stroke-opacity:1"
          x="84.310448"
          y="108.40294">()</tspan></text>
   </g>

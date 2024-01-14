@@ -83,7 +83,6 @@ dayWebsocket.onmessage = function(event) {
 	if (message.state != "open-calendar") {
 		var el = document.getElementsByClassName(`${message.person} ${message.day}`)[0]
 		console.log(el)
-		console.log(`${message.person} ${message.day}`)
 		el.childNodes[0].setAttribute("data-state", message.state) 
 		el.childNodes[0].src = "/images/" + message.state + ".svg"
 		var i = stateList.findIndex((item) => { item == message.state })
@@ -119,40 +118,23 @@ var shoppingList = document.getElementById("shop-list")
 
 var shopWebSocket = new WebSocket(`${WS_BASE}/shopWS`, "echo-protocol")
 
-function addItem() {
-	var content = document.getElementById("item-name-add").value
-	shopWebSocket.send(JSON.stringify({
-		"id": "-1",
-		"content": content,
-		"action": "add"
-	}))
-}
-
-function editItem(event) {
+function editItem(editButton) {
 
 }
 
-function removeItem(event) {
-	var id = this.parentElement.id
-	console.log("[INFO] ID to remove:", id)
-	shopWebSocket.send(JSON.stringify({
-		"id": `${id}`, 
-		"content": "",
-		"action": "remove"
-	}))
+function removeItem(removeButton) {
+
 }
 
-shopWebSocket.onopen = () => {
-	console.log("[INFO] Opening Shop Socket")
-	shopWebSocket.send(JSON.stringify({
-		"id": "0",
+dayWebsocket.onopen = () => {
+	dayWebsocket.send(JSON.stringify({
+		"id": 0,
 		"content": "",
 		"action": "open-shopping"
 	}))
 }
 
-shopWebSocket.onmessage = (event) => {
-	console.log("[INFO] Received Shop Message")
+dayWebsocket.onmessage = (event) => {
 	var message = JSON.parse(event.data)
 
 	if (message.action == "add") {
@@ -164,32 +146,24 @@ shopWebSocket.onmessage = (event) => {
 		item_desc.innerText = message.content
 
 		var edit_button = document.createElement("button")
-		edit_button.addEventListener("click", editItem)
+		edit_button.onclick = "editItem(this)"
 		edit_button.innerText = "Edit"
 
 		var remove_button = document.createElement("button")
-		remove_button.addEventListener("click", removeItem)
+		remove_button.onclick = "removeItem(this)"
 		remove_button.innerText = "Remove"
 
 
 		shoppingItem.appendChild(item_desc)
 		shoppingItem.appendChild(edit_button)
 		shoppingItem.appendChild(remove_button)
+
 		shoppingList.appendChild(shoppingItem)
 
 	} else if (message.action == "edit") {
-		for (var i = 0; i < shoppingList.children.length; i++) {
-			if (shoppingList.children[i].id == message.id) {
-				shoppingList.children[i].children[0].innerText = message.Content
-			}
-		}
+
 	} else {
-		// remove the item by id
-		for (var i = 0; i < shoppingList.children.length; i++) {
-			if (shoppingList.children[i].id == message.id) {
-				shoppingList.children[i].remove()
-				break
-			}
-		}
+		// remove the item by Id
+		
 	}
 }

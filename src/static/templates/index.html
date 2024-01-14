@@ -5,7 +5,9 @@
 
 	<head>
 		<link href="/css/index.css" rel="stylesheet" type="text/css">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="icon" type="image/x-icon" href="/images/chalk-green.png">
+		<title>Sis50's Chalkboard</title>
 	</head>
 
 
@@ -73,17 +75,19 @@
 			</div>
 
 			<h1>Shopping List</h1>
-			<form action="">
-				<input name="item" placeholder="Item here..."></input>
-				<button type="submit">Add Item</button>
-			</form>
+			<div class="form">
+				<input id="item-name-add" placeholder="Item here..."></input>
+				<button id="add-item" onclick="addItem()">Add Item</button>
+			</div>
 
-			<div class="shopping-list">
-				<div class="shopping-item">
+			<div id="shop-list" class="shopping-list">
+				<!--
+				<div id="0" class="shopping-item">
 					<p>The name of an item...</p>
-					<button>Edit</button>
-					<button>Remove</button>
+					<button onclick="editItem(this)">Edit</button>
+					<button onclick="removeItem(this)">Remove</button>
 				</div>
+				-->
 			</div>
 
 		</div>

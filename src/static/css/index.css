@@ -106,7 +106,7 @@ body {
 	max-width: 80%;
 	max-height: 80%;
 	width: 100%;
-	margin: auto;
+	margin-top: 4%;
 }
 
 h1 {
@@ -114,13 +114,13 @@ h1 {
 	text-decoration: underline;
 }
 
-form {
+.form {
 	font-size: 1.5rem;
 	display: flex;
 	justify-content: space-evenly;
 }
 
-form input {
+.form input {
 	width: 70%;
 	font-size: 1.75rem;
 	color: var(--primary);
@@ -131,7 +131,7 @@ form input {
 	padding: 5px;
 }
 
-form button {
+.form button {
 	width: 25%;
 	font-size: 1.75rem;
 	background-color: var(--primary);
@@ -148,10 +148,10 @@ form button {
 	margin: 40px 0 40px 0;
 	border-radius: 5px;
 	display: flex;
-	flex-direction: row;
+	flex-direction: column;
 	height: 400px;
 	padding: 10px 40px 10px 40px;
-
+	overflow-y: auto;
 }
 
 .shopping-item {
@@ -218,4 +218,20 @@ a {
 
 .selected {
 	color: var(--accent);
+}
+
+.shopping-list::-webkit-scrollbar {
+	background-color: var(--bg);
+	border: none;
+	outline: none;
+}
+
+.shopping-list::-webkit-scrollbar-thumb {
+	background-color: var(--second);
+	border-radius: 20px;
+	border: 2px solid var(--primary);
+}
+
+.shopping-list::-webkit-scrollbar-track {
+	background-color: var(--primary);
 }
