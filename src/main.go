@@ -134,6 +134,8 @@ func DayWebsocketHandler(conn *websocket.Conn) {
 			}
 		}
 	}
+
+	WriteCalendar(cal)
 }
 
 func BroadcastToConnections(message MessageStruct) {

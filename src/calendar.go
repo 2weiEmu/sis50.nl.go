@@ -91,4 +91,29 @@ func UpdateCalendar(cal Calendar, message MessageStruct) string {
 }
 
 func WriteCalendar(cal Calendar) {
+	fmt.Println("Saving Calendar")
+	err := os.Truncate(CALENDAR_FILE, 0)
+	if err != nil {
+		// TODO:
+		fmt.Println("[ERROR]", err)
+	}
+
+	file, err := os.OpenFile(CALENDAR_FILE, os.O_WRONLY, os.ModeAppend)
+	if err != nil {
+		// TODO:
+		fmt.Println("[ERROR]", err)
+	}
+	defer file.Close()
+
+	for _, r := range cal.Day {
+		f := ""
+		for _, c := range r {
+			f += strconv.Itoa(c)
+		}
+		f += "\n"
+		_, err := file.WriteString(f)
+		if err != nil {
+			fmt.Println("[ERROR] Writing to File", err)
+		}
+	}
 }
