@@ -88,7 +88,7 @@ dayWebsocket.onmessage = function(event) {
 		el.childNodes[0].src = "/images/" + message.state + ".svg"
 		var i = stateList.findIndex((item) => { item == message.state })
 		console.log(i)
-		el.childNodes[0].alt = altTextList[i]
+		el.childNodes[0].title = altTextList[i]
 	} else {
 		var days = message.day.split("/")
 		for (var i = 0; i < days.length; i++) {
@@ -102,7 +102,7 @@ dayWebsocket.onmessage = function(event) {
 				console.log(el)
 				el.childNodes[0].setAttribute("data-state", newState) 
 				el.childNodes[0].src = "/images/" + newState + ".svg"
-				el.childNodes[0].alt = altTextList[day_states[j]]
+				el.childNodes[0].title = altTextList[day_states[j]]
 			}
 		}
 	}
