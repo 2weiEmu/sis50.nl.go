@@ -20,7 +20,7 @@ type MessageStruct struct {
 
 var websocket_connections []*websocket.Conn
 var p_ws_conn *string
-var cal = InitCalendarDefault()
+var cal = ReadCalendar(InitCalendarDefault())
 
 func main() {
 
@@ -111,11 +111,28 @@ func DayWebsocketHandler(conn *websocket.Conn) {
 			fmt.Println(err)
 			break
 		}
-
 		fmt.Println("Message received: ", message)
 
-		message.State = UpdateCalendar(cal, message)
-		BroadcastToConnections(message)
+		if message.State != "open-calendar" {
+			message.State = UpdateCalendar(cal, message)
+			BroadcastToConnections(message)
+		} else {
+			m := ""
+			for _, s := range cal.Day {
+				for _, k := range s {
+					m += strconv.Itoa(k)
+				}
+				m += "/"
+			}
+			fmt.Println("[INFO] Open:", m)
+
+			message.Day = m
+			err := websocket.JSON.Send(conn, &message)
+			if err != nil {
+				fmt.Println(err)
+				// TODO:
+			}
+		}
 	}
 }
 

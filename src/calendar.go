@@ -1,6 +1,12 @@
 package main
 
-import "fmt"
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strconv"
+	"strings"
+)
 
 
 var stateList = []string{"present", "absent", "cooking", "uncertain", "maybe-cooking", "cant-cook"}
@@ -14,20 +20,51 @@ type Calendar struct {
 const DAY_COUNT = 7
 const PERSON_COUNT = 4
 
+const CALENDAR_FILE = "./resources/calendar"
+
 func InitCalendarDefault() Calendar {
-	var cal Calendar
-	cal.Day = make([][]int, DAY_COUNT)
+	var newCal Calendar
+	newCal.Day = make([][]int, DAY_COUNT)
 	for i := 0; i < DAY_COUNT; i++ {
-		cal.Day[i] = make([]int, PERSON_COUNT)
-		for j := range cal.Day[i] {
-			cal.Day[i][j] = 0
+		newCal.Day[i] = make([]int, PERSON_COUNT)
+		for j := range newCal.Day[i] {
+			newCal.Day[i][j] = 0
 		}
 	}
 
-	fmt.Println("[INFO] InitCalendarDefault", cal)
-	return cal
+	fmt.Println("[INFO] InitCalendarDefault", newCal)
+	return newCal
 }
 
+func ReadCalendar(cal Calendar) Calendar {
+	
+	calFile, err := os.Open(CALENDAR_FILE)
+	if err != nil {
+		// TODO:
+		fmt.Println(err)
+	}
+	defer calFile.Close()
+
+	fileScanner := bufio.NewScanner(calFile)
+	fileScanner.Split(bufio.ScanLines)
+
+	d := 0
+	for fileScanner.Scan() {
+		tState := strings.Split(fileScanner.Text(), "")
+		for i := 0; i < PERSON_COUNT; i++ {
+			cal.Day[d][i], err = strconv.Atoi(tState[i])
+			if err != nil {
+				// TODO:
+				fmt.Println(err)
+			}
+		}
+		d++
+	}
+
+	fmt.Println("[INFO] Calendar Read:", cal)
+
+	return cal
+}
 
 func UpdateCalendar(cal Calendar, message MessageStruct) string {
 
@@ -51,4 +88,7 @@ func UpdateCalendar(cal Calendar, message MessageStruct) string {
 	cal.Day[dayIndex][personIndex] = new_state
 
 	return stateList[new_state]
+}
+
+func WriteCalendar(cal Calendar) {
 }

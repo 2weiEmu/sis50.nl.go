@@ -12,12 +12,13 @@ console.log(`WS_BASE: ${WS_BASE}`)
 // NOTE: weekday section
 //       ---------------
 const weekdayList = ["zo", "ma", "di", "wo", "do", "vr", "za"]
+const personList = ["rick", "youri", "robert", "milan"]
 const date = new Date()
 
 setInterval(setWeekday(date), 600000);
 function setWeekday(date) {
 	var day = weekdayList[date.getDay()]
-	var old_day = weekdayList[Math.abs(date.getDay() - 7)]
+	var old_day = weekdayList[Math.abs(date.getDay() - 6)]
 	var old_el = document.getElementsByClassName(`day ${old_day}`)[0]
 	old_el.classList.remove("selecteled")
 
@@ -40,7 +41,11 @@ console.log(`${WS_BASE}/dayWS`)
 var dayWebsocket = new WebSocket(`${WS_BASE}/dayWS`, "echo-protocol")
 
 dayWebsocket.onopen = (event) => {
-	// TODO:
+	dayWebsocket.send(JSON.stringify({
+		"day": "",
+		"person": "",
+		"state": "open-calendar"
+	}))
 }
 
 var gridElList = Array.from(document.getElementsByClassName("rick"))
@@ -74,8 +79,25 @@ dayWebsocket.onmessage = function(event) {
 	var message = JSON.parse(event.data)
 	console.log(message)
 
-	var el = document.getElementsByClassName(`${message.person} ${message.day}`)[0]
-	console.log(el)
-	el.childNodes[0].setAttribute("data-state", message.state) 
-	el.childNodes[0].src = "/images/" + message.state + ".svg"
+	if (message.state != "open-calendar") {
+		var el = document.getElementsByClassName(`${message.person} ${message.day}`)[0]
+		console.log(el)
+		el.childNodes[0].setAttribute("data-state", message.state) 
+		el.childNodes[0].src = "/images/" + message.state + ".svg"
+	} else {
+		var days = message.day.split("/")
+		for (var i = 0; i < days.length; i++) {
+			day_states = days[i].split("")
+			var day = weekdayList[((i + 1) % 7)]
+			console.log("Open day:", day)
+			for (var j = 0; j < day_states.length; j++) {
+				var person = personList[j]
+				var newState = stateList[day_states[j]]
+				var el = document.getElementsByClassName(`${person} ${day}`)[0]
+				console.log(el)
+				el.childNodes[0].setAttribute("data-state", newState) 
+				el.childNodes[0].src = "/images/" + newState + ".svg"
+			}
+		}
+	}
 }
