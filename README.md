@@ -20,7 +20,7 @@ This is a simple site created for the house Sis50 in the Netherlands to coordina
     - [x] Maybe cooking
     - [x] Cooking
     - [x] Not there
-- [ ] Calendar will be saved
+- [x] Calendar will be saved
 - [ ] A basic shopping list with 3 options:
     - [ ] Remove
     - [ ] Edit
@@ -28,7 +28,6 @@ This is a simple site created for the house Sis50 in the Netherlands to coordina
 - [ ] Notification / Notices Page
     - [ ] Ability to post new Announcement with bold highlighting
 - [ ] Addition of a basic favicon for the website
-- [ ] Saving the calendar in a downloadable CSV
 - [ ] A link to the local supermarket's site
 - [ ] Add mobile design (basic)
 - [ ] There is a basic help page
