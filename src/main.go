@@ -139,6 +139,8 @@ func DayWebsocketHandler(conn *websocket.Conn) {
 			}
 		}
 	}
+	WriteCalendar(cal)
+	websocket_day_connections = RemoveWebsocketFromPool(conn, websocket_day_connections)
 }
 
 
@@ -202,6 +204,7 @@ func ShoppingListWebsocketHandler(shop_conn *websocket.Conn) {
 			}
 		}
 	}
+	websocket_shop_connections = RemoveWebsocketFromPool(shop_conn, websocket_shop_connections)
 }
 
 func BroadcastToConnections(message MessageStruct) {
