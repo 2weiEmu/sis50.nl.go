@@ -21,10 +21,10 @@ This is a simple site created for the house Sis50 in the Netherlands to coordina
     - [x] Cooking
     - [x] Not there
 - [x] Calendar will be saved
-- [ ] A basic shopping list with 3 options:
-    - [ ] Remove
+- [x] A basic shopping list with 3 options:
+    - [x] Remove
     - [ ] Edit
-    - [ ] Add
+    - [x] Add
 - [ ] Notification / Notices Page
     - [ ] Ability to post new Announcement with bold highlighting
 - [ ] Addition of a basic favicon for the website

@@ -129,12 +129,12 @@ function addItem() {
 }
 
 function editItem(event) {
-	var new_content = window.prompt("Edit the name", "New name...")
+	var new_content window.prompt("Edit the name", "New name...")
 	var id = this.parentElement.id
 	console.log("[INFO] ID to remove:", id)
 	shopWebSocket.send(JSON.stringify({
 		"id": `${id}`, 
-		"content": new_content,
+		"content": "",
 		"action": "edit"
 	}))
 }
@@ -161,7 +161,6 @@ shopWebSocket.onopen = () => {
 shopWebSocket.onmessage = (event) => {
 	console.log("[INFO] Received Shop Message")
 	var message = JSON.parse(event.data)
-	console.log(message)
 
 	if (message.action == "add") {
 		var shoppingItem = document.createElement("div")
@@ -188,7 +187,7 @@ shopWebSocket.onmessage = (event) => {
 	} else if (message.action == "edit") {
 		for (var i = 0; i < shoppingList.children.length; i++) {
 			if (shoppingList.children[i].id == message.id) {
-				shoppingList.children[i].children[0].innerText = message.content
+				shoppingList.children[i].children[0].innerText = message.Content
 			}
 		}
 	} else {
