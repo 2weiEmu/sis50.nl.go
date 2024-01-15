@@ -129,7 +129,8 @@ function addItem() {
 }
 
 function editItem(event) {
-	var new_content = window.prompt("Edit the name", "New name...")
+	var old_content = this.parentElement.children[0].innerText
+	var new_content = window.prompt("Edit the name", `${old_content}`)
 	var id = this.parentElement.id
 	console.log("[INFO] ID to remove:", id)
 	shopWebSocket.send(JSON.stringify({
