@@ -52,7 +52,7 @@ body {
 .message-notif p {
 	margin: 0;
 	padding: 0 20px 0 20px;
-}
+ }
 
 .msg-icon {
 	height: 24px;
@@ -118,6 +118,12 @@ h1 {
 	font-size: 1.5rem;
 	display: flex;
 	justify-content: space-evenly;
+	border-top: 1px solid var(--second);
+	border-left: 1px solid var(--second);
+	border-right: 1px solid var(--second);
+	border-radius: 5px 5px 0 0;
+	margin: 0px 0 0px 0;
+	padding: 10px 35px 10px 35px;
 }
 
 .form input {
@@ -144,9 +150,11 @@ h1 {
 
 .shopping-list {
 	width: calc(100% - 82px);
-	border: 1px solid var(--second);
-	margin: 40px 0 40px 0;
-	border-radius: 5px;
+	border-bottom: 1px solid var(--second);
+	border-left: 1px solid var(--second);
+	border-right: 1px solid var(--second);
+	margin: 0px 0 40px 0;
+	border-radius: 0 0 5px 5px;
 	display: flex;
 	flex-direction: column;
 	height: 400px;
