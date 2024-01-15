@@ -75,10 +75,10 @@
 			</div>
 
 			<h1>Shopping List</h1>
-			<div class="form">
+			<form onsubmit="cleanInput(); return false;" class="form">
 				<input id="item-name-add" placeholder="Item here..."></input>
 				<button id="add-item" onclick="addItem()">Add Item</button>
-			</div>
+			</form>
 
 			<div id="shop-list" class="shopping-list">
 				<!--

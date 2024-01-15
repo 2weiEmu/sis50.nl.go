@@ -202,3 +202,8 @@ shopWebSocket.onmessage = (event) => {
 		}
 	}
 }
+
+function cleanInput() {
+	document.getElementById("item-name-add").value = ""
+	return false;
+}
