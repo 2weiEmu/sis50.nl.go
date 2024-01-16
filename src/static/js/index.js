@@ -1,10 +1,16 @@
 console.log("Loaded index.js")
 
+document.getElementById("bg-button").addEventListener("click", bgMenu)
+
+if (localStorage.getItem("sis50-background") === null) {
+	localStorage.setItem("sis50-background", "")
+}
+
 // NOTE: getting arguments, setting state
 //		 --------------------------------
 
-var arguments = document.currentScript.getAttribute("args")
-var argv = arguments.split(" ")
+var ws_args = document.currentScript.getAttribute("args")
+var argv = ws_args.split(" ")
 
 var WS_BASE = argv[0]
 console.log(`WS_BASE: ${WS_BASE}`)
@@ -207,3 +213,6 @@ function cleanInput() {
 	document.getElementById("item-name-add").value = ""
 	return false;
 }
+
+// Background images
+

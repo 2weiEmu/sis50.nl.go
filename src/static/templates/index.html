@@ -11,11 +11,12 @@
 	</head>
 
 
-	<body>
+	<body id="mbody">
 		<div class="std-header">
 			<a href="/">Home</a>
 			<a href="/messages">Messages</a>
 			<a href="/help">Help</a>
+			<button id="bg-button">bg</button>
 		</div>
 
 		<div class="std-content">
@@ -94,5 +95,19 @@
 
 	</body>
 
+	<script src="/js/wallpaper.js" args="{{ . }}"></script>
 	<script src="/js/index.js" args="{{ . }}"></script>
+
+	<div id="bg-menu" style="display: none;">
+		<h1>Select One of Your Saved Backgrounds</h1>
+		<div id="bgl">
+		</div>
+		<button id="bg-confirm" data-selected="">Confirm</button>
+		<button id="bg-remove" data-selected="">Remove</button>
+		<h2>Add a New Background</h2>
+		<input id="new-bg" placeholder="New Background Image URL"></input>
+		<button id="add-new-bg" data-selected="">Add</button>
+	</div>
 </html>
+
+
