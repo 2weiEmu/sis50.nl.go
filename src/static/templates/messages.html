@@ -20,14 +20,25 @@
 		</div>
 
 		<div class="std-content">
-			<form onsubmit="cleanInput(); return false;" class="form complete-form">
+			<!-- TODO: clean input preferably on the server side I guess --->
+			<form onsubmit="addMessage()" class="form complete-form">
 				<input id="msg-content" placeholder="Message here.."></input>
-				<button id="add-msg" onclick="addItem()">Post</button>
+				<button id="add-msg" type="submit">Post</button>
 			</form>
-			<div>
+			<div id="msg-list">
+				<!--
 				<div class="msg">
 					<p>This is a message.</p>
 				</div>
+				-->
+			</div>
+			<div style="display: flex; justify-content: space-around;">
+				<button 
+					id="load-button"
+					onclick="loadMoreItems(this)"
+					data-page-number="0"
+					style="background-color: var(--second-lo)">
+					Load more messages...</button>
 			</div>
 		</div>
 
@@ -44,6 +55,7 @@
 		<button id="add-new-bg" data-selected="">Add</button>
 	</div>
 
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 	<script src="/js/wallpaper.js" args="{{ . }}"></script>
 	<script src="/js/messages.js" args="{{ . }}"></script>
 </html>

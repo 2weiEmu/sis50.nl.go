@@ -35,6 +35,7 @@ type MessageList struct {
 // GET pages of Messages
 // POST a new message to a page, and save this
 func GETMessages(writer http.ResponseWriter, request *http.Request) {
+	fmt.Println("[INFO] GET REQUEST RECEIVED")
 	messageList = readMessages(messageList)
 
 	vars := mux.Vars(request)
@@ -51,9 +52,11 @@ func GETMessages(writer http.ResponseWriter, request *http.Request) {
 	if page == nil {
 		// TODO:
 		fmt.Println(err)
-		writer.Write([]byte("No Page\n"))
+		http.Error(
+			writer, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 	}
 	fmt.Println(messageList)
+	writer.Header().Set("Access-Control-Allow-Headers", "x-requested-with")
 	writer.Write(page)
 }
 
@@ -70,6 +73,7 @@ func getMessageJson(pageNumber int) []byte {
 }
 
 func POSTMessage(writer http.ResponseWriter, request *http.Request) {
+	fmt.Println("[INFO] POST REQUEST RECEIVED")
 	messageList = readMessages(messageList)
 	var msgPost MessagePost
 	err := json.NewDecoder(request.Body).Decode(&msgPost)

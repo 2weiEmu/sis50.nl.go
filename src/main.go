@@ -42,7 +42,7 @@ func main() {
 	router.Handle("/dayWS", websocket.Handler(DayWebsocketHandler))
 	router.Handle("/shopWS", websocket.Handler(ShoppingListWebsocketHandler))
 	router.HandleFunc("/api/messages/{pageNumber}", GETMessages).Methods("GET")
-	router.HandleFunc("/api/messages/", POSTMessage).Methods("POST")
+	router.HandleFunc("/api/messages", POSTMessage).Methods("POST")
 	router.HandleFunc("/", IndexPage)
 	router.HandleFunc("/{page}", GetPage)
 	router.HandleFunc("/css/{style}", GetStyle)
