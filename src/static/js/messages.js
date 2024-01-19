@@ -37,6 +37,10 @@ window.onload = (event) => {
 				el.appendChild(msgPar)
 				msgList.appendChild(el)
 			}
+
+			if (messagePageZero.messages.length < 5) {
+				loadMoreItems(document.getElementById("load-button"))
+			}
 		},
 		error: function(req, error) {
 			alert("Messages could not be loaded.")
