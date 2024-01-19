@@ -30,6 +30,7 @@ var messageList MessageList
 
 func main() {
 	messageList.Pages = []MessagePage{ MessagePage{ Message: []string{}}}
+	messageList = readMessages(messageList)
 
 	p_deploy := flag.Bool("d", false, "A flag specifying the deploy mode of the server.")
 	p_port := flag.Int("p", 8000, "The port the server should be deployed on.")

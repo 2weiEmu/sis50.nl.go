@@ -1,10 +1,12 @@
 package main
 
 import (
+	"encoding/csv"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/gorilla/mux"
@@ -15,6 +17,8 @@ NOTE:
 The scheme by which the messages are saved:
 // right now - all in memory, and saved to a file at the end of the day
 */
+
+const MESSAGE_FILE = "./resources/messages"
 
 type MessagePost struct {
 	Message string `json:"message"`
@@ -31,6 +35,8 @@ type MessageList struct {
 // GET pages of Messages
 // POST a new message to a page, and save this
 func GETMessages(writer http.ResponseWriter, request *http.Request) {
+	messageList = readMessages(messageList)
+
 	vars := mux.Vars(request)
 	pageNumber, err := strconv.Atoi(vars["pageNumber"])
 	if err != nil {
@@ -64,6 +70,7 @@ func getMessageJson(pageNumber int) []byte {
 }
 
 func POSTMessage(writer http.ResponseWriter, request *http.Request) {
+	messageList = readMessages(messageList)
 	var msgPost MessagePost
 	err := json.NewDecoder(request.Body).Decode(&msgPost)
 	if err != nil {
@@ -71,6 +78,7 @@ func POSTMessage(writer http.ResponseWriter, request *http.Request) {
 		fmt.Println(err)
 	}
 
+	fmt.Println(messageList)
 	err = addMessageToList(msgPost.Message)
 	if err != nil {
 		writer.Write([]byte("Failed to Add\n"))
@@ -78,6 +86,7 @@ func POSTMessage(writer http.ResponseWriter, request *http.Request) {
 		writer.Write([]byte("Added\n"))
 	}
 	fmt.Println(messageList)
+	saveMessages(messageList)
 }
 
 func addMessageToList(message string) error {
@@ -95,4 +104,66 @@ func addMessageToList(message string) error {
 				messageList.Pages[len(messageList.Pages)-1].Message, message)
 	} 
 	return nil
+}
+
+func saveMessages(messageList MessageList) {
+	err := os.Truncate(MESSAGE_FILE, 0)
+	if err != nil {
+		// TODO:
+		fmt.Println(err)
+	}
+
+	file, err := os.OpenFile(
+		MESSAGE_FILE, os.O_RDWR | os.O_APPEND, os.ModeAppend)
+	if err != nil {
+		// TODO:
+		fmt.Println(err)
+	}
+	defer file.Close()
+
+	csvWriter := csv.NewWriter(file)
+
+	for _, page := range messageList.Pages {
+		fmt.Println("[INFO] Writing Page:", page)
+		err = csvWriter.Write(page.Message)
+		if err != nil {
+			// TODO:
+			fmt.Println(err)
+		}
+	}
+	csvWriter.Flush()
+	err = csvWriter.Error()
+	if err != nil {
+		// TODO:
+		fmt.Println(err)
+	}
+
+}
+
+func readMessages(messageList MessageList) MessageList {
+	file, err := os.OpenFile(
+		MESSAGE_FILE, os.O_RDWR | os.O_APPEND, os.ModeAppend)
+	if err != nil {
+		// TODO:
+		fmt.Println(err)
+	}
+	defer file.Close()
+
+	csvr := csv.NewReader(file)
+	csvr.FieldsPerRecord = -1
+	records, err := csvr.ReadAll()
+	if err != nil {
+		// TODO:
+		fmt.Println("[ERROR] Record:", err)
+	}
+
+	messageList.Pages = []MessagePage{}
+	
+	for _, record := range records {
+		fmt.Println("[INFO] Read record:", record)
+		messageList.Pages = append(messageList.Pages, MessagePage{record})
+	}
+	fmt.Println("[INFO] Finished Read messageList:", messageList)
+
+	return messageList
 }
