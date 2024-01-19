@@ -26,7 +26,10 @@ var cal = ReadCalendar(InitCalendarDefault())
 var shoppingList []ShoppingItem
 var id_count int
 
+var messageList MessageList
+
 func main() {
+	messageList.Pages = []MessagePage{ MessagePage{ Message: []string{}}}
 
 	p_deploy := flag.Bool("d", false, "A flag specifying the deploy mode of the server.")
 	p_port := flag.Int("p", 8000, "The port the server should be deployed on.")
@@ -37,6 +40,8 @@ func main() {
 
 	router.Handle("/dayWS", websocket.Handler(DayWebsocketHandler))
 	router.Handle("/shopWS", websocket.Handler(ShoppingListWebsocketHandler))
+	router.HandleFunc("/api/messages/{pageNumber}", GETMessages).Methods("GET")
+	router.HandleFunc("/api/messages/", POSTMessage).Methods("POST")
 	router.HandleFunc("/", IndexPage)
 	router.HandleFunc("/{page}", GetPage)
 	router.HandleFunc("/css/{style}", GetStyle)

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+
+
+<html>
+
+	<head>
+		<link href="/css/index.css" rel="stylesheet" type="text/css">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="icon" type="image/x-icon" href="/images/chalk-green.png">
+		<title>Sis50's Chalkboard</title>
+	</head>
+
+
+	<body id="mbody">
+		<div class="std-header">
+			<a href="/">Home</a>
+			<a href="/messages">Messages</a>
+			<a href="/help">Help</a>
+			<button id="bg-button">bg</button>
+		</div>
+
+		<div class="std-content">
+			<form onsubmit="cleanInput(); return false;" class="form complete-form">
+				<input id="msg-content" placeholder="Message here.."></input>
+				<button id="add-msg" onclick="addItem()">Post</button>
+			</form>
+			<div>
+				<div class="msg">
+					<p>This is a message.</p>
+				</div>
+			</div>
+		</div>
+
+	</body>
+
+	<div id="bg-menu" style="display: none;">
+		<h1>Select One of Your Saved Backgrounds</h1>
+		<div id="bgl">
+		</div>
+		<button id="bg-confirm" data-selected="">Confirm</button>
+		<button id="bg-remove" data-selected="">Remove</button>
+		<h2>Add a New Background</h2>
+		<input id="new-bg" placeholder="New Background Image URL"></input>
+		<button id="add-new-bg" data-selected="">Add</button>
+	</div>
+
+	<script src="/js/wallpaper.js" args="{{ . }}"></script>
+	<script src="/js/messages.js" args="{{ . }}"></script>
+</html>
+
+

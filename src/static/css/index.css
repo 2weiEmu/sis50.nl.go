@@ -286,3 +286,15 @@ a {
 #bgl img {
 	width: 30%;
 }
+
+.complete-form {
+	border-bottom: 1px solid var(--second);
+	border-radius: 5px;
+}
+
+.msg {
+	background-color: var(--sec-bg);
+	margin: 10px 25px 10px 25px;
+	padding: 1px 10px 1px 10px;
+	border-radius: 5px;
+}
