@@ -60,7 +60,7 @@ function addMessage() {
 		dataType: "JSON",
 		data: data,
 		success: function(data) { alert("yes") },
-		error: function(req, error) { alert("no") }
+		error: function(req, error) { alert(error) }
 	})
 }
 
