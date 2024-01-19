@@ -62,6 +62,11 @@ func main() {
 	}
 }
 
+type MainPageStruct struct {
+	Message string
+	Args string
+}
+
 func IndexPage(writer http.ResponseWriter, request *http.Request) {
 	index := "src/static/templates/index.html"
 	tmpl, err := template.ParseFiles(index)
@@ -69,7 +74,21 @@ func IndexPage(writer http.ResponseWriter, request *http.Request) {
 		fmt.Println(err)
 	}
 
-	err = tmpl.Execute(writer, p_ws_conn)
+	var titleMsg string
+	pagesLength := len(messageList.Pages)
+	if pagesLength == 0 {
+		titleMsg = "No messages."
+	} else {
+		titleMsg = messageList.Pages[pagesLength - 1].Message[
+			len(messageList.Pages[pagesLength - 1].Message) - 1]
+	}
+
+	MainPageStruct := MainPageStruct{
+		Message: titleMsg,
+		Args: *p_ws_conn,
+	}
+
+	err = tmpl.Execute(writer, MainPageStruct)
 	if err != nil {
 		fmt.Println(err)
 	}

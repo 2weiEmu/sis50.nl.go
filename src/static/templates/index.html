@@ -23,7 +23,7 @@
 
 			<div class="message-notif">
 				<img src="/images/message-icon.png" class="msg-icon">
-				<p>No messages.</p>
+				<p>{{ .Message }}</p>
 			</div>
 
 			<div class="outer-cook-table"> 
@@ -106,8 +106,8 @@
 		<button id="add-new-bg" data-selected="">Add</button>
 	</div>
 
-	<script src="/js/wallpaper.js" args="{{ . }}"></script>
-	<script src="/js/index.js" args="{{ . }}"></script>
+	<script src="/js/wallpaper.js" args="{{ .Args }}"></script>
+	<script src="/js/index.js" args="{{ .Args }}"></script>
 </html>
 
 

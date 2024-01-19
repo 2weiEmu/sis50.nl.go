@@ -98,7 +98,9 @@ func addMessageToList(message string) error {
 		return errors.New("Empty Message")
 	}
 
-	if len(messageList.Pages[len(messageList.Pages) - 1].Message) >= 10 {
+	if len(messageList.Pages) == 0 {
+		messageList.Pages = []MessagePage{{Message: []string{message}}}
+	} else if len(messageList.Pages[len(messageList.Pages) - 1].Message) >= 10 {
 		var msgPage MessagePage
 		msgPage.Message = []string{message};
 		messageList.Pages = append(messageList.Pages, msgPage)

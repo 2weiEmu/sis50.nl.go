@@ -39,7 +39,7 @@ window.onload = (event) => {
 			}
 
 			if (messagePageZero.messages.length < 5) {
-				loadMoreItems(document.getElementById("load-button"))
+				loadMoreItems(document.getElementById("load-button"), true)
 			}
 		},
 		error: function(req, error) {
@@ -60,11 +60,11 @@ function addMessage() {
 		dataType: "JSON",
 		data: data,
 		success: function(data) { alert("yes") },
-		error: function(req, error) { alert(error) }
+		error: function(req, error) { alert(error); return false; }
 	})
 }
 
-function loadMoreItems(button) {
+function loadMoreItems(button, flag = false) {
 	var pageNumber = button.getAttribute("data-page-number")
 	pageNumber++
 
@@ -94,7 +94,10 @@ function loadMoreItems(button) {
 			button.setAttribute("data-page-number", pageNumber)
 		},
 		error: function(req, error) {
-			alert("Messages could not be loaded.")
+			if (!flag) {
+				alert("Messages could not be loaded.")
+			} 
+
 		}
 	})
 
