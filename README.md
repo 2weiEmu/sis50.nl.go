@@ -25,10 +25,12 @@ This is a simple site created for the house Sis50 in the Netherlands to coordina
     - [x] Remove
     - [x] Edit
     - [x] Add
-- [ ] Notification / Notices Page
-    - [ ] Ability to post new Announcement with bold highlighting
+- [x] Notification / Notices Page
+    - [x] Ability to post new Announcement 
+    - [ ] Ability to have bold highlighting
+    - [ ] Ability to have italics
 - [x] Addition of a basic favicon for the website
-- [ ] A link to the local supermarket's site
+~- [ ] A link to the local supermarket's site~
 - [x] Add mobile design (basic)
 - [x] There is a basic help page
 
@@ -40,7 +42,7 @@ This is a simple site created for the house Sis50 in the Netherlands to coordina
 - [ ] A basic admin account
 - [ ] A basic admin panel
 - [ ] A basic help page
-- [ ] The ability to set a background photo
+- [x] The ability to set a background photo
 - [ ] The ability to modify the basic colours of the page
 
 ### **Feature Set** (Shopping Streamling Stage)
