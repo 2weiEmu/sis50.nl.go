@@ -58,9 +58,8 @@ function addMessage() {
 	$.ajax({
 		url: `http://${WS_BASE}/api/messages`,
 		type: "POST",
-		dataType: "JSON",
 		data: data,
-		success: function(data) { alert("yes") },
+		success: function(data) {},
 		error: function(req, error) { alert(error); return false; }
 	})
 }
