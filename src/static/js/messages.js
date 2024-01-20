@@ -11,11 +11,12 @@ var ws_args = document.currentScript.getAttribute("args")
 var argv = ws_args.split(" ")
 
 var WS_BASE = argv[0]
+console.log(WS_BASE)
 
 window.onload = (event) => {
 	// Make GET request to receive first page
 	$.ajax({
-		url: `http://localhost:8000/api/messages/0`,
+		url: `http://${WS_BASE}/api/messages/0`,
 		type: 'GET',
 		dataType: 'json',
 		CORS: true,
@@ -55,7 +56,7 @@ function addMessage() {
 	})
 
 	$.ajax({
-		url: "http://localhost:8000/api/messages",
+		url: `http://${WS_BASE}/api/messages`,
 		type: "POST",
 		dataType: "JSON",
 		data: data,
@@ -69,7 +70,7 @@ function loadMoreItems(button, flag = false) {
 	pageNumber++
 
 	$.ajax({
-		url: `http://localhost:8000/api/messages/${pageNumber}`,
+		url: `http://${WS_BASE}/api/messages/${pageNumber}`,
 		type: 'GET',
 		dataType: 'json',
 		CORS: true,
@@ -94,7 +95,7 @@ function loadMoreItems(button, flag = false) {
 			button.setAttribute("data-page-number", pageNumber)
 		},
 		error: function(req, error) {
-			if (!flag) {
+			if (!flag && error != "parsererror") {
 				alert("Messages could not be loaded.")
 			} 
 

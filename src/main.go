@@ -34,7 +34,7 @@ func main() {
 
 	p_deploy := flag.Bool("d", false, "A flag specifying the deploy mode of the server.")
 	p_port := flag.Int("p", 8000, "The port the server should be deployed on.")
-	p_ws_conn = flag.String("ws", "ws://localhost:8000", "The websocket base")
+	p_ws_conn = flag.String("base", "localhost:8000", "The websocket base")
 	flag.Parse()
 
 	router := mux.NewRouter()
@@ -124,7 +124,17 @@ func GetAdmin(writer http.ResponseWriter, request *http.Request) {
 func GetPage(writer http.ResponseWriter, request *http.Request) {
 	vars := mux.Vars(request)
 	page := vars["page"]
-	http.ServeFile(writer, request, "src/static/templates/" + page + ".html")
+
+	pageLocation := "src/static/templates/" + page + ".html"
+	tmpl, err := template.ParseFiles(pageLocation)
+	if err != nil {
+		fmt.Println(err)
+	}
+	
+	err = tmpl.Execute(writer, p_ws_conn)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 func DayWebsocketHandler(conn *websocket.Conn) {
