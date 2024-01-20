@@ -298,3 +298,32 @@ a {
 	padding: 1px 10px 1px 10px;
 	border-radius: 5px;
 }
+
+.site-icon {
+	height: 1.25rem;
+}
+
+table {
+	border-spacing: 0;
+	text-align: center;
+}
+
+tr th:first-child {
+	border: none;
+}
+
+tr th {
+	border-left: 1px solid var(--second);
+}
+
+tr td:first-child {
+	border: none;
+}
+
+tr td {
+	border-left: 1px solid var(--second);
+}
+
+td, th {
+	padding: 5px 20px 5px 20px;
+}
