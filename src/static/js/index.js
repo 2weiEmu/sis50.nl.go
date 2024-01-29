@@ -24,14 +24,11 @@ const date = new Date()
 setInterval(setWeekday(date), 600000);
 function setWeekday(date) {
 	var day = weekdayList[date.getDay()]
-	var old_day = weekdayList[Math.abs(date.getDay() - 6)]
-	var old_el = document.getElementsByClassName(`day ${old_day}`)[0]
-	old_el.classList.remove("selecteled")
+	var old_el = document.getElementsByClassName("selected")[0]
+	old_el.classList.remove("selected");
 
-	console.log(`Got day: ${day}`)
 	var el = document.getElementsByClassName(`day ${day}`)[0]
 	el.classList.add("selected")
-	console.log(`Set Weekday`)
 }
 
 // NOTE: day websocket section
