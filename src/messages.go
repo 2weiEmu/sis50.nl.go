@@ -147,6 +147,7 @@ func saveMessages(messageList MessageList) {
 }
 
 func readMessages(messageList MessageList) MessageList {
+
 	file, err := os.OpenFile(
 		MESSAGE_FILE, os.O_RDWR | os.O_APPEND, os.ModeAppend)
 	if err != nil {

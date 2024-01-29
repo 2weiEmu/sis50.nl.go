@@ -12,13 +12,6 @@ import (
 	"golang.org/x/net/websocket"
 )
 
-type MessageStruct struct {
-	Day string `json:"day"`
-	Person string `json:"person"`
-	State string `json:"state"`
-}
-
-
 var websocket_day_connections []*websocket.Conn
 var websocket_shop_connections []*websocket.Conn
 var p_ws_conn *string
@@ -26,12 +19,9 @@ var cal = ReadCalendar(InitCalendarDefault())
 var shoppingList []ShoppingItem
 var id_count int
 
-var messageList MessageList
+var messageList = readMessages(MessageList{});
 
 func main() {
-	messageList.Pages = []MessagePage{ MessagePage{ Message: []string{}}}
-	messageList = readMessages(messageList)
-
 	p_deploy := flag.Bool("d", false, "A flag specifying the deploy mode of the server.")
 	p_port := flag.Int("p", 8000, "The port the server should be deployed on.")
 	p_ws_conn = flag.String("base", "localhost:8000", "The websocket base")
@@ -62,7 +52,7 @@ func main() {
 	}
 }
 
-type MainPageStruct struct {
+type IndexPageStruct struct {
 	Message string
 	Args string
 }
@@ -83,7 +73,7 @@ func IndexPage(writer http.ResponseWriter, request *http.Request) {
 			len(messageList.Pages[pagesLength - 1].Message) - 1]
 	}
 
-	MainPageStruct := MainPageStruct{
+	MainPageStruct := IndexPageStruct{
 		Message: titleMsg,
 		Args: *p_ws_conn,
 	}
@@ -143,7 +133,7 @@ func DayWebsocketHandler(conn *websocket.Conn) {
 	websocket_day_connections = append(websocket_day_connections, conn)
 	fmt.Println(websocket_day_connections)
 
-	var message MessageStruct
+	var message CalMessage
 	for {
 		err := websocket.JSON.Receive(conn, &message)
 		if err != nil {
@@ -239,10 +229,11 @@ func ShoppingListWebsocketHandler(shop_conn *websocket.Conn) {
 			}
 		}
 	}
-	websocket_shop_connections = RemoveWebsocketFromPool(shop_conn, websocket_shop_connections)
+	websocket_shop_connections = RemoveWebsocketFromPool(
+		shop_conn, websocket_shop_connections)
 }
 
-func BroadcastToConnections(message MessageStruct) {
+func BroadcastToConnections(message CalMessage) {
 	fmt.Println("[BROADCAST STARTING]")
 	for i := 0; i < len(websocket_day_connections); i++ {
 		fmt.Println("[WS] Sending to: ", websocket_day_connections[i])

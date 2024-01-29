@@ -8,6 +8,11 @@ import (
 	"strings"
 )
 
+type CalMessage struct {
+	Day string `json:"day"`
+	Person string `json:"person"`
+	State string `json:"state"`
+}
 
 var stateList = []string{"present", "absent", "cooking", "uncertain", "maybe-cooking", "cant-cook"}
 var personList = []string{"rick", "youri", "robert", "milan"}
@@ -66,7 +71,7 @@ func ReadCalendar(cal Calendar) Calendar {
 	return cal
 }
 
-func UpdateCalendar(cal Calendar, message MessageStruct) string {
+func UpdateCalendar(cal Calendar, message CalMessage) string {
 
 	var dayIndex, personIndex int
 
