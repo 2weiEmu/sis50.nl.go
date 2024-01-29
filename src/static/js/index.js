@@ -24,8 +24,10 @@ const date = new Date()
 setInterval(setWeekday(date), 600000);
 function setWeekday(date) {
 	var day = weekdayList[date.getDay()]
-	var old_el = document.getElementsByClassName("selected")[0]
-	old_el.classList.remove("selected");
+	try {
+		var old_el = document.getElementsByClassName("selected")[0]
+		old_el.classList.remove("selected");
+	} catch (error) {}
 
 	var el = document.getElementsByClassName(`day ${day}`)[0]
 	el.classList.add("selected")
