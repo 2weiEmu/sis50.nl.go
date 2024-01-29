@@ -1,6 +1,6 @@
 OBJECTS = src/*.go 
 CMD = go
-TARGET = sis50.nl
+TARGET = build/sis50.nl
 
 default: $(OBJECTS)
 	$(CMD) run $(OBJECTS)
