@@ -141,19 +141,18 @@ input {
 	width: 80%;
 	color: var(--primary);
 	font-size: 1.25rem;
-	text-decoration: underline;
 	background-color: var(--second-lo);
 	border: 2px solid var(--second);
 	border-radius: 5px;
 	padding: 5px;
 }
 
-input:focus {
-	text-decoration: none;
+input:placeholder-shown {
+	text-decoration: underline;
 }
 
-::placeholder {
-	text-decoration: underline;
+input:not(:placeholder-shown) {
+	text-decoration: none;
 }
 
 .form button {
