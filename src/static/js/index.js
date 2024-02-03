@@ -164,7 +164,7 @@ shopWebSocket.onopen = () => {
 	}))
 }
 
-shopWebSocket.onmessage = (event) => {
+shopWebSocket.onmessage = async (event) => {
 	console.log("[INFO] Received Shop Message")
 	var message = JSON.parse(event.data)
 	console.log(message)
@@ -201,6 +201,14 @@ shopWebSocket.onmessage = (event) => {
 		// remove the item by id
 		for (var i = 0; i < shoppingList.children.length; i++) {
 			if (shoppingList.children[i].id == message.id) {
+				var h = shoppingList.children[i].clientHeight
+				shoppingList.children[i].style.height = h + "px";
+				await new Promise(r => setTimeout(r, 10));
+				for (var j = 0; j < shoppingList.children[i].children.length; j++) {
+					shoppingList.children[i].children[j].innerText = ""
+				}
+				shoppingList.children[i].style.height = "1px";
+				await new Promise(r => setTimeout(r, 200));
 				shoppingList.children[i].remove()
 				break
 			}
