@@ -132,7 +132,7 @@ function formatMessage(text) {
 		}
 		else if (text[i] == "_" && italicOpen) {
 			italicOpen = false
-			result += "</b>"
+			result += "</i>"
 		}
 		else if (text[i] == "~" && text[i + 1] != " " && !strikeOpen) {
 			strikeOpen = true
