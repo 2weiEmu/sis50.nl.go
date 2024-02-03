@@ -221,5 +221,6 @@ function cleanInput() {
 	return false;
 }
 
-// Background images
-
+var notifNote = document.getElementsByClassName("message-notif")[0].children[1]
+notifNote.innerHTML = formatMessage(notifNote.innerText)
+console.log("Formatted.")
