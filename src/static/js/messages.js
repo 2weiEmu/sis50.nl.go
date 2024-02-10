@@ -61,7 +61,7 @@ function addMessage(event) {
 		type: "POST",
 		data: data,
 		async: false, // ok apparently sync here is bad (it's deprecated, but it makes this work on firefox which I like)
-		success: function(data) { alert("worked"); return false; },
+		success: function(data) { return false; },
 		error: function(req, error) { alert(error); return false; }
 	})
 }
