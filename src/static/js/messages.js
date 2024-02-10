@@ -1,5 +1,6 @@
 console.log("Loaded messages.js")
 
+document.getElementById("msg-form").addEventListener("submit", addMessage)
 document.getElementById("bg-button").addEventListener("click", bgMenu)
 
 if (localStorage.getItem("sis50-background") === null) {
@@ -49,7 +50,7 @@ window.onload = (event) => {
 	})
 }
 
-function addMessage() {
+function addMessage(event) {
 	var msg = document.getElementById("msg-content").value
 	var data = JSON.stringify({
 		"message": msg
@@ -59,10 +60,12 @@ function addMessage() {
 		url: `http://${WS_BASE}/api/messages`,
 		type: "POST",
 		data: data,
-		success: function(data) {},
+		async: false, // ok apparently sync here is bad (it's deprecated, but it makes this work on firefox which I like)
+		success: function(data) { alert("worked"); return false; },
 		error: function(req, error) { alert(error); return false; }
 	})
 }
+
 
 function loadMoreItems(button, flag = false) {
 	var pageNumber = button.getAttribute("data-page-number")
