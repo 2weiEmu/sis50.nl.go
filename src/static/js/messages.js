@@ -1,4 +1,4 @@
-console.log("Loaded messages.js")
+console.log("[INFO] Loaded messages.js")
 
 document.getElementById("msg-form").addEventListener("submit", addMessage)
 document.getElementById("bg-button").addEventListener("click", bgMenu)
@@ -7,15 +7,13 @@ if (localStorage.getItem("sis50-background") === null) {
 	localStorage.setItem("sis50-background", "")
 }
 
-// TODO: this does not actually work yet - has to be fixed before deployment
 var ws_args = document.currentScript.getAttribute("args")
 var argv = ws_args.split(" ")
 
 var WS_BASE = argv[0]
-console.log(WS_BASE)
+console.log(`[INFO] ${WS_BASE}`)
 
 window.onload = (event) => {
-	// Make GET request to receive first page
 	$.ajax({
 		url: `http://${WS_BASE}/api/messages/0`,
 		type: 'GET',
@@ -25,13 +23,12 @@ window.onload = (event) => {
 			'Access-Control-Allow-Origin': '*',
 		},
 		success: function(data) {
-			console.log(data)
+			console.log(`[INFO] Ajax Success to /api/messages/0 with data:\n${data}`)
 			var messagePageZero = data
 
 			var msgList = document.getElementById("msg-list")
 
 			for (var i = messagePageZero.messages.length - 1; i > -1; i--) {
-				console.log(messagePageZero.messages[i])
 				var el = document.createElement("div")
 				el.classList.add("msg")
 				var msgPar = document.createElement("p")
@@ -45,7 +42,7 @@ window.onload = (event) => {
 			}
 		},
 		error: function(req, error) {
-			alert("Messages could not be loaded.")
+			alert(`[ERROR] ${error} -> Loading first page of Messages`)
 		}
 	})
 }
@@ -61,8 +58,13 @@ function addMessage(event) {
 		type: "POST",
 		data: data,
 		async: false, // ok apparently sync here is bad (it's deprecated, but it makes this work on firefox which I like)
-		success: function(data) { return false; },
-		error: function(req, error) { alert(error); return false; }
+		success: function(data) { 
+			return false
+		},
+		error: function(req, error) { 
+			alert(`[ERROR] ${error} -> when trying to add a message`)
+			return false
+		}
 	})
 }
 
@@ -70,7 +72,6 @@ function addMessage(event) {
 function loadMoreItems(button, flag = false) {
 	var pageNumber = button.getAttribute("data-page-number")
 	pageNumber++
-
 	$.ajax({
 		url: `http://${WS_BASE}/api/messages/${pageNumber}`,
 		type: 'GET',
@@ -80,13 +81,12 @@ function loadMoreItems(button, flag = false) {
 			'Access-Control-Allow-Origin': '*',
 		},
 		success: function(data) {
-			console.log(data)
+			console.log(`[INFO] Loading More items on PageNumber: ${pageNumber} | data:\n${data}`)
 			var messagePageZero = data
 
 			var msgList = document.getElementById("msg-list")
 
 			for (var i = messagePageZero.messages.length - 1; i > -1; i--) {
-				console.log(messagePageZero.messages[i])
 				var el = document.createElement("div")
 				el.classList.add("msg")
 				var msgPar = document.createElement("p")
@@ -100,9 +100,7 @@ function loadMoreItems(button, flag = false) {
 			if (!flag && error != "parsererror") {
 				alert("Messages could not be loaded.")
 			} 
-
 		}
 	})
-
 }
 

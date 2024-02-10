@@ -1,47 +1,38 @@
-var symbolMap = {
-	"*": "b",
-	"_": "i",
-	"~": "s",
-}
+var symbols = [
+	["*", "b", false],
+	["_", "i", false],
+	["~", "s", false],
+]
 
 // TODO: reformat this please
 function formatMessage(text) {
 	var result = ""
-	var boldOpen = false
-	var italicOpen = false
-	var strikeOpen = false
+	var flag = false
 	text = text + " "
 
 	for (var i = 0; i < text.length - 1; i++) {
 
-		if (text[i] == "*" && text[i + 1] != " " && !boldOpen) {
-			boldOpen = true
-			result += "<b>"
+		for (var j = 0; j < symbols.length; j++) {
+			var targetSymbol = symbols[j][0]
+			var symbolOpen = symbols[j][2]
+			var insertSymbol = symbols[j][1]
+
+			if (text[i] == targetSymbol && text[i + 1] != " " && !symbolOpen) {
+				symbols[j][2] = true
+				result += `<${insertSymbol}>`
+				flag = true
+			}
+			else if (text[i] == targetSymbol && symbolOpen) {
+				symbols[j][2] = false
+				result += `</${insertSymbol}>`
+				flag = true
+			}
 		}
-		else if (text[i] == "*" && boldOpen) {
-			boldOpen = false
-			result += "</b>"
-		}
-		else if (text[i] == "_" && text[i + 1] != " " && !italicOpen) {
-			italicOpen = true
-			result += "<i>"
-		}
-		else if (text[i] == "_" && italicOpen) {
-			italicOpen = false
-			result += "</i>"
-		}
-		else if (text[i] == "~" && text[i + 1] != " " && !strikeOpen) {
-			strikeOpen = true
-			result += "<s>"
-		}
-		else if (text[i] == "~" && strikeOpen) {
-			strikeOpen = false
-			result += "</s>"
-		}
-		else {
+
+		if (!flag) {
 			result += text[i]
 		}
+		flag = false
 	}
-
 	return result
 }
