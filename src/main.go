@@ -16,10 +16,12 @@ var websocket_day_connections []*websocket.Conn
 var websocket_shop_connections []*websocket.Conn
 var p_ws_conn *string
 var cal = ReadCalendar(InitCalendarDefault())
-var shoppingList []ShoppingItem
+var shoppingList, err = ReadShoppingList()
 var id_count int
 
 var messageList = readMessages(MessageList{});
+
+const SHOPPING_FILE = "./resources/shopping"
 
 func main() {
 	p_deploy := flag.Bool("d", false, "A flag specifying the deploy mode of the server.")
@@ -183,38 +185,45 @@ func ShoppingListWebsocketHandler(shop_conn *websocket.Conn) {
 			fmt.Println(err)
 			break
 		}
-		fmt.Println("Message received: ", message)
 
+		fmt.Println("[INFO] Message received: ", message)
 		message.Content = htmlcleaner.Clean(nil, message.Content)
 
 		if message.Action != "open-shopping" {
-			// Broadcast to all connections, the item that was added
 			if message.Action == "remove" {
-				fmt.Println("[INFO] Removing", message.Id)
-				err := RemoveShoppingItemById(message.Id)
+				err = RemoveShoppingItemById(message.Id)
+				WriteShoppingList(shoppingList)
+				shoppingList, err = ReadShoppingList()
 				if err != nil {
 					// TODO:
-					fmt.Println(err)
 				}
+
 			} else if message.Action == "add" {
 				message.Id = id_count
 				id_count++
 				shoppingList = append(shoppingList, message)
-
-			} else if message.Action == "edit" {
-				err := EditMessageById(message.Id, message.Content)
+				WriteShoppingList(shoppingList)
+				shoppingList, err = ReadShoppingList()
 				if err != nil {
 					// TODO:
-					fmt.Println(err)
+				}
+
+			} else if message.Action == "edit" {
+				err = EditMessageById(message.Id, message.Content)
+				WriteShoppingList(shoppingList)
+				shoppingList, err = ReadShoppingList()
+				if err != nil {
+					// TODO:
 				}
 			}
 
 			for _, ws_conn := range websocket_shop_connections {
-				err := websocket.JSON.Send(ws_conn, message)
-				if err != nil {
-					// TODO:
-					fmt.Println(err)
-				}
+				err = websocket.JSON.Send(ws_conn, message)
+			}
+			
+			if err != nil {
+				// TODO:
+				fmt.Println(err)
 			}
 		} else {
 			fmt.Println("Opening")
