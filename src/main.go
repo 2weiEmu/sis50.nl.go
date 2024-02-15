@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"slices"
 	"strconv"
 
 	"github.com/gorilla/mux"
@@ -124,6 +125,13 @@ func GetPage(writer http.ResponseWriter, request *http.Request) {
 	vars := mux.Vars(request)
 	page := vars["page"]
 
+	if !slices.Contains(getValidPages(), page) {
+		http.ServeFile(
+			writer, request, "src/static/templates/404.html",
+		)
+		return
+	}
+
 	pageLocation := "src/static/templates/" + page + ".html"
 	tmpl, err := template.ParseFiles(pageLocation)
 	if err != nil {
@@ -133,5 +141,12 @@ func GetPage(writer http.ResponseWriter, request *http.Request) {
 	err = tmpl.Execute(writer, paramWebSocketConn)
 	if err != nil {
 		fmt.Println(err)
+	}
+}
+
+func getValidPages() []string {
+	return []string{
+		"messages", 
+		"help",
 	}
 }
