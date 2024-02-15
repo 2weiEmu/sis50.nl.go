@@ -6,6 +6,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"golang.org/x/net/websocket"
 )
 
 type CalMessage struct {
@@ -14,24 +16,15 @@ type CalMessage struct {
 	State string `json:"state"`
 }
 
-var stateList = []string{"present", "absent", "cooking", "uncertain", "maybe-cooking", "cant-cook"}
-var personList = []string{"rick", "youri", "robert", "milan"}
-var dayList = []string{"ma", "di", "wo", "do", "vr", "za", "zo"}
-
 type Calendar struct {
 	Day [][]int
 }
 
-const DAY_COUNT = 7
-const PERSON_COUNT = 4
-
-const CALENDAR_FILE = "./resources/calendar"
-
 func InitCalendarDefault() Calendar {
 	var newCal Calendar
-	newCal.Day = make([][]int, DAY_COUNT)
-	for i := 0; i < DAY_COUNT; i++ {
-		newCal.Day[i] = make([]int, PERSON_COUNT)
+	newCal.Day = make([][]int, DayCount)
+	for i := 0; i < DayCount; i++ {
+		newCal.Day[i] = make([]int, UserCount)
 		for j := range newCal.Day[i] {
 			newCal.Day[i][j] = 0
 		}
@@ -43,7 +36,7 @@ func InitCalendarDefault() Calendar {
 
 func ReadCalendar(cal Calendar) Calendar {
 	
-	calFile, err := os.Open(CALENDAR_FILE)
+	calFile, err := os.Open(CalendarFile)
 	if err != nil {
 		// TODO:
 		fmt.Println(err)
@@ -56,7 +49,7 @@ func ReadCalendar(cal Calendar) Calendar {
 	d := 0
 	for fileScanner.Scan() {
 		tState := strings.Split(fileScanner.Text(), "")
-		for i := 0; i < PERSON_COUNT; i++ {
+		for i := 0; i < UserCount; i++ {
 			cal.Day[d][i], err = strconv.Atoi(tState[i])
 			if err != nil {
 				// TODO:
@@ -75,35 +68,35 @@ func UpdateCalendar(cal Calendar, message CalMessage) string {
 
 	var dayIndex, personIndex int
 
-	for i, d := range dayList {
+	for i, d := range DayList {
 		if d == message.Day {
 			dayIndex = i 
 			break
 		}
 	}
 
-	for i, p := range personList {
+	for i, p := range ConstPersonList {
 		if p == message.Person {
 			personIndex = i 
 			break
 		}
 	}
 
-	new_state := (cal.Day[dayIndex][personIndex] + 1) % len(stateList)
+	new_state := (cal.Day[dayIndex][personIndex] + 1) % len(StateList)
 	cal.Day[dayIndex][personIndex] = new_state
 
-	return stateList[new_state]
+	return StateList[new_state]
 }
 
 func WriteCalendar(cal Calendar) {
 	fmt.Println("Saving Calendar")
-	err := os.Truncate(CALENDAR_FILE, 0)
+	err := os.Truncate(CalendarFile, 0)
 	if err != nil {
 		// TODO:
 		fmt.Println("[ERROR]", err)
 	}
 
-	file, err := os.OpenFile(CALENDAR_FILE, os.O_WRONLY, os.ModeAppend)
+	file, err := os.OpenFile(CalendarFile, os.O_WRONLY, os.ModeAppend)
 	if err != nil {
 		// TODO:
 		fmt.Println("[ERROR]", err)
@@ -121,4 +114,45 @@ func WriteCalendar(cal Calendar) {
 			fmt.Println("[ERROR] Writing to File", err)
 		}
 	}
+}
+
+func DayWebsocketHandler(conn *websocket.Conn) {
+	fmt.Println("Activating WebSocket handler...")
+
+	WebSocketDayConnections = append(WebSocketDayConnections, conn)
+	fmt.Println(WebSocketDayConnections)
+
+	var message CalMessage
+	for {
+		err := websocket.JSON.Receive(conn, &message)
+		if err != nil {
+			// TODO:
+			fmt.Println(err)
+			break
+		}
+		fmt.Println("Message received: ", message)
+
+		if message.State != "open-calendar" {
+			message.State = UpdateCalendar(StateCalendar, message)
+			BroadcastToConnections(message)
+		} else {
+			m := ""
+			for _, s := range StateCalendar.Day {
+				for _, k := range s {
+					m += strconv.Itoa(k)
+				}
+				m += "/"
+			}
+			fmt.Println("[INFO] Open:", m)
+
+			message.Day = m
+			err := websocket.JSON.Send(conn, &message)
+			if err != nil {
+				fmt.Println(err)
+				// TODO:
+			}
+		}
+	}
+	WriteCalendar(StateCalendar)
+	WebSocketDayConnections = RemoveWebsocketFromPool(conn, WebSocketDayConnections)
 }

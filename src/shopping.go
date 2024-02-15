@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+
+	"github.com/benlubar/htmlcleaner"
+	"golang.org/x/net/websocket"
 )
 
 type ShoppingItem struct {
@@ -18,7 +21,7 @@ func RemoveShoppingItemById(id int) error {
 	fmt.Println("[INFO] Removing", id)
 	i := -1
 
-	for j, b := range shoppingList {
+	for j, b := range ShoppingList {
 		if b.Id == id {
 			i = j
 			break
@@ -30,14 +33,14 @@ func RemoveShoppingItemById(id int) error {
 		return errors.New("Failed to find the correct Id in the list")
 	}
 
-	shoppingList = append(shoppingList[:i], shoppingList[i+1:]...)
+	ShoppingList = append(ShoppingList[:i], ShoppingList[i+1:]...)
 	return nil
 }
 
 func EditMessageById(id int, content string) error {
 	i := -1
 
-	for j, b := range shoppingList {
+	for j, b := range ShoppingList {
 		if b.Id == id {
 			i = j
 			break
@@ -49,13 +52,13 @@ func EditMessageById(id int, content string) error {
 		return errors.New("Failed to find the correct Id in the list")
 	}
 
-	shoppingList[i].Content = content
+	ShoppingList[i].Content = content
 	return nil
 }
 
 func ReadShoppingList() ([]ShoppingItem, error) {
 	file, err := os.OpenFile(
-		SHOPPING_FILE, os.O_RDWR | os.O_APPEND, os.ModeAppend)
+		ShoppingFile, os.O_RDWR | os.O_APPEND, os.ModeAppend)
 	if err != nil {
 		return nil, err
 	}
@@ -90,13 +93,13 @@ func ReadShoppingList() ([]ShoppingItem, error) {
 }
 
 func WriteShoppingList(shoppingList []ShoppingItem) error {
-	err := os.Truncate(SHOPPING_FILE, 0)
+	err := os.Truncate(ShoppingFile, 0)
 	if err != nil {
 		return err
 	}
 
 	file, err := os.OpenFile(
-		SHOPPING_FILE, os.O_RDWR | os.O_APPEND, os.ModeAppend)
+		ShoppingFile, os.O_RDWR | os.O_APPEND, os.ModeAppend)
 	if err != nil {
 		return err
 	}
@@ -122,4 +125,75 @@ func (item *ShoppingItem) Serialize() []string {
 	list[1] = item.Content
 	list[2] = item.Action
 	return list
+}
+
+func ShoppingListWebsocketHandler(shop_conn *websocket.Conn) {
+	fmt.Println("[INFO] Activating Shopping Handler")
+
+	WebSocketShopConnections = append(WebSocketShopConnections, shop_conn)
+	fmt.Println(WebSocketShopConnections)
+
+	var message ShoppingItem
+	for {
+		err := websocket.JSON.Receive(shop_conn, &message)
+		if err != nil {
+			// TODO:
+			fmt.Println(err)
+			break
+		}
+
+		fmt.Println("[INFO] Message received: ", message)
+		message.Content = htmlcleaner.Clean(nil, message.Content)
+
+		if message.Action != "open-shopping" {
+			if message.Action == "remove" {
+				err = RemoveShoppingItemById(message.Id)
+				WriteShoppingList(ShoppingList)
+				ShoppingList, err = ReadShoppingList()
+				if err != nil {
+					// TODO:
+				}
+
+			} else if message.Action == "add" {
+				message.Id = IdCount
+				IdCount++
+				ShoppingList = append(ShoppingList, message)
+				WriteShoppingList(ShoppingList)
+				ShoppingList, err = ReadShoppingList()
+				if err != nil {
+					// TODO:
+				}
+
+			} else if message.Action == "edit" {
+				err = EditMessageById(message.Id, message.Content)
+				WriteShoppingList(ShoppingList)
+				ShoppingList, err = ReadShoppingList()
+				if err != nil {
+					// TODO:
+				}
+			}
+
+			for _, ws_conn := range WebSocketShopConnections {
+				err = websocket.JSON.Send(ws_conn, message)
+			}
+			
+			if err != nil {
+				// TODO:
+				fmt.Println(err)
+			}
+		} else {
+			fmt.Println("Opening")
+			for _, si := range ShoppingList {
+				// NOTE: thought we had to make the actions be "add" manually -
+				// but everything that gets added to the list already has "add"
+				err := websocket.JSON.Send(shop_conn, si)
+				if err != nil {
+					// TODO:
+					fmt.Println(err)
+				}
+			}
+		}
+	}
+	WebSocketShopConnections = RemoveWebsocketFromPool(
+		shop_conn, WebSocketShopConnections)
 }

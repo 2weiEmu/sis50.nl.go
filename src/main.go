@@ -7,26 +7,33 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/benlubar/htmlcleaner"
 	"github.com/gorilla/mux"
 	"golang.org/x/net/websocket"
 )
 
-var websocket_day_connections []*websocket.Conn
-var websocket_shop_connections []*websocket.Conn
-var p_ws_conn *string
-var cal = ReadCalendar(InitCalendarDefault())
-var shoppingList, err = ReadShoppingList()
-var id_count int
+var WebSocketDayConnections []*websocket.Conn
+var WebSocketShopConnections []*websocket.Conn
+var paramWebSocketConn *string
+var StateCalendar = ReadCalendar(InitCalendarDefault())
+var ShoppingList, err = ReadShoppingList()
+var IdCount int
+var AllMessagesList = readMessages(MessageList{});
 
-var messageList = readMessages(MessageList{});
+const MessageFile = "./resources/messages"
+const ShoppingFile = "./resources/shopping"
+const CalendarFile = "./resources/calendar"
 
-const SHOPPING_FILE = "./resources/shopping"
+const DayCount = 7
+const UserCount = 4
+
+var StateList = []string{"present", "absent", "cooking", "uncertain", "maybe-cooking", "cant-cook"}
+var ConstPersonList = []string{"rick", "youri", "robert", "milan"}
+var DayList = []string{"ma", "di", "wo", "do", "vr", "za", "zo"}
 
 func main() {
-	p_deploy := flag.Bool("d", false, "A flag specifying the deploy mode of the server.")
-	p_port := flag.Int("p", 8000, "The port the server should be deployed on.")
-	p_ws_conn = flag.String("base", "localhost:8000", "The websocket base")
+	paramDeploy := flag.Bool("d", false, "A flag specifying the deploy mode of the server.")
+	paramPort := flag.Int("p", 8000, "The port the server should be deployed on.")
+	paramWebSocketConn = flag.String("base", "localhost:8000", "The websocket base")
 	flag.Parse()
 
 	router := mux.NewRouter()
@@ -44,13 +51,13 @@ func main() {
 	router.HandleFunc("/admin", GetAdmin)
 	http.Handle("/", router)
 
-	if *p_deploy {
+	if *paramDeploy {
 		// TODO:
 		// http.ListenAndServeTLS()
 	} else {
 
-		fmt.Println("Began listening on port: " + strconv.Itoa(*p_port));
-		http.ListenAndServe(":" + strconv.Itoa(*p_port), nil)
+		fmt.Println("Began listening on port: " + strconv.Itoa(*paramPort));
+		http.ListenAndServe(":" + strconv.Itoa(*paramPort), nil)
 	}
 }
 
@@ -67,17 +74,17 @@ func IndexPage(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	var titleMsg string
-	pagesLength := len(messageList.Pages)
+	pagesLength := len(AllMessagesList.Pages)
 	if pagesLength == 0 {
 		titleMsg = "No messages."
 	} else {
-		titleMsg = messageList.Pages[pagesLength - 1].Message[
-			len(messageList.Pages[pagesLength - 1].Message) - 1]
+		titleMsg = AllMessagesList.Pages[pagesLength - 1].Message[
+			len(AllMessagesList.Pages[pagesLength - 1].Message) - 1]
 	}
 
 	MainPageStruct := IndexPageStruct{
 		Message: titleMsg,
-		Args: *p_ws_conn,
+		Args: *paramWebSocketConn,
 	}
 
 	err = tmpl.Execute(writer, MainPageStruct)
@@ -123,134 +130,8 @@ func GetPage(writer http.ResponseWriter, request *http.Request) {
 		fmt.Println(err)
 	}
 	
-	err = tmpl.Execute(writer, p_ws_conn)
+	err = tmpl.Execute(writer, paramWebSocketConn)
 	if err != nil {
 		fmt.Println(err)
 	}
 }
-
-func DayWebsocketHandler(conn *websocket.Conn) {
-	fmt.Println("Activating WebSocket handler...")
-
-	websocket_day_connections = append(websocket_day_connections, conn)
-	fmt.Println(websocket_day_connections)
-
-	var message CalMessage
-	for {
-		err := websocket.JSON.Receive(conn, &message)
-		if err != nil {
-			// TODO:
-			fmt.Println(err)
-			break
-		}
-		fmt.Println("Message received: ", message)
-
-		if message.State != "open-calendar" {
-			message.State = UpdateCalendar(cal, message)
-			BroadcastToConnections(message)
-		} else {
-			m := ""
-			for _, s := range cal.Day {
-				for _, k := range s {
-					m += strconv.Itoa(k)
-				}
-				m += "/"
-			}
-			fmt.Println("[INFO] Open:", m)
-
-			message.Day = m
-			err := websocket.JSON.Send(conn, &message)
-			if err != nil {
-				fmt.Println(err)
-				// TODO:
-			}
-		}
-	}
-	WriteCalendar(cal)
-	websocket_day_connections = RemoveWebsocketFromPool(conn, websocket_day_connections)
-}
-
-
-func ShoppingListWebsocketHandler(shop_conn *websocket.Conn) {
-	fmt.Println("[INFO] Activating Shopping Handler")
-
-	websocket_shop_connections = append(websocket_shop_connections, shop_conn)
-	fmt.Println(websocket_shop_connections)
-
-	var message ShoppingItem
-	for {
-		err := websocket.JSON.Receive(shop_conn, &message)
-		if err != nil {
-			// TODO:
-			fmt.Println(err)
-			break
-		}
-
-		fmt.Println("[INFO] Message received: ", message)
-		message.Content = htmlcleaner.Clean(nil, message.Content)
-
-		if message.Action != "open-shopping" {
-			if message.Action == "remove" {
-				err = RemoveShoppingItemById(message.Id)
-				WriteShoppingList(shoppingList)
-				shoppingList, err = ReadShoppingList()
-				if err != nil {
-					// TODO:
-				}
-
-			} else if message.Action == "add" {
-				message.Id = id_count
-				id_count++
-				shoppingList = append(shoppingList, message)
-				WriteShoppingList(shoppingList)
-				shoppingList, err = ReadShoppingList()
-				if err != nil {
-					// TODO:
-				}
-
-			} else if message.Action == "edit" {
-				err = EditMessageById(message.Id, message.Content)
-				WriteShoppingList(shoppingList)
-				shoppingList, err = ReadShoppingList()
-				if err != nil {
-					// TODO:
-				}
-			}
-
-			for _, ws_conn := range websocket_shop_connections {
-				err = websocket.JSON.Send(ws_conn, message)
-			}
-			
-			if err != nil {
-				// TODO:
-				fmt.Println(err)
-			}
-		} else {
-			fmt.Println("Opening")
-			for _, si := range shoppingList {
-				// NOTE: thought we had to make the actions be "add" manually -
-				// but everything that gets added to the list already has "add"
-				err := websocket.JSON.Send(shop_conn, si)
-				if err != nil {
-					// TODO:
-					fmt.Println(err)
-				}
-			}
-		}
-	}
-	websocket_shop_connections = RemoveWebsocketFromPool(
-		shop_conn, websocket_shop_connections)
-}
-
-func BroadcastToConnections(message CalMessage) {
-	fmt.Println("[BROADCAST STARTING]")
-	for i := 0; i < len(websocket_day_connections); i++ {
-		fmt.Println("[WS] Sending to: ", websocket_day_connections[i])
-		err := websocket.JSON.Send(websocket_day_connections[i], message)
-		if err != nil {
-			fmt.Println(err)
-		}
-	}
-}
-
-
