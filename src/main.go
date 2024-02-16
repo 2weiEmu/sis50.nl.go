@@ -136,11 +136,20 @@ func GetPage(writer http.ResponseWriter, request *http.Request) {
 	tmpl, err := template.ParseFiles(pageLocation)
 	if err != nil {
 		fmt.Println(err)
+		writer.WriteHeader(http.StatusInternalServerError)
+		http.ServeFile(
+			writer, request, "src/static/templates/500.html",
+		)
+		return
 	}
 	
 	err = tmpl.Execute(writer, paramWebSocketConn)
 	if err != nil {
 		fmt.Println(err)
+		writer.WriteHeader(http.StatusInternalServerError)
+		http.ServeFile(
+			writer, request, "src/static/templates/500.html",
+		)
 	}
 }
 
