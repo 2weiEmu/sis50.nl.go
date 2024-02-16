@@ -141,6 +141,7 @@ func GetPage(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
+// stand-in for a constant slice (which isn't possible in Go)
 func getValidPages() []string {
 	return []string{
 		"messages", 

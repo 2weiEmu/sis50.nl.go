@@ -12,11 +12,24 @@
 
 @font-face {
 	src: url("/fonts/IBMPlexSerif-Regular.ttf");
-	font-family: IBS-Regular;
+	font-family: IBS;
+	font-weight: 400;
+	font-style: normal;
+}
+
+@font-face {
+	src: url("/fonts/IBMPlexSerif-Bold.ttf");
+	font-family: IBS;
+	font-weight: 700;
+	font-style: normal;
 }
 
 * {
-	font-family: IBS-Regular, Serif;
+	font-family: IBS, Serif;
+}
+
+b {
+	font-weight: 700;
 }
 
 body {
@@ -306,6 +319,7 @@ a {
 	margin: 10px 25px 10px 25px;
 	padding: 1px 10px 1px 10px;
 	border-radius: 5px;
+	font-size: 20px;
 }
 
 .site-icon {
