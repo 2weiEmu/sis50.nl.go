@@ -159,10 +159,10 @@ func readMessages(messageList MessageList) MessageList {
 	messageList.Pages = []MessagePage{}
 	
 	for _, record := range records {
-		fmt.Println("[INFO] Read record:", record)
+		// fmt.Println("[INFO] Read record:", record)
 		messageList.Pages = append(messageList.Pages, MessagePage{record})
 	}
-	fmt.Println("[INFO] Finished Read messageList:", messageList)
+	// fmt.Println("[INFO] Finished Read messageList:", messageList)
 
 	return messageList
 }

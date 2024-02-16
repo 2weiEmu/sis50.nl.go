@@ -32,25 +32,37 @@ var ConstPersonList = []string{"rick", "youri", "robert", "milan"}
 var DayList = []string{"ma", "di", "wo", "do", "vr", "za", "zo"}
 
 func main() {
-	paramDeploy := flag.Bool("d", false, "A flag specifying the deploy mode of the server.")
-	paramPort := flag.Int("p", 8000, "The port the server should be deployed on.")
-	paramWebSocketConn = flag.String("base", "localhost:8000", "The websocket base")
+	paramDeploy := flag.Bool(
+		"d", false, "A flag specifying the deploy mode of the server.")
+	paramPort := flag.Int(
+		"p", 8000, "The port the server should be deployed on.")
+	paramWebSocketConn = flag.String(
+		"base", "localhost:8000", "Where websockets should connect.")
 	flag.Parse()
 
-	router := mux.NewRouter()
+	// NOTE: consider changing this, to something like src/static and moving
+	// all the templates somewhere else so they can't be accessed... maybe a
+	// "public" folder?
+	cssDir := http.Dir("src/static/css")
+	imgDir := http.Dir("src/static/images")
+	jsDir := http.Dir("src/static/js")
+	fontsDir := http.Dir("src/static/fonts")
 
+	router := mux.NewRouter()
 	router.Handle("/dayWS", websocket.Handler(DayWebsocketHandler))
 	router.Handle("/shopWS", websocket.Handler(ShoppingListWebsocketHandler))
 	router.HandleFunc("/api/messages/{pageNumber}", GETMessages).Methods("GET")
 	router.HandleFunc("/api/messages", POSTMessage).Methods("POST")
 	router.HandleFunc("/", IndexPage)
 	router.HandleFunc("/{page}", GetPage)
-	router.HandleFunc("/css/{style}", GetStyle)
-	router.HandleFunc("/js/{script}", GetScript)
-	router.HandleFunc("/images/{image}", GetImage)
-	router.HandleFunc("/fonts/{font}", GetFont)
 	router.HandleFunc("/admin", GetAdmin)
 	http.Handle("/", router)
+
+	// ok so apparently this doesn't work with router.Handle???
+	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(cssDir)))
+	http.Handle("/images/", http.StripPrefix("/images/", http.FileServer(imgDir)))
+	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(jsDir)))
+	http.Handle("/fonts/", http.StripPrefix("/fonts/", http.FileServer(fontsDir)))
 
 	if *paramDeploy {
 		// TODO:
@@ -92,30 +104,6 @@ func IndexPage(writer http.ResponseWriter, request *http.Request) {
 	if err != nil {
 		fmt.Println(err)
 	}
-}
-
-func GetStyle(writer http.ResponseWriter, request *http.Request) {
-	vars := mux.Vars(request)
-	style := vars["style"]
-	http.ServeFile(writer, request, "src/static/css/" + style)
-}
-
-func GetScript(writer http.ResponseWriter, request *http.Request) {
-	vars := mux.Vars(request)
-	script := vars["script"]
-	http.ServeFile(writer, request, "src/static/js/" + script)
-}
-
-func GetImage(writer http.ResponseWriter, request *http.Request) {
-	vars := mux.Vars(request)
-	image := vars["image"]
-	http.ServeFile(writer, request, "src/static/images/" + image)
-}
-
-func GetFont(writer http.ResponseWriter, request *http.Request) {
-	vars := mux.Vars(request)
-	font := vars["font"]
-	http.ServeFile(writer, request, "src/static/fonts/" + font)
 }
 
 func GetAdmin(writer http.ResponseWriter, request *http.Request) {
