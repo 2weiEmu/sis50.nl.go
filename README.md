@@ -27,8 +27,8 @@ This is a simple site created for the house Sis50 in the Netherlands to coordina
     - [x] Add
 - [x] Notification / Notices Page
     - [x] Ability to post new Announcement 
-    - [ ] Ability to have bold highlighting
-    - [ ] Ability to have italics
+    - [x] Ability to have bold highlighting
+    - [x] Ability to have italics
 - [x] Addition of a basic favicon for the website
 ~- [ ] A link to the local supermarket's site~
 - [x] Add mobile design (basic)
@@ -41,7 +41,7 @@ This is a simple site created for the house Sis50 in the Netherlands to coordina
 - [ ] The ability to post a message as that user
 - [ ] A basic admin account
 - [ ] A basic admin panel
-- [ ] A basic help page
+- [x] A basic help page
 - [x] The ability to set a background photo
 - [ ] The ability to modify the basic colours of the page
 
