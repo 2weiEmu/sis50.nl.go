@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"golang.org/x/net/websocket"
 )
@@ -19,6 +20,8 @@ type CalMessage struct {
 type Calendar struct {
 	Day [][]int
 }
+
+var calFileReady = make(chan bool)
 
 func InitCalendarDefault() Calendar {
 	var newCal Calendar
@@ -136,16 +139,7 @@ func DayWebsocketHandler(conn *websocket.Conn) {
 			message.State = UpdateCalendar(StateCalendar, message)
 			BroadcastToConnections(message)
 		} else {
-			m := ""
-			for _, s := range StateCalendar.Day {
-				for _, k := range s {
-					m += strconv.Itoa(k)
-				}
-				m += "/"
-			}
-			fmt.Println("[INFO] Open:", m)
-
-			message.Day = m
+			message := genOpenCalMessage()
 			err := websocket.JSON.Send(conn, &message)
 			if err != nil {
 				fmt.Println(err)
@@ -155,4 +149,41 @@ func DayWebsocketHandler(conn *websocket.Conn) {
 	}
 	WriteCalendar(StateCalendar)
 	WebSocketDayConnections = RemoveWebsocketFromPool(conn, WebSocketDayConnections)
+}
+
+func resetCalendar() {
+	StateCalendar = InitCalendarDefault()
+	WriteCalendar(StateCalendar);
+}
+
+func genOpenCalMessage() CalMessage {
+	m := ""
+	for _, s := range StateCalendar.Day {
+		for _, k := range s {
+			m += strconv.Itoa(k)
+		}
+		m += "/"
+	}
+
+	message := CalMessage{}
+	message.Day = m
+	message.State = "open-calendar" 
+
+	return message
+}
+
+func weeklyResetTimer() {
+	for {
+		// wait until Monday
+		currentWeekday := time.Now().Weekday()
+		var targetTime time.Time
+		t := time.Now().AddDate(0, 0, 7 - int(currentWeekday - 1))
+		targetTime = time.Date(
+			t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.Now().Location())
+		timeUntilMonday := time.Until(targetTime)
+		time.Sleep(timeUntilMonday)
+
+		resetCalendar()
+		BroadcastToConnections(genOpenCalMessage())
+	}
 }
