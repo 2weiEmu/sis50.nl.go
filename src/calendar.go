@@ -122,8 +122,8 @@ func WriteCalendar(cal Calendar) {
 func DayWebsocketHandler(conn *websocket.Conn) {
 	fmt.Println("Activating WebSocket handler...")
 
-	WebSocketDayConnections = append(WebSocketDayConnections, conn)
-	fmt.Println(WebSocketDayConnections)
+	webSocketDayConnections = append(webSocketDayConnections, conn)
+	fmt.Println(webSocketDayConnections)
 
 	var message CalMessage
 	for {
@@ -136,7 +136,7 @@ func DayWebsocketHandler(conn *websocket.Conn) {
 		fmt.Println("Message received: ", message)
 
 		if message.State != "open-calendar" {
-			message.State = UpdateCalendar(StateCalendar, message)
+			message.State = UpdateCalendar(stateCalendar, message)
 			BroadcastToConnections(message)
 		} else {
 			message := genOpenCalMessage()
@@ -147,18 +147,18 @@ func DayWebsocketHandler(conn *websocket.Conn) {
 			}
 		}
 	}
-	WriteCalendar(StateCalendar)
-	WebSocketDayConnections = RemoveWebsocketFromPool(conn, WebSocketDayConnections)
+	WriteCalendar(stateCalendar)
+	webSocketDayConnections = RemoveWebsocketFromPool(conn, webSocketDayConnections)
 }
 
 func resetCalendar() {
-	StateCalendar = InitCalendarDefault()
-	WriteCalendar(StateCalendar);
+	stateCalendar = InitCalendarDefault()
+	WriteCalendar(stateCalendar);
 }
 
 func genOpenCalMessage() CalMessage {
 	m := ""
-	for _, s := range StateCalendar.Day {
+	for _, s := range stateCalendar.Day {
 		for _, k := range s {
 			m += strconv.Itoa(k)
 		}

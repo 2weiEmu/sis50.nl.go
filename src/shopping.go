@@ -21,7 +21,7 @@ func RemoveShoppingItemById(id int) error {
 	fmt.Println("[INFO] Removing", id)
 	i := -1
 
-	for j, b := range ShoppingList {
+	for j, b := range shoppingList {
 		if b.Id == id {
 			i = j
 			break
@@ -33,14 +33,14 @@ func RemoveShoppingItemById(id int) error {
 		return errors.New("Failed to find the correct Id in the list")
 	}
 
-	ShoppingList = append(ShoppingList[:i], ShoppingList[i+1:]...)
+	shoppingList = append(shoppingList[:i], shoppingList[i+1:]...)
 	return nil
 }
 
 func EditMessageById(id int, content string) error {
 	i := -1
 
-	for j, b := range ShoppingList {
+	for j, b := range shoppingList {
 		if b.Id == id {
 			i = j
 			break
@@ -52,7 +52,7 @@ func EditMessageById(id int, content string) error {
 		return errors.New("Failed to find the correct Id in the list")
 	}
 
-	ShoppingList[i].Content = content
+	shoppingList[i].Content = content
 	return nil
 }
 
@@ -130,8 +130,8 @@ func (item *ShoppingItem) Serialize() []string {
 func ShoppingListWebsocketHandler(shop_conn *websocket.Conn) {
 	fmt.Println("[INFO] Activating Shopping Handler")
 
-	WebSocketShopConnections = append(WebSocketShopConnections, shop_conn)
-	fmt.Println(WebSocketShopConnections)
+	webSocketShopConnections = append(webSocketShopConnections, shop_conn)
+	fmt.Println(webSocketShopConnections)
 
 	var message ShoppingItem
 	for {
@@ -148,32 +148,32 @@ func ShoppingListWebsocketHandler(shop_conn *websocket.Conn) {
 		if message.Action != "open-shopping" {
 			if message.Action == "remove" {
 				err = RemoveShoppingItemById(message.Id)
-				WriteShoppingList(ShoppingList)
-				ShoppingList, err = ReadShoppingList()
+				WriteShoppingList(shoppingList)
+				shoppingList, err = ReadShoppingList()
 				if err != nil {
 					// TODO:
 				}
 
 			} else if message.Action == "add" {
-				message.Id = IdCount
-				IdCount++
-				ShoppingList = append(ShoppingList, message)
-				WriteShoppingList(ShoppingList)
-				ShoppingList, err = ReadShoppingList()
+				message.Id = idCount
+				idCount++
+				shoppingList = append(shoppingList, message)
+				WriteShoppingList(shoppingList)
+				shoppingList, err = ReadShoppingList()
 				if err != nil {
 					// TODO:
 				}
 
 			} else if message.Action == "edit" {
 				err = EditMessageById(message.Id, message.Content)
-				WriteShoppingList(ShoppingList)
-				ShoppingList, err = ReadShoppingList()
+				WriteShoppingList(shoppingList)
+				shoppingList, err = ReadShoppingList()
 				if err != nil {
 					// TODO:
 				}
 			}
 
-			for _, ws_conn := range WebSocketShopConnections {
+			for _, ws_conn := range webSocketShopConnections {
 				err = websocket.JSON.Send(ws_conn, message)
 			}
 			
@@ -183,7 +183,7 @@ func ShoppingListWebsocketHandler(shop_conn *websocket.Conn) {
 			}
 		} else {
 			fmt.Println("Opening")
-			for _, si := range ShoppingList {
+			for _, si := range shoppingList {
 				// NOTE: thought we had to make the actions be "add" manually -
 				// but everything that gets added to the list already has "add"
 				err := websocket.JSON.Send(shop_conn, si)
@@ -194,6 +194,6 @@ func ShoppingListWebsocketHandler(shop_conn *websocket.Conn) {
 			}
 		}
 	}
-	WebSocketShopConnections = RemoveWebsocketFromPool(
-		shop_conn, WebSocketShopConnections)
+	webSocketShopConnections = RemoveWebsocketFromPool(
+		shop_conn, webSocketShopConnections)
 }

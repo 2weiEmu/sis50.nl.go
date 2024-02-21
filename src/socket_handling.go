@@ -26,9 +26,9 @@ func RemoveWebsocketFromPool(conn *websocket.Conn, list []*websocket.Conn) []*we
 
 func BroadcastToConnections(message CalMessage) {
 	fmt.Println("[BROADCAST STARTING]")
-	for i := 0; i < len(WebSocketDayConnections); i++ {
-		fmt.Println("[WS] Sending to: ", WebSocketDayConnections[i])
-		err := websocket.JSON.Send(WebSocketDayConnections[i], message)
+	for i := 0; i < len(webSocketDayConnections); i++ {
+		fmt.Println("[WS] Sending to: ", webSocketDayConnections[i])
+		err := websocket.JSON.Send(webSocketDayConnections[i], message)
 		if err != nil {
 			fmt.Println(err)
 		}

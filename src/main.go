@@ -12,13 +12,13 @@ import (
 	"golang.org/x/net/websocket"
 )
 
-var WebSocketDayConnections []*websocket.Conn
-var WebSocketShopConnections []*websocket.Conn
+var webSocketDayConnections []*websocket.Conn
+var webSocketShopConnections []*websocket.Conn
 var paramWebSocketConn *string
-var StateCalendar = ReadCalendar(InitCalendarDefault())
-var ShoppingList, err = ReadShoppingList()
-var IdCount int
-var AllMessagesList = readMessages(MessageList{});
+var stateCalendar = ReadCalendar(InitCalendarDefault())
+var shoppingList, err = ReadShoppingList()
+var idCount int
+var allMessagesList = readMessages(MessageList{});
 
 const MessageFile = "./resources/messages"
 const ShoppingFile = "./resources/shopping"
@@ -89,12 +89,12 @@ func IndexPage(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	var titleMsg string
-	pagesLength := len(AllMessagesList.Pages)
+	pagesLength := len(allMessagesList.Pages)
 	if pagesLength == 0 {
 		titleMsg = "No messages."
 	} else {
-		titleMsg = AllMessagesList.Pages[pagesLength - 1].Message[
-			len(AllMessagesList.Pages[pagesLength - 1].Message) - 1]
+		titleMsg = allMessagesList.Pages[pagesLength - 1].Message[
+			len(allMessagesList.Pages[pagesLength - 1].Message) - 1]
 	}
 
 	MainPageStruct := IndexPageStruct{

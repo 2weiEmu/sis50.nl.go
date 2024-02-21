@@ -28,7 +28,7 @@ type MessageList struct {
 // POST a new message to a page, and save this
 func GETMessages(writer http.ResponseWriter, request *http.Request) {
 	fmt.Println("[INFO] GET REQUEST RECEIVED")
-	AllMessagesList = readMessages(AllMessagesList)
+	allMessagesList = readMessages(allMessagesList)
 
 	vars := mux.Vars(request)
 	pageNumber, err := strconv.Atoi(vars["pageNumber"])
@@ -47,26 +47,26 @@ func GETMessages(writer http.ResponseWriter, request *http.Request) {
 		http.Error(
 			writer, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 	}
-	fmt.Println(AllMessagesList)
+	fmt.Println(allMessagesList)
 	writer.Header().Set("Access-Control-Allow-Headers", "x-requested-with")
 	writer.Write(page)
 }
 
 func getMessageJson(pageNumber int) []byte {
 	
-	if len(AllMessagesList.Pages) <= pageNumber || pageNumber < 0 {
+	if len(allMessagesList.Pages) <= pageNumber || pageNumber < 0 {
 		return nil;
 	}
 
 	// TODO: add check
-	page, _ := json.Marshal(AllMessagesList.Pages[
-		len(AllMessagesList.Pages) - pageNumber - 1])
+	page, _ := json.Marshal(allMessagesList.Pages[
+		len(allMessagesList.Pages) - pageNumber - 1])
 	return page
 }
 
 func POSTMessage(writer http.ResponseWriter, request *http.Request) {
 	fmt.Println("[INFO] POST REQUEST RECEIVED")
-	AllMessagesList = readMessages(AllMessagesList)
+	allMessagesList = readMessages(allMessagesList)
 	var msgPost MessagePost
 	err := json.NewDecoder(request.Body).Decode(&msgPost)
 	if err != nil {
@@ -74,15 +74,15 @@ func POSTMessage(writer http.ResponseWriter, request *http.Request) {
 		fmt.Println(err)
 	}
 
-	fmt.Println(AllMessagesList)
+	fmt.Println(allMessagesList)
 	err = addMessageToList(msgPost.Message)
 	if err != nil {
 		writer.Write([]byte("Failed to Add\n"))
 	} else {
 		writer.Write([]byte("Added\n"))
 	}
-	fmt.Println(AllMessagesList)
-	saveMessages(AllMessagesList)
+	fmt.Println(allMessagesList)
+	saveMessages(allMessagesList)
 }
 
 func addMessageToList(message string) error {
@@ -90,16 +90,16 @@ func addMessageToList(message string) error {
 		return errors.New("Empty Message")
 	}
 
-	if len(AllMessagesList.Pages) == 0 {
-		AllMessagesList.Pages = []MessagePage{{Message: []string{message}}}
-	} else if len(AllMessagesList.Pages[len(AllMessagesList.Pages) - 1].Message) >= 10 {
+	if len(allMessagesList.Pages) == 0 {
+		allMessagesList.Pages = []MessagePage{{Message: []string{message}}}
+	} else if len(allMessagesList.Pages[len(allMessagesList.Pages) - 1].Message) >= 10 {
 		var msgPage MessagePage
 		msgPage.Message = []string{message};
-		AllMessagesList.Pages = append(AllMessagesList.Pages, msgPage)
+		allMessagesList.Pages = append(allMessagesList.Pages, msgPage)
 	} else {
-		AllMessagesList.Pages[len(AllMessagesList.Pages) - 1].Message =
+		allMessagesList.Pages[len(allMessagesList.Pages) - 1].Message =
 			append(
-				AllMessagesList.Pages[len(AllMessagesList.Pages)-1].Message, message)
+				allMessagesList.Pages[len(allMessagesList.Pages)-1].Message, message)
 	} 
 	return nil
 }
