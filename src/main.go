@@ -20,17 +20,6 @@ var shoppingList, err = ReadShoppingList()
 var idCount int
 var allMessagesList = readMessages(MessageList{});
 
-const MessageFile = "./resources/messages"
-const ShoppingFile = "./resources/shopping"
-const CalendarFile = "./resources/calendar"
-
-const DayCount = 7
-const UserCount = 4
-
-var StateList = []string{"present", "absent", "cooking", "uncertain", "maybe-cooking", "cant-cook"}
-var ConstPersonList = []string{"rick", "youri", "robert", "milan"}
-var DayList = []string{"ma", "di", "wo", "do", "vr", "za", "zo"}
-
 func main() {
 	paramDeploy := flag.Bool(
 		"d", false, "A flag specifying the deploy mode of the server.")
@@ -140,13 +129,5 @@ func GetPage(writer http.ResponseWriter, request *http.Request) {
 		http.ServeFile(
 			writer, request, "src/static/templates/500.html",
 		)
-	}
-}
-
-// stand-in for a constant slice (which isn't possible in Go)
-func getValidPages() []string {
-	return []string{
-		"messages", 
-		"help",
 	}
 }

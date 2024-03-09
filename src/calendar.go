@@ -71,24 +71,24 @@ func UpdateCalendar(cal Calendar, message CalMessage) string {
 
 	var dayIndex, personIndex int
 
-	for i, d := range DayList {
+	for i, d := range getDayList() {
 		if d == message.Day {
 			dayIndex = i 
 			break
 		}
 	}
 
-	for i, p := range ConstPersonList {
+	for i, p := range getPersonList() {
 		if p == message.Person {
 			personIndex = i 
 			break
 		}
 	}
 
-	new_state := (cal.Day[dayIndex][personIndex] + 1) % len(StateList)
+	new_state := (cal.Day[dayIndex][personIndex] + 1) % len(getStateList())
 	cal.Day[dayIndex][personIndex] = new_state
 
-	return StateList[new_state]
+	return getStateList()[new_state]
 }
 
 func WriteCalendar(cal Calendar) {
