@@ -21,16 +21,19 @@ const weekdayList = ["zo", "ma", "di", "wo", "do", "vr", "za"]
 const personList = ["rick", "youri", "robert", "milan"]
 const date = new Date()
 
-setInterval(setWeekday(date), 600000);
-function setWeekday(date) {
-	var day = weekdayList[date.getDay()]
-	try {
-		var old_el = document.getElementsByClassName("selected")[0]
-		old_el.classList.remove("selected");
-	} catch (error) {}
+let day = weekdayList[date.getDay()]
+let yesterday = weekdayList[(date.getDay() + 6) % weekdayList.length]
 
-	var el = document.getElementsByClassName(`day ${day}`)[0]
-	el.classList.add("selected")
+setWeekday(date)
+// 600_000 = 10 minutes
+setInterval(setWeekday(date), 600_000);
+function setWeekday(date) {
+	let days = document.getElementsByClassName("day")
+	for (let i = 0; i < 7; i++) {
+		let set = weekdayList[(date.getDay() + 4 + i) % weekdayList.length]
+		set = set[0].toUpperCase() + set[1] + "."
+		days[i].innerHTML = `<p>${set}</p>`
+	}
 }
 
 // NOTE: day websocket section

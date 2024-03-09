@@ -53,7 +53,8 @@ func main() {
 	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(jsDir)))
 	http.Handle("/fonts/", http.StripPrefix("/fonts/", http.FileServer(fontsDir)))
 	
-	go weeklyResetTimer()
+	// go weeklyResetTimer()
+	go shiftCalendarDaily()
 
 	if *paramDeploy {
 		// TODO:

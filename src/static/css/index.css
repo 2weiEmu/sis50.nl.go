@@ -97,12 +97,16 @@ body {
 }
 
 
-.outer-cook-table div:nth-child(1n + 1) {
-	border-right: 1px solid var(--primary);
-}
+/*.outer-cook-table div:nth-child(1n + 1) {*/
+	/*border-right: 1px solid var(--primary);*/
+/*}*/
+/**/
+/*.outer-cook-table div:nth-child(5n) {*/
+	/*border-right: none;*/
+/*}*/
 
-.outer-cook-table div:nth-child(5n) {
-	border-right: none;
+.day.do {
+	border-right: 5px solid var(--accent);
 }
 
 .outer-cook-table * {
@@ -267,8 +271,13 @@ a {
 	}
 }
 
-.selected {
-	color: var(--accent);
+.rick.do {
+	border-left: 5px solid var(--accent);
+}
+
+.do {
+	border-bottom: 5px solid var(--accent);
+	border-top: 5px solid var(--accent);
 }
 
 .shopping-list::-webkit-scrollbar {

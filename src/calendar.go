@@ -23,6 +23,39 @@ type Calendar struct {
 
 var calFileReady = make(chan bool)
 
+func shiftCalendarDaily() {
+	for {
+		t := time.Now().AddDate(0, 0, 1)
+		targetTime := time.Date(
+			t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.Now().Location())
+		timeUntilTmr := time.Until(targetTime)
+		time.Sleep(timeUntilTmr)
+
+		WriteCalendar(stateCalendar)
+		stateCalendar = shiftCalendar()
+		WriteCalendar(stateCalendar)
+
+		BroadcastToConnections(genOpenCalMessage())
+	}
+}
+
+func shiftCalendar() Calendar {
+	cal := ReadCalendar(InitCalendarDefault())
+
+	for d := 0; d < len(getDayList()) - 1; d++ {
+		for s := 0; s < len(getPersonList()); s++ {
+			cal.Day[d][s] = cal.Day[d+1][s];
+		}
+	}
+
+	lastDay := len(getDayList()) - 1
+	for s := 0; s < len(getPersonList()); s++ {
+		cal.Day[lastDay][s] = 0;
+	}
+
+	return cal
+}
+
 func InitCalendarDefault() Calendar {
 	var newCal Calendar
 	newCal.Day = make([][]int, DayCount)
