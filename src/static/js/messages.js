@@ -15,7 +15,7 @@ console.log(`[INFO] ${WS_BASE}`)
 
 window.onload = (event) => {
 	$.ajax({
-		url: `http://${WS_BASE}/api/messages/0`,
+		url: `https://${WS_BASE}/api/messages/0`,
 		type: 'GET',
 		dataType: 'json',
 		CORS: true,
@@ -54,7 +54,7 @@ function addMessage(event) {
 	})
 
 	$.ajax({
-		url: `http://${WS_BASE}/api/messages`,
+		url: `https://${WS_BASE}/api/messages`,
 		type: "POST",
 		data: data,
 		async: false, // ok apparently sync here is bad (it's deprecated, but it makes this work on firefox which I like)
@@ -73,7 +73,7 @@ function loadMoreItems(button, flag = false) {
 	var pageNumber = button.getAttribute("data-page-number")
 	pageNumber++
 	$.ajax({
-		url: `http://${WS_BASE}/api/messages/${pageNumber}`,
+		url: `https://${WS_BASE}/api/messages/${pageNumber}`,
 		type: 'GET',
 		dataType: 'json',
 		CORS: true,
