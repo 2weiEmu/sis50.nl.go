@@ -61,7 +61,7 @@ func main() {
 	if *paramDeploy {
 		// TODO:
 		// http.ListenAndServeTLS()
-		fmt.Println("Began listening on port: " + strconv.Itoa(*paramPort));
+		fmt.Println("Began listening (SSL) on port: " + strconv.Itoa(*paramPort));
 		err = http.ListenAndServeTLS(":" + strconv.Itoa(*paramPort), *cert, *secret, nil)
 	} else {
 
