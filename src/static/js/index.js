@@ -46,8 +46,8 @@ function setWeekday(date) {
 var stateList = ["present", "absent", "cooking", "uncertain", "maybe-cooking", "cant-cook"]
 var altTextList = ["Present", "Absent", "Cooking", "Uncertain if Present", "Maybe Cooking", "Can't Cook"]
 
-console.log(`ws://${WS_BASE}/dayWS`)
-var dayWebsocket = new WebSocket(`ws://${WS_BASE}/dayWS`, "echo-protocol")
+console.log(`wss://${WS_BASE}/dayWS`)
+var dayWebsocket = new WebSocket(`wss://${WS_BASE}/dayWS`, "echo-protocol")
 
 dayWebsocket.onopen = (event) => {
 	dayWebsocket.send(JSON.stringify({
@@ -126,7 +126,7 @@ dayWebsocket.onmessage = function(event) {
 
 var shoppingList = document.getElementById("shop-list")
 
-var shopWebSocket = new WebSocket(`ws://${WS_BASE}/shopWS`, "echo-protocol")
+var shopWebSocket = new WebSocket(`wss://${WS_BASE}/shopWS`, "echo-protocol")
 
 function addItem() {
 	var content = document.getElementById("item-name-add").value
