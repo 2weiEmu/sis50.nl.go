@@ -27,8 +27,8 @@ func main() {
 		"p", 8000, "The port the server should be deployed on.")
 	paramWebSocketConn = flag.String(
 		"base", "localhost:8000", "Where websockets should connect.")
-    cert := flag.String("c", "", "State the certificate location")
-    secret := flag.String("k", "", "State the private key location")
+	cert := flag.String("c", "", "State the certificate location")
+	secret := flag.String("k", "", "State the private key location")
 	flag.Parse()
 
 	// NOTE: consider changing this, to something like src/static and moving
@@ -62,11 +62,15 @@ func main() {
 		// TODO:
 		// http.ListenAndServeTLS()
 		fmt.Println("Began listening on port: " + strconv.Itoa(*paramPort));
-        err = http.ListenAndServeTLS(":" + strconv.Itoa(*paramPort), *cert, *secret, nil)
+		err = http.ListenAndServeTLS(":" + strconv.Itoa(*paramPort), *cert, *secret, nil)
 	} else {
 
 		fmt.Println("Began listening on port: " + strconv.Itoa(*paramPort));
-		http.ListenAndServe(":" + strconv.Itoa(*paramPort), nil)
+		err = http.ListenAndServe(":" + strconv.Itoa(*paramPort), nil)
+	}
+
+	if err != nil {
+		fmt.Println(err);
 	}
 }
 
