@@ -1,5 +1,9 @@
 console.log("Loaded index.js")
 
+function sleep(ms = 0) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 document.getElementById("bg-button").addEventListener("click", bgMenu)
 
 if (localStorage.getItem("sis50-background") === null) {
@@ -46,8 +50,8 @@ function setWeekday(date) {
 var stateList = ["present", "absent", "cooking", "uncertain", "maybe-cooking", "cant-cook"]
 var altTextList = ["Present", "Absent", "Cooking", "Uncertain if Present", "Maybe Cooking", "Can't Cook"]
 
-console.log(`wss://${WS_BASE}/dayWS`)
 var dayWebsocket = new WebSocket(`wss://${WS_BASE}/dayWS`, "echo-protocol")
+// var dayWebsocket = new WebSocket(`ws://${WS_BASE}/dayWS`, "echo-protocol")
 
 dayWebsocket.onopen = (event) => {
 	dayWebsocket.send(JSON.stringify({
@@ -83,20 +87,37 @@ for (var i = 0; i < gridElList.length; i++) {
 	gridElList[i].childNodes[0].setAttribute("draggable", false)
 }
 
-dayWebsocket.onmessage = function(event) {
+dayWebsocket.onmessage = async function(event) {
 	console.log("Received Message")
 	var message = JSON.parse(event.data)
 	console.log(message)
 
 	if (message.state != "open-calendar") {
+		// Update the day's state
 		var el = document.getElementsByClassName(`${message.person} ${message.day}`)[0]
-		console.log(el)
-		console.log(`${message.person} ${message.day}`)
-		el.childNodes[0].setAttribute("data-state", message.state) 
-		el.childNodes[0].src = "/images/" + message.state + ".svg"
+		let state_image = el.childNodes[0]
+
+		state_image.style.width = "0"
+		state_image.style.marginRight = "50%"
+		state_image.style.marginLeft = "50%"
+		state_image.style.marginTop = "50%"
+		state_image.style.marginBottom = "50%"
+		await sleep(300)
+
+		state_image.setAttribute("data-state", message.state) 
+		state_image.src = "/images/" + message.state + ".svg"
+
+		state_image.style.width = "100%"
+		state_image.style.marginRight = "0"
+		state_image.style.marginLeft = "0"
+		state_image.style.marginTop = "8px"
+		state_image.style.marginBottom = "0"
+		await sleep(300)
+
 		console.log(`[INFO] message.state: ${message.state}`)
 		var i = stateList.findIndex((item) => { return item == message.state })
-		el.childNodes[0].title = altTextList[i]
+		state_image.title = altTextList[i]
+		
 	} else {
 		var days = message.day.split("/")
 		for (var i = 0; i < days.length; i++) {
@@ -127,6 +148,7 @@ dayWebsocket.onmessage = function(event) {
 var shoppingList = document.getElementById("shop-list")
 
 var shopWebSocket = new WebSocket(`wss://${WS_BASE}/shopWS`, "echo-protocol")
+// var shopWebSocket = new WebSocket(`ws://${WS_BASE}/shopWS`, "echo-protocol")
 
 function addItem() {
 	var content = document.getElementById("item-name-add").value
