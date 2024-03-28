@@ -98,9 +98,10 @@ dayWebsocket.onmessage = async function(event) {
 		let state_image = el.childNodes[0]
 
 		state_image.style.width = "0"
+		state_image.style.height = "0"
 		state_image.style.marginRight = "50%"
 		state_image.style.marginLeft = "50%"
-		state_image.style.marginTop = "50%"
+		state_image.style.marginTop = "30%"
 		state_image.style.marginBottom = "50%"
 		await sleep(300)
 
@@ -112,6 +113,7 @@ dayWebsocket.onmessage = async function(event) {
 		state_image.style.marginLeft = "0"
 		state_image.style.marginTop = "8px"
 		state_image.style.marginBottom = "0"
+		state_image.style.height = "80%"
 		await sleep(300)
 
 		console.log(`[INFO] message.state: ${message.state}`)
