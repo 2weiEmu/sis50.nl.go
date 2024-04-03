@@ -2,7 +2,7 @@
 
 ## Contents
 
-- [What is this Site?](#What-is-this-Site?)
+- [What is this Site?](#What-is-this-Site)
 
 - [Features](#Features)
 
