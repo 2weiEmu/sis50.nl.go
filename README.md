@@ -1,5 +1,13 @@
 # The Sis50 House Site
 
+## Contents
+
+- [What is this Site?](##What-is-this-site?)
+
+- [Features](##Features)
+
+- [Technical Information](##Technical-Information)
+
 ## What is this site?
 
 This is a simple site created for the house Sis50 in the Netherlands to coordinate cooking schedules, share funny memes, and create a community shopping list. This site's backend is written in Go, and the design is focused on a mobile-first experience.
@@ -56,30 +64,30 @@ This is a simple site created for the house Sis50 in the Netherlands to coordina
 - [ ] More advanced admin panel controls for the calendar
 
 - **Feature Set** (Recipe Stage)
-- [ ]
+- [ ] Todo...
 
 - **Feature Set** (Minesweeper Stage)
-- [ ]
+- [ ] Todo...
 
 - **Feature Set** (Pull up Leaderboard)
-- [ ]
+- [ ] Todo...
 
 - **Feature Set** ("Avalex" Stage)
-- [ ]
+- [ ] Todo...
 
 - **Feature Set** (Generic HTTP API Stage)
-- [ ]
+- [ ] Todo...
 
 - **Feature Set** (Terminal Program Stage)
-- [ ]
+- [ ] Todo...
 
 - **Feature Set** (Android Program Stage)
-- [ ]
+- [ ] Todo...
 
 
 ## Technical Information
 
-### Interacting with Web sockets
+### Installing for Yourself
 
 Also I just want to thank this blog article:
 https://www.alexedwards.net/blog/working-with-cookies-in-go
