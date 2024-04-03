@@ -2,11 +2,11 @@
 
 ## Contents
 
-- [What is this Site?](##What-is-this-site?)
+- [What is this Site?](#What-is-this-site?)
 
-- [Features](##Features)
+- [Features](#Features)
 
-- [Technical Information](##Technical-Information)
+- [Technical Information](#Technical-Information)
 
 ## What is this site?
 
