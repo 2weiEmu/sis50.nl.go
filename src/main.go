@@ -15,6 +15,7 @@ import (
 var webSocketDayConnections []*websocket.Conn
 var webSocketShopConnections []*websocket.Conn
 var paramWebSocketConn *string
+var secure string
 var stateCalendar = ReadCalendar(InitCalendarDefault())
 var shoppingList, err = ReadShoppingList()
 var idCount int
@@ -61,10 +62,12 @@ func main() {
 	if *paramDeploy {
 		// TODO:
 		// http.ListenAndServeTLS()
+		secure = "ssl"
 		fmt.Println("Began listening (SSL) on port: " + strconv.Itoa(*paramPort));
 		err = http.ListenAndServeTLS(":" + strconv.Itoa(*paramPort), *cert, *secret, nil)
 	} else {
 
+		secure = "none"
 		fmt.Println("Began listening on port: " + strconv.Itoa(*paramPort));
 		err = http.ListenAndServe(":" + strconv.Itoa(*paramPort), nil)
 	}
@@ -97,7 +100,7 @@ func IndexPage(writer http.ResponseWriter, request *http.Request) {
 
 	MainPageStruct := IndexPageStruct{
 		Message: titleMsg,
-		Args: *paramWebSocketConn,
+		Args: *paramWebSocketConn + " " + secure,
 	}
 
 	err = tmpl.Execute(writer, MainPageStruct)
@@ -112,6 +115,8 @@ func GetAdmin(writer http.ResponseWriter, request *http.Request) {
 func GetPage(writer http.ResponseWriter, request *http.Request) {
 	vars := mux.Vars(request)
 	page := vars["page"]
+
+	jsArguments := *paramWebSocketConn + " " + secure
 
 	if !slices.Contains(getValidPages(), page) {
 		http.ServeFile(
@@ -131,7 +136,8 @@ func GetPage(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	
-	err = tmpl.Execute(writer, paramWebSocketConn)
+	fmt.Println(jsArguments)
+	err = tmpl.Execute(writer, jsArguments)
 	if err != nil {
 		fmt.Println(err)
 		writer.WriteHeader(http.StatusInternalServerError)

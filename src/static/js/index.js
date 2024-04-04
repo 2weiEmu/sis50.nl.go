@@ -11,12 +11,21 @@ if (localStorage.getItem("sis50-background") === null) {
 }
 
 // NOTE: getting arguments, setting state
-//		 --------------------------------
+// --------------------------------
 
 var ws_args = document.currentScript.getAttribute("args")
 var argv = ws_args.split(" ")
 
 var WS_BASE = argv[0]
+var security = argv[1]
+
+var secure = "ws"
+
+if (security != "none") {
+	secure = "wss"
+}
+
+console.log(`secure: ${secure}`)
 console.log(`WS_BASE: ${WS_BASE}`)
 
 // NOTE: weekday section
@@ -50,8 +59,7 @@ function setWeekday(date) {
 var stateList = ["present", "absent", "cooking", "uncertain", "maybe-cooking", "cant-cook"]
 var altTextList = ["Present", "Absent", "Cooking", "Uncertain if Present", "Maybe Cooking", "Can't Cook"]
 
-// var dayWebsocket = new WebSocket(`wss://${WS_BASE}/dayWS`, "echo-protocol")
-var dayWebsocket = new WebSocket(`ws://${WS_BASE}/dayWS`, "echo-protocol")
+var dayWebsocket = new WebSocket(`${secure}://${WS_BASE}/dayWS`, "echo-protocol")
 
 dayWebsocket.onopen = (event) => {
 	dayWebsocket.send(JSON.stringify({
@@ -149,8 +157,7 @@ dayWebsocket.onmessage = async function(event) {
 
 var shoppingList = document.getElementById("shop-list")
 
-// var shopWebSocket = new WebSocket(`wss://${WS_BASE}/shopWS`, "echo-protocol")
-var shopWebSocket = new WebSocket(`ws://${WS_BASE}/shopWS`, "echo-protocol")
+var shopWebSocket = new WebSocket(`${secure}://${WS_BASE}/shopWS`, "echo-protocol")
 
 function addItem() {
 	var content = document.getElementById("item-name-add").value
