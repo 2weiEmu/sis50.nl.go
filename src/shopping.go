@@ -48,8 +48,7 @@ func EditMessageById(id int, content string) error {
 	}
 
 	if i == -1 {
-		// TODO:
-		return errors.New("Failed to find the correct Id in the list")
+		return ErrLog("Id not found in list", nil)
 	}
 
 	shoppingList[i].Content = content

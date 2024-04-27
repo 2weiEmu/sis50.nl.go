@@ -1,25 +1,30 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 )
 
-type MessagesError struct {
+type LocalErr struct {
 	Message string
 	Err error
 }
 
-func msgErrLog(text string, err error) MessagesError {
+func ErrLog(text string, err error) LocalErr {
 	errorLog.Println(text)
 
-	return MessagesError{
+	if err == nil {
+		err = errors.New(text)
+	}
+
+	return LocalErr{
 		Message: text,
 		Err: err,
 	}
 }
 
-func (err MessagesError) Error() string {
+func (err LocalErr) Error() string {
 	return fmt.Sprintf("MessagesError %s, with: %v", err.Message, err.Err)
 }
 
