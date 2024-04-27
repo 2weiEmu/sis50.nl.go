@@ -12,10 +12,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type MessagePost struct {
-	Message string `json:"message"`
-}
-
 type MessagePage struct {
 	Message []string `json:"messages"`
 }
@@ -27,33 +23,32 @@ type MessageList struct {
 // GET pages of Messages
 // POST a new message to a page, and save this
 func GETMessages(writer http.ResponseWriter, request *http.Request) {
-	fmt.Println("[INFO] GET REQUEST RECEIVED")
-	allMessagesList = readMessages(allMessagesList)
+	infoLog.Println("Get Messages Request")
+
+	allMessagesList, err = readMessages(allMessagesList)
+	if err != nil {
+		errorLogAndHttpStat(writer, err)
+		return
+	}
 
 	vars := mux.Vars(request)
 	pageNumber, err := strconv.Atoi(vars["pageNumber"])
 	if err != nil {
-		// TODO:
-		fmt.Println(err)
+		errorLogAndHttpStat(writer, err)
+		return
 	}
 
-	// TODO: this needs more error checking
-	// page, err := json.Marshal(messageList.Pages[pageNumber])
 	page := getMessageJson(pageNumber)
-
 	if page == nil {
-		// TODO:
-		fmt.Println(err)
+		infoLog.Println("messages.go: Could not get more messages")
 		http.Error(
 			writer, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
 	}
-	fmt.Println(allMessagesList)
-	writer.Header().Set("Access-Control-Allow-Headers", "x-requested-with")
 	writer.Write(page)
 }
 
 func getMessageJson(pageNumber int) []byte {
-	
 	if len(allMessagesList.Pages) <= pageNumber || pageNumber < 0 {
 		return nil;
 	}
@@ -65,17 +60,22 @@ func getMessageJson(pageNumber int) []byte {
 }
 
 func POSTMessage(writer http.ResponseWriter, request *http.Request) {
-	fmt.Println("[INFO] POST REQUEST RECEIVED")
-	allMessagesList = readMessages(allMessagesList)
-	var msgPost MessagePost
+	infoLog.Println("POSTing message")
+	allMessagesList, err = readMessages(allMessagesList)
+	if err != nil {
+		errorLogAndHttpStat(writer, err)
+		return
+	}
+
+	var msgPost string
 	err := json.NewDecoder(request.Body).Decode(&msgPost)
 	if err != nil {
-		// TODO:
-		fmt.Println(err)
+		errorLogAndHttpStat(writer, err)
+		return
 	}
 
 	fmt.Println(allMessagesList)
-	err = addMessageToList(msgPost.Message)
+	err = addMessageToList(msgPost)
 	if err != nil {
 		writer.Write([]byte("Failed to Add\n"))
 	} else {
@@ -138,13 +138,11 @@ func saveMessages(messageList MessageList) {
 
 }
 
-func readMessages(messageList MessageList) MessageList {
-
+func readMessages(messageList MessageList) (MessageList, error) {
 	file, err := os.OpenFile(
 		MessageFile, os.O_RDWR | os.O_APPEND, os.ModeAppend)
 	if err != nil {
-		// TODO:
-		fmt.Println(err)
+		return MessageList{}, msgErrLog("Could not open message file", err)
 	}
 	defer file.Close()
 
@@ -152,17 +150,14 @@ func readMessages(messageList MessageList) MessageList {
 	csvr.FieldsPerRecord = -1
 	records, err := csvr.ReadAll()
 	if err != nil {
-		// TODO:
-		fmt.Println("[ERROR] Record:", err)
+		return MessageList{}, msgErrLog("Failed with record err", err)
 	}
 
 	messageList.Pages = []MessagePage{}
 	
 	for _, record := range records {
-		// fmt.Println("[INFO] Read record:", record)
 		messageList.Pages = append(messageList.Pages, MessagePage{record})
 	}
-	// fmt.Println("[INFO] Finished Read messageList:", messageList)
 
-	return messageList
+	return messageList, nil
 }

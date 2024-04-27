@@ -11,11 +11,17 @@ var ws_args = document.currentScript.getAttribute("args")
 var argv = ws_args.split(" ")
 
 var WS_BASE = argv[0]
+var security = argv[1]
+
+var sec = "http"
+if (security != "none") {
+	sec = "https"
+}
 console.log(`[INFO] ${WS_BASE}`)
 
 window.onload = (event) => {
 	$.ajax({
-		url: `https://${WS_BASE}/api/messages/0`,
+		url: `${sec}://${WS_BASE}/api/messages/0`,
 		type: 'GET',
 		dataType: 'json',
 		CORS: true,
@@ -49,13 +55,14 @@ window.onload = (event) => {
 
 function addMessage(event) {
 	var msg = document.getElementById("msg-content").value
-	var data = JSON.stringify({
-		"message": msg
-	})
+	var data = JSON.stringify(msg)
 
 	$.ajax({
-		url: `https://${WS_BASE}/api/messages`,
+		url: `${sec}://${WS_BASE}/api/messages`,
 		type: "POST",
+		headers: {
+			'Access-Control-Allow-Origin': '*',
+		},
 		data: data,
 		async: false, // ok apparently sync here is bad (it's deprecated, but it makes this work on firefox which I like)
 		success: function(data) { 
@@ -73,7 +80,7 @@ function loadMoreItems(button, flag = false) {
 	var pageNumber = button.getAttribute("data-page-number")
 	pageNumber++
 	$.ajax({
-		url: `https://${WS_BASE}/api/messages/${pageNumber}`,
+		url: `${sec}://${WS_BASE}/api/messages/${pageNumber}`,
 		type: 'GET',
 		dataType: 'json',
 		CORS: true,

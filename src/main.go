@@ -4,7 +4,9 @@ import (
 	"flag"
 	"fmt"
 	"html/template"
+	"log"
 	"net/http"
+	"os"
 	"slices"
 	"strconv"
 
@@ -19,7 +21,8 @@ var secure string
 var stateCalendar = ReadCalendar(InitCalendarDefault())
 var shoppingList, err = ReadShoppingList()
 var idCount int
-var allMessagesList = readMessages(MessageList{});
+var allMessagesList, _ = readMessages(MessageList{});
+var infoLog, requestLog, errorLog *log.Logger
 
 func main() {
 	paramDeploy := flag.Bool(
@@ -31,6 +34,16 @@ func main() {
 	cert := flag.String("c", "", "State the certificate location")
 	secret := flag.String("k", "", "State the private key location")
 	flag.Parse()
+
+    logFile, err := os.OpenFile("./log/sis50.log", os.O_APPEND | os.O_RDWR, 664)
+    if err != nil {
+        fmt.Println("[LOGS] Failed to open main log file.")
+    }
+    defer logFile.Close()
+
+	infoLog = log.New(logFile, "[INFO] ", loggerFlags)
+	requestLog = log.New(logFile, "[REQUEST] ", loggerFlags)
+	errorLog = log.New(logFile, "[ERROR] ", loggerFlags)
 
 	// NOTE: consider changing this, to something like src/static and moving
 	// all the templates somewhere else so they can't be accessed... maybe a
