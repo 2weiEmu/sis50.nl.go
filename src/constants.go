@@ -47,3 +47,20 @@ func getDayList() []string {
 		"zo",
 	}
 }
+
+// Actions for Shopping
+const (
+	ADD = iota
+	OPEN
+	REMOVE
+	EDIT
+	REARRANGE
+)
+
+var shoppingActionMap = map[string]int{
+	"add": ADD,
+	"open-shopping": OPEN,
+	"remove": REMOVE,
+	"edit": EDIT,
+	"rearrange": REARRANGE,
+}

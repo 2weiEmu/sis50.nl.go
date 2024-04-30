@@ -35,11 +35,11 @@ func main() {
 	secret := flag.String("k", "", "State the private key location")
 	flag.Parse()
 
-    logFile, err := os.OpenFile("./log/sis50.log", os.O_APPEND | os.O_RDWR, 664)
-    if err != nil {
-        fmt.Println("[LOGS] Failed to open main log file.")
-    }
-    defer logFile.Close()
+	logFile, err := os.OpenFile("./log/sis50.log", os.O_APPEND | os.O_RDWR, 664)
+	if err != nil {
+		fmt.Println("[LOGS] Failed to open main log file.")
+	}
+	defer logFile.Close()
 
 	infoLog = log.New(logFile, "[INFO] ", loggerFlags)
 	requestLog = log.New(logFile, "[REQUEST] ", loggerFlags)

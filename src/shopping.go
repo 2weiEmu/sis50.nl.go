@@ -42,49 +42,45 @@ func ShoppingListWebsocketHandler(conn *websocket.Conn) {
 		if err != nil {
 			ErrLog("Failed to re-read shopping list from file", err)
 			break
-		} else {
-			fmt.Println(shopItemList)
 		}
 
 		message.Content = htmlcleaner.Clean(nil, message.Content)
 
-		if message.Action != "open-shopping" {
-			if message.Action == "remove" {
+		keyword, prs := shoppingActionMap[message.Action]
+
+		if !prs {
+			ErrLog("Action wasn't valid", nil)
+			break
+		}
+
+		if keyword != OPEN {
+			switch keyword {
+			case ADD:
+				message.Id = idCount
+				idCount++
+				shopItemList.add(message)
+
+			case REMOVE:
 				err := shopItemList.RemoveByItemId(message.Id)
 				if err != nil {
 					ErrLog("Failed to remove shopping item by id", err)
 					break
 				}
-
-				err = shopItemList.WriteToFile()
-				if err != nil {
-					ErrLog("Failed to write shopping list to file after removal", err)
-					break
-				}
-
-			} else if message.Action == "add" {
-				message.Id = idCount
-				idCount++
-				shopItemList.add(message)
-
-				err = shopItemList.WriteToFile()
-				if err != nil {
-					ErrLog("Failed to write shopping list when adding item", err)
-					break
-				}
-
-			} else if message.Action == "edit" {
+				
+			case EDIT:
 				err = shopItemList.EditMessageById(message.Id, message.Content)
 				if err != nil {
 					ErrLog("Could not edit message by id", err)
 					break
 				}
 
-				err = shopItemList.WriteToFile()
-				if err != nil {
-					ErrLog("Failed to write shopping list to file", err)
-					break
-				}
+			case REARRANGE:
+			}
+
+			err = shopItemList.WriteToFile()
+			if err != nil {
+				ErrLog("Failed to write shopping list to file", err)
+				break
 			}
 
 			for _, wsConn := range webSocketShopConnections {
@@ -94,13 +90,12 @@ func ShoppingListWebsocketHandler(conn *websocket.Conn) {
 				ErrLog("Failed to broadcast to other connections", err)
 				break
 			}
+
 		} else {
 			infoLog.Println("Sending new opening websocket")
-			fmt.Println("SHOPITEMLIST.INDEXLIST", shopItemList.indexList)
 
 			for _, node := range shopItemList.indexList {
 				err := websocket.JSON.Send(conn, node.value)
-				fmt.Println("Sent: ", node.value)
 				if err != nil {
 					ErrLog("Failed to send opening shopping list statement", err)
 					break
@@ -108,6 +103,7 @@ func ShoppingListWebsocketHandler(conn *websocket.Conn) {
 			}
 			infoLog.Println("Completed sending opening")
 		}
+
 	}
 	webSocketShopConnections = RemoveWebsocketFromPool(
 		conn, webSocketShopConnections)
