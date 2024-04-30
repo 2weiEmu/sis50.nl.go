@@ -12,7 +12,7 @@ build: $(OBJECTS)
 	$(CMD) build -o $(TARGET) $(OBJECTS) 
 
 test: $(OBJECTS)
-	$(CMD) test -v ./...
+	$(CMD) test -coverprofile -v ./...
 
 deploy: $(OBJECTS)
 	$(CMD) build -o $(TARGET) $(OBJECTS)
