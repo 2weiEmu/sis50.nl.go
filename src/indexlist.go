@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/csv"
+	"fmt"
 	"os"
 	"strconv"
 )
@@ -139,9 +140,35 @@ func ReadFromFile() (IndexList, error) {
 	list := NewIndexList()
 
 	for _, record := range records {
-		// TODO:
+		deserialized, err := deserialize(record)
+		fmt.Println("deserialized:", deserialized);
+		if err != nil {
+			return IndexList{}, ErrLog("Failed to deserialize record", err)
+		}
+
+		list.indexList = append(list.indexList, deserialized)
 	}
 
-	return IndexList{}, nil
+	return list, nil
 }
 
+func deserialize(serial []string) (IndexNode, error) {
+	index, err := strconv.Atoi(serial[3])
+	if err != nil {
+		return IndexNode{}, ErrLog("Failed to convert index from file", err)
+	}
+
+	itemId, err := strconv.Atoi(serial[0])
+	if err != nil {
+		return IndexNode{}, ErrLog("Failed to convert item id from file", err)
+	}
+
+	return IndexNode {
+		index: index,
+		value: ShoppingItem{
+			Id: itemId,
+			Content: serial[1],
+			Action: serial[2],
+		},
+	}, nil
+}

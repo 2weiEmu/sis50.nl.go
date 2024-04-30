@@ -19,7 +19,7 @@ var webSocketShopConnections []*websocket.Conn
 var paramWebSocketConn *string
 var secure string
 var stateCalendar = ReadCalendar(InitCalendarDefault())
-var shoppingList, err = ReadShoppingList()
+var shopItemList, _ = ReadFromFile()
 var idCount int
 var allMessagesList, _ = readMessages(MessageList{});
 var infoLog, requestLog, errorLog *log.Logger

@@ -1,10 +1,7 @@
 package main
 
 import (
-	"encoding/csv"
-	"errors"
 	"fmt"
-	"os"
 	"strconv"
 
 	"github.com/benlubar/htmlcleaner"
@@ -17,106 +14,6 @@ type ShoppingItem struct {
 	Action string `json:"action"`
 }
 
-func RemoveShoppingItemById(id int) error {
-	fmt.Println("[INFO] Removing", id)
-	i := -1
-
-	for j, b := range shoppingList {
-		if b.Id == id {
-			i = j
-			break
-		}
-	}
-
-	if i == -1 {
-		// TODO:
-		return errors.New("Failed to find the correct Id in the list")
-	}
-
-	shoppingList = append(shoppingList[:i], shoppingList[i+1:]...)
-	return nil
-}
-
-func EditMessageById(id int, content string) error {
-	i := -1
-
-	for j, b := range shoppingList {
-		if b.Id == id {
-			i = j
-			break
-		}
-	}
-
-	if i == -1 {
-		return ErrLog("Id not found in list", nil)
-	}
-
-	shoppingList[i].Content = content
-	return nil
-}
-
-func ReadShoppingList() ([]ShoppingItem, error) {
-	file, err := os.OpenFile(
-		ShoppingFile, os.O_RDWR | os.O_APPEND, os.ModeAppend)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	reader := csv.NewReader(file)
-	reader.FieldsPerRecord = -1
-
-	records, err := reader.ReadAll()
-	if err != nil {
-		return nil, err
-	}
-
-	shoppingList := make([]ShoppingItem, 0)
-
-	for _, record := range records {
-		id, err := strconv.Atoi(record[0])
-		if err != nil {
-			return nil, err
-		}
-
-		item := ShoppingItem{
-			Id: id,
-			Content: record[1],
-			Action: record[2],
-		}
-		shoppingList = append(shoppingList, item)
-	}
-
-	fmt.Println("[INFO] Read:", shoppingList)
-	return shoppingList, nil
-}
-
-func WriteShoppingList(shoppingList []ShoppingItem) error {
-	err := os.Truncate(ShoppingFile, 0)
-	if err != nil {
-		return err
-	}
-
-	file, err := os.OpenFile(
-		ShoppingFile, os.O_RDWR | os.O_APPEND, os.ModeAppend)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	writer := csv.NewWriter(file)
-
-	for _, item := range shoppingList {
-		serial := item.Serialize()
-		fmt.Println("[INFO] Writing:", serial)
-		writer.Write(serial)
-	}
-
-	writer.Flush()
-	err = writer.Error()
-	return err // will return nil if nil
-}
-
 func (item *ShoppingItem) Serialize() []string {
 	list := make([]string, 3)
 
@@ -126,73 +23,94 @@ func (item *ShoppingItem) Serialize() []string {
 	return list
 }
 
-func ShoppingListWebsocketHandler(shop_conn *websocket.Conn) {
-	fmt.Println("[INFO] Activating Shopping Handler")
-
-	webSocketShopConnections = append(webSocketShopConnections, shop_conn)
-	fmt.Println(webSocketShopConnections)
+func ShoppingListWebsocketHandler(conn *websocket.Conn) {
+	infoLog.Println("Using Shopping Websocket Handler")
+	webSocketShopConnections = append(webSocketShopConnections, conn)
 
 	var message ShoppingItem
+
 	for {
-		err := websocket.JSON.Receive(shop_conn, &message)
+		err := websocket.JSON.Receive(conn, &message)
 		if err != nil {
-			// TODO:
-			fmt.Println(err)
+			ErrLog("Failed to read websocket JSON", err)
+			fmt.Println("Failed with message received:", err)
 			break
 		}
 
-		fmt.Println("[INFO] Message received: ", message)
+		infoLog.Println("Message received:", message)
+		shopItemList, err = ReadFromFile()
+		if err != nil {
+			ErrLog("Failed to re-read shopping list from file", err)
+			break
+		} else {
+			fmt.Println(shopItemList)
+		}
+
 		message.Content = htmlcleaner.Clean(nil, message.Content)
 
 		if message.Action != "open-shopping" {
 			if message.Action == "remove" {
-				err = RemoveShoppingItemById(message.Id)
-				WriteShoppingList(shoppingList)
-				shoppingList, err = ReadShoppingList()
+				err := shopItemList.removeByItemId(message.Id)
 				if err != nil {
-					// TODO:
+					ErrLog("Failed to remove shopping item by id", err)
+					break
+				}
+
+				err = shopItemList.writeToFile()
+				if err != nil {
+					ErrLog("Failed to write shopping list to file after removal", err)
+					break
 				}
 
 			} else if message.Action == "add" {
 				message.Id = idCount
 				idCount++
-				shoppingList = append(shoppingList, message)
-				WriteShoppingList(shoppingList)
-				shoppingList, err = ReadShoppingList()
+				shopItemList.add(message)
+
+				err = shopItemList.writeToFile()
 				if err != nil {
-					// TODO:
+					ErrLog("Failed to write shopping list when adding item", err)
+					break
 				}
 
 			} else if message.Action == "edit" {
-				err = EditMessageById(message.Id, message.Content)
-				WriteShoppingList(shoppingList)
-				shoppingList, err = ReadShoppingList()
+				err = shopItemList.editMessageById(message.Id, message.Content)
 				if err != nil {
-					// TODO:
+					ErrLog("Could not edit message by id", err)
+					break
+				}
+
+				err = shopItemList.writeToFile()
+				if err != nil {
+					ErrLog("Failed to write shopping list to file", err)
+					break
 				}
 			}
 
-			for _, ws_conn := range webSocketShopConnections {
-				err = websocket.JSON.Send(ws_conn, message)
+			for _, wsConn := range webSocketShopConnections {
+				err = websocket.JSON.Send(wsConn, message)
 			}
-			
 			if err != nil {
-				// TODO:
-				fmt.Println(err)
+				ErrLog("Failed to broadcast to other connections", err)
+				break
 			}
 		} else {
-			fmt.Println("Opening")
-			for _, si := range shoppingList {
-				// NOTE: thought we had to make the actions be "add" manually -
-				// but everything that gets added to the list already has "add"
-				err := websocket.JSON.Send(shop_conn, si)
+			infoLog.Println("Sending new opening websocket")
+			fmt.Println("SHOPITEMLIST.INDEXLIST", shopItemList.indexList)
+
+			for _, node := range shopItemList.indexList {
+				err := websocket.JSON.Send(conn, node.value)
+				fmt.Println("Sent: ", node.value)
 				if err != nil {
-					// TODO:
-					fmt.Println(err)
+					ErrLog("Failed to send opening shopping list statement", err)
+					break
 				}
 			}
+			infoLog.Println("Completed sending opening")
 		}
 	}
 	webSocketShopConnections = RemoveWebsocketFromPool(
-		shop_conn, webSocketShopConnections)
+		conn, webSocketShopConnections)
+	conn.Close()
 }
+

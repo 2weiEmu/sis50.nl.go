@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"runtime"
 )
 
 type LocalErr struct {
@@ -12,7 +13,8 @@ type LocalErr struct {
 }
 
 func ErrLog(text string, err error) LocalErr {
-	errorLog.Println(text)
+	_, file, no, _ := runtime.Caller(1)
+	errorLog.Println("[IN ", file, ":", no, "]", text)
 
 	if err == nil {
 		err = errors.New(text)

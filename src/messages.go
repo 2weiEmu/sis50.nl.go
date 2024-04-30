@@ -25,7 +25,7 @@ type MessageList struct {
 func GETMessages(writer http.ResponseWriter, request *http.Request) {
 	infoLog.Println("Get Messages Request")
 
-	allMessagesList, err = readMessages(allMessagesList)
+	_, err := readMessages(allMessagesList)
 	if err != nil {
 		errorLogAndHttpStat(writer, err)
 		return
@@ -61,14 +61,14 @@ func getMessageJson(pageNumber int) []byte {
 
 func POSTMessage(writer http.ResponseWriter, request *http.Request) {
 	infoLog.Println("POSTing message")
-	allMessagesList, err = readMessages(allMessagesList)
+	allMessagesList, err := readMessages(allMessagesList)
 	if err != nil {
 		errorLogAndHttpStat(writer, err)
 		return
 	}
 
 	var msgPost string
-	err := json.NewDecoder(request.Body).Decode(&msgPost)
+	err = json.NewDecoder(request.Body).Decode(&msgPost)
 	if err != nil {
 		errorLogAndHttpStat(writer, err)
 		return
@@ -142,7 +142,7 @@ func readMessages(messageList MessageList) (MessageList, error) {
 	file, err := os.OpenFile(
 		MessageFile, os.O_RDWR | os.O_APPEND, os.ModeAppend)
 	if err != nil {
-		return MessageList{}, msgErrLog("Could not open message file", err)
+		return MessageList{}, ErrLog("Could not open message file", err)
 	}
 	defer file.Close()
 
@@ -150,7 +150,7 @@ func readMessages(messageList MessageList) (MessageList, error) {
 	csvr.FieldsPerRecord = -1
 	records, err := csvr.ReadAll()
 	if err != nil {
-		return MessageList{}, msgErrLog("Failed with record err", err)
+		return MessageList{}, ErrLog("Failed with record err", err)
 	}
 
 	messageList.Pages = []MessagePage{}
