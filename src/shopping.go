@@ -50,13 +50,13 @@ func ShoppingListWebsocketHandler(conn *websocket.Conn) {
 
 		if message.Action != "open-shopping" {
 			if message.Action == "remove" {
-				err := shopItemList.removeByItemId(message.Id)
+				err := shopItemList.RemoveByItemId(message.Id)
 				if err != nil {
 					ErrLog("Failed to remove shopping item by id", err)
 					break
 				}
 
-				err = shopItemList.writeToFile()
+				err = shopItemList.WriteToFile()
 				if err != nil {
 					ErrLog("Failed to write shopping list to file after removal", err)
 					break
@@ -67,20 +67,20 @@ func ShoppingListWebsocketHandler(conn *websocket.Conn) {
 				idCount++
 				shopItemList.add(message)
 
-				err = shopItemList.writeToFile()
+				err = shopItemList.WriteToFile()
 				if err != nil {
 					ErrLog("Failed to write shopping list when adding item", err)
 					break
 				}
 
 			} else if message.Action == "edit" {
-				err = shopItemList.editMessageById(message.Id, message.Content)
+				err = shopItemList.EditMessageById(message.Id, message.Content)
 				if err != nil {
 					ErrLog("Could not edit message by id", err)
 					break
 				}
 
-				err = shopItemList.writeToFile()
+				err = shopItemList.WriteToFile()
 				if err != nil {
 					ErrLog("Failed to write shopping list to file", err)
 					break

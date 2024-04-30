@@ -13,6 +13,9 @@ type LocalErr struct {
 }
 
 func ErrLog(text string, err error) LocalErr {
+	if errorLog == nil {
+		return LocalErr{}
+	}
 	_, file, no, _ := runtime.Caller(1)
 	errorLog.Println("[IN ", file, ":", no, "]", text)
 

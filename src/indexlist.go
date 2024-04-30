@@ -27,12 +27,12 @@ func (list *IndexList) add(value ShoppingItem) {
 	})
 }
 
-func (list *IndexList) length() int {
+func (list *IndexList) Length() int {
 	return len(list.indexList)
 }
 
-func (list *IndexList) removeByItemId(id int) error {
-	idx := list.indexOfId(id)
+func (list *IndexList) RemoveByItemId(id int) error {
+	idx := list.IndexOfId(id)
 	if idx == -1 {
 		return ErrLog("Couldn't remove item", nil)
 	}
@@ -49,7 +49,7 @@ func (list *IndexList) removeByItemId(id int) error {
 	return nil
 }
 
-func (list *IndexList) indexOfId(id int) int {
+func (list *IndexList) IndexOfId(id int) int {
 	for i, item := range list.indexList {
 		if item.value.Id == id {
 			return i
@@ -58,8 +58,8 @@ func (list *IndexList) indexOfId(id int) int {
 	return -1
 }
 
-func (list *IndexList) editMessageById(id int, newContent string) error {
-	idx := list.indexOfId(id)
+func (list *IndexList) EditMessageById(id int, newContent string) error {
+	idx := list.IndexOfId(id)
 	if idx == -1 {
 		return ErrLog("Could not edit message using Id, id not found", nil)
 	}
@@ -68,8 +68,8 @@ func (list *IndexList) editMessageById(id int, newContent string) error {
 	return nil
 }
 
-func (list *IndexList) moveToNewIndexById(id int, newIndex int) error {
-	idx := list.indexOfId(id)
+func (list *IndexList) MoveToNewIndexById(id int, newIndex int) error {
+	idx := list.IndexOfId(id)
 	if idx == -1 {
 		return ErrLog("Id not found when moving", nil)
 	}
@@ -84,7 +84,7 @@ func (list *IndexList) moveToNewIndexById(id int, newIndex int) error {
 	return nil
 }
 
-func (list *IndexList) writeToFile() error {
+func (list *IndexList) WriteToFile() error {
 	err := os.Truncate(ShoppingFile, 0)
 	if err != nil {
 		return ErrLog("Failed to truncate shopping file", err)
@@ -124,8 +124,9 @@ func ReadFromFile() (IndexList, error) {
 	file, err := os.OpenFile(
 		ShoppingFile, os.O_RDWR | os.O_APPEND, os.ModeAppend)
 	if err != nil {
-		return IndexList{}, ErrLog(
-			"Something went wrong when opening the file for reading", err)
+		return IndexList{}, 
+			ErrLog(
+				"Something went wrong when opening the file for reading", err)
 	}
 	defer file.Close()
 
@@ -150,6 +151,10 @@ func ReadFromFile() (IndexList, error) {
 	}
 
 	return list, nil
+}
+
+func (list *IndexList) IterateOrdered() {
+
 }
 
 func deserialize(serial []string) (IndexNode, error) {

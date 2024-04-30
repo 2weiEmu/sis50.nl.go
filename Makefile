@@ -11,6 +11,9 @@ default: $(OBJECTS)
 build: $(OBJECTS)
 	$(CMD) build -o $(TARGET) $(OBJECTS) 
 
+test: $(OBJECTS)
+	$(CMD) test -v ./...
+
 deploy: $(OBJECTS)
 	$(CMD) build -o $(TARGET) $(OBJECTS)
 	killall sis50.nl
