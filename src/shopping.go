@@ -75,6 +75,16 @@ func ShoppingListWebsocketHandler(conn *websocket.Conn) {
 				}
 
 			case REARRANGE:
+				newIdx, err := strconv.Atoi(message.Content)
+				if err != nil {
+					ErrLog("Failed to convert message content when rearranging", err)
+					break
+				}
+				err = shopItemList.MoveToNewIndexById(message.Id, newIdx)
+				if err != nil {
+					ErrLog("Failed to move to new index", err)
+					break
+				}
 			}
 
 			err = shopItemList.WriteToFile()
@@ -94,8 +104,8 @@ func ShoppingListWebsocketHandler(conn *websocket.Conn) {
 		} else {
 			infoLog.Println("Sending new opening websocket")
 
-			for _, node := range shopItemList.indexList {
-				err := websocket.JSON.Send(conn, node.value)
+			for _, item := range shopItemList.Ordered() {
+				err := websocket.JSON.Send(conn, item)
 				if err != nil {
 					ErrLog("Failed to send opening shopping list statement", err)
 					break

@@ -153,8 +153,17 @@ func ReadFromFile() (IndexList, error) {
 	return list, nil
 }
 
-func (list *IndexList) IterateOrdered() {
+func (list *IndexList) Ordered() []ShoppingItem {
+	newList := make([]ShoppingItem, list.Length())
 
+	for i := 0; i < list.Length(); i++ {
+		for _, item := range list.indexList {
+			if item.index == i {
+				newList = append(newList, item.value)
+			}
+		}
+	}
+	return newList
 }
 
 func deserialize(serial []string) (IndexNode, error) {

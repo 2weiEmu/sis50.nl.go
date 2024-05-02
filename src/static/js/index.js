@@ -61,7 +61,7 @@ var altTextList = ["Present", "Absent", "Cooking", "Uncertain if Present", "Mayb
 
 var dayWebsocket = new WebSocket(`${secure}://${WS_BASE}/dayWS`, "echo-protocol")
 
-dayWebsocket.onopen = (event) => {
+dayWebsocket.onopen = (_) => {
 	dayWebsocket.send(JSON.stringify({
 		"day": "",
 		"person": "",
@@ -76,7 +76,7 @@ gridElList = gridElList.concat(Array.from(document.getElementsByClassName("milan
 console.log(gridElList)
 
 for (var i = 0; i < gridElList.length; i++) {
-	gridElList[i].addEventListener("click", function (event) {
+	gridElList[i].addEventListener("click", function (_) {
 		var day, person, state
 
 		day = this.getAttribute("data-day")
@@ -168,7 +168,7 @@ function addItem() {
 	}))
 }
 
-function editItem(event) {
+function editItem(_) {
 	var old_content = this.parentElement.children[0].innerText
 	var new_content = window.prompt("Edit the name", `${old_content}`)
 	var id = this.parentElement.id
@@ -180,7 +180,7 @@ function editItem(event) {
 	}))
 }
 
-function removeItem(event) {
+function removeItem(_) {
 	var id = this.parentElement.id
 	console.log("[INFO] ID to remove:", id)
 	shopWebSocket.send(JSON.stringify({
@@ -199,6 +199,73 @@ shopWebSocket.onopen = () => {
 	}))
 }
 
+let dragged;
+
+function handleDragStart(event) {
+	console.log("Started dragging")
+	dragged = event.target;
+}
+
+function handleDragEnd(event) {
+	console.log("Stopped dragging")
+	dragged = null
+}
+
+function handleDragEnter(event) {
+	let el = event.target
+	el.classList.add("hovered-over")
+}
+
+function handleDragLeave(event) {
+	let el = event.target
+	el.classList.remove("hovered-over")
+}
+
+function handleDropOn(event) {
+	console.log("dropping")
+	let el = event.target
+
+	if (dragged === null) return
+
+	shopWebSocket.send(JSON.stringify({
+		"id": dragged.id,
+		"content": `${indexInShoppingList(el)}`,
+		"action": "rearrange"
+	}))
+}
+
+function indexInShoppingList(element) {
+	for (let i = 0; i < shoppingList.children.length; i++) {
+		if (shoppingList.children[i] == element) {
+			return i;
+		}
+	}
+
+	return -1;
+}
+
+function insertInShoppingListAtIndex(id, index) {
+	let target = document.getElementById(id).cloneNode(true)
+	let to_remove = document.getElementById(id)
+
+	
+	target.addEventListener("dragstart", handleDragStart)
+	target.addEventListener("dragend", handleDragEnd)
+
+	target.addEventListener("dragenter", handleDragEnter)
+	target.addEventListener("dragleave", handleDragLeave)
+	target.addEventListener("dragover", function(ev){ ev.preventDefault() })
+
+	target.addEventListener("drop", handleDropOn)
+
+	if (index >= shoppingList.children.length) {
+		shoppingList.appendChild(target)
+	} else {
+		shoppingList.children[index].nextSibling.insertBefore(target, null)
+	}
+	to_remove.remove()
+}
+
 shopWebSocket.onmessage = async (event) => {
 	console.log("[INFO] Received Shop Message")
 	var message = JSON.parse(event.data)
@@ -208,6 +275,16 @@ shopWebSocket.onmessage = async (event) => {
 		var shoppingItem = document.createElement("div")
 		shoppingItem.classList.add("shopping-item")
 		shoppingItem.id = message.id
+
+		shoppingItem.draggable = true
+		shoppingItem.addEventListener("dragstart", handleDragStart)
+		shoppingItem.addEventListener("dragend", handleDragEnd)
+
+		shoppingItem.addEventListener("dragenter", handleDragEnter)
+		shoppingItem.addEventListener("dragleave", handleDragLeave)
+		shoppingItem.addEventListener("dragover", function(ev){ ev.preventDefault() })
+
+		shoppingItem.addEventListener("drop", handleDropOn)
 
 		var item_desc = document.createElement("p")
 		item_desc.innerText = message.content
@@ -232,6 +309,8 @@ shopWebSocket.onmessage = async (event) => {
 				shoppingList.children[i].children[0].innerText = message.content
 			}
 		}
+	} else if (message.action == "rearrange") {
+		insertInShoppingListAtIndex(message.id, message.content)
 	} else {
 		// remove the item by id
 		for (var i = 0; i < shoppingList.children.length; i++) {
