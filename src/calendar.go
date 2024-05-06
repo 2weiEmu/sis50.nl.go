@@ -91,7 +91,6 @@ func ReadCalendar(cal Calendar) Calendar {
 		d++
 	}
 
-	infoLog.Println("Calendar Read:", cal)
 	return cal
 }
 
