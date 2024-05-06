@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/benlubar/htmlcleaner"
@@ -33,7 +32,6 @@ func ShoppingListWebsocketHandler(conn *websocket.Conn) {
 		err := websocket.JSON.Receive(conn, &message)
 		if err != nil {
 			ErrLog("Failed to read websocket JSON", err)
-			fmt.Println("Failed with message received:", err)
 			break
 		}
 
@@ -81,16 +79,11 @@ func ShoppingListWebsocketHandler(conn *websocket.Conn) {
 					break
 				}
 
-				fmt.Println("MESSAGE CONTENT IS RIGHT HERE MOTHERFUCKER:", message.Content)
-				fmt.Println("ALSO THE NEW INDEX:", newIdx)
 				err = shopItemList.MoveToNewIndexById(message.Id, newIdx)
 				if err != nil {
 					ErrLog("Failed to move to new index", err)
 					break
 				}
-
-				fmt.Println("Rearranged, order: ", shopItemList.Ordered())
-				fmt.Println("ShopitemList", shopItemList)
 			}
 
 			err = shopItemList.WriteToFile()
