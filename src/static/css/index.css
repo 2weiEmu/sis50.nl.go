@@ -380,6 +380,10 @@ td, th {
 	padding: 5px 20px 5px 20px;
 }
 
-.hovered-over {
+.hovered-over-high {
 	border-top: 2px solid blue;
+}
+
+.hovered-over-low {
+	border-bottom: 2px solid blue;
 }

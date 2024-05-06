@@ -217,12 +217,18 @@ function handleDragEnd() {
 
 function handleDragEnter(event) {
 	let el = event.target
-	el.classList.add("hovered-over")
+	if (indexInShoppingList(el) > indexInShoppingList(dragged)) {
+		el.classList.add("hovered-over-low")
+	}
+	else {
+		el.classList.add("hovered-over-high")
+	}
 }
 
 function handleDragLeave(event) {
 	let el = event.target
-	el.classList.remove("hovered-over")
+	el.classList.remove("hovered-over-high")
+	el.classList.remove("hovered-over-low")
 }
 
 function handleDropOn(event) {
@@ -250,9 +256,11 @@ function indexInShoppingList(element) {
 	return -1;
 }
 
-function insertInShoppingListAtIndex(id, index) {
+function insertInShoppingListAtIndex(id, newIndex) {
 	let target = document.getElementById(id).cloneNode(true)
 	let to_remove = document.getElementById(id)
+
+	let oldIndex = indexInShoppingList(to_remove)
 	
 	target.addEventListener("dragstart", handleDragStart)
 	target.addEventListener("dragend", handleDragEnd)
@@ -261,10 +269,12 @@ function insertInShoppingListAtIndex(id, index) {
 	target.addEventListener("dragover", function(ev){ ev.preventDefault() })
 	target.addEventListener("drop", handleDropOn)
 
-	if (index >= shoppingList.children.length) {
+	if (newIndex >= shoppingList.children.length) {
 		shoppingList.appendChild(target)
+	} else if (oldIndex > newIndex) {
+		shoppingList.insertBefore(target, shoppingList.children[newIndex])
 	} else {
-		shoppingList.insertBefore(target, shoppingList.children[index])
+		shoppingList.insertBefore(target, shoppingList.children[newIndex].nextSibling)
 	}
 	to_remove.remove()
 }
