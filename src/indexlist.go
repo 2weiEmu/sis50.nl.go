@@ -41,9 +41,9 @@ func (list *IndexList) RemoveByItemId(id int) error {
 
 	list.indexList = append(list.indexList[:idx], list.indexList[idx+1:]...)
 
-	for _, item := range list.indexList {
+	for i, item := range list.indexList {
 		if item.index > ridx {
-			item.index--
+			list.indexList[i].index -= 1
 		}
 	}
 	return nil
