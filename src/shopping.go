@@ -80,11 +80,17 @@ func ShoppingListWebsocketHandler(conn *websocket.Conn) {
 					ErrLog("Failed to convert message content when rearranging", err)
 					break
 				}
+
+				fmt.Println("MESSAGE CONTENT IS RIGHT HERE MOTHERFUCKER:", message.Content)
+				fmt.Println("ALSO THE NEW INDEX:", newIdx)
 				err = shopItemList.MoveToNewIndexById(message.Id, newIdx)
 				if err != nil {
 					ErrLog("Failed to move to new index", err)
 					break
 				}
+
+				fmt.Println("Rearranged, order: ", shopItemList.Ordered())
+				fmt.Println("ShopitemList", shopItemList)
 			}
 
 			err = shopItemList.WriteToFile()

@@ -22,7 +22,7 @@ type IndexList struct {
 
 func (list *IndexList) add(value ShoppingItem) {
 	list.indexList = append(list.indexList, IndexNode {
-		index: len(list.indexList),
+		index: list.Length(),
 		value: value,
 	})
 }
@@ -69,14 +69,27 @@ func (list *IndexList) EditMessageById(id int, newContent string) error {
 }
 
 func (list *IndexList) MoveToNewIndexById(id int, newIndex int) error {
+	fmt.Println("newIndex:", newIndex)
 	idx := list.IndexOfId(id)
+	oldIndex := list.indexList[idx].index
+	fmt.Println("idx:", idx, " oldIndex:", oldIndex)
+
 	if idx == -1 {
 		return ErrLog("Id not found when moving", nil)
 	}
 
-	for i, item := range list.indexList {
-		if item.index >= newIndex && i != idx {
-			item.index++
+	// if the old index was at the top of the list, we have to shift things up
+	if oldIndex < newIndex {
+		for i, item := range list.indexList {
+			if item.index <= newIndex && item.index >= oldIndex {
+				list.indexList[i].index -= 1
+			}
+		}
+	} else {
+		for i, item := range list.indexList {
+			if item.index >= newIndex && item.index <= oldIndex {
+				list.indexList[i].index += 1
+			}
 		}
 	}
 
@@ -141,8 +154,7 @@ func ReadFromFile() (IndexList, error) {
 	list := NewIndexList()
 
 	for _, record := range records {
-		deserialized, err := deserialize(record)
-		fmt.Println("deserialized:", deserialized);
+		deserialized, err := Deserialize(record)
 		if err != nil {
 			return IndexList{}, ErrLog("Failed to deserialize record", err)
 		}
@@ -154,7 +166,7 @@ func ReadFromFile() (IndexList, error) {
 }
 
 func (list *IndexList) Ordered() []ShoppingItem {
-	newList := make([]ShoppingItem, list.Length())
+	newList := make([]ShoppingItem, 0)
 
 	for i := 0; i < list.Length(); i++ {
 		for _, item := range list.indexList {
@@ -166,7 +178,7 @@ func (list *IndexList) Ordered() []ShoppingItem {
 	return newList
 }
 
-func deserialize(serial []string) (IndexNode, error) {
+func Deserialize(serial []string) (IndexNode, error) {
 	index, err := strconv.Atoi(serial[3])
 	if err != nil {
 		return IndexNode{}, ErrLog("Failed to convert index from file", err)

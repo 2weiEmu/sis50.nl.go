@@ -381,5 +381,5 @@ td, th {
 }
 
 .hovered-over {
-	border-bottom: 2px solid blue;
+	border-top: 2px solid blue;
 }

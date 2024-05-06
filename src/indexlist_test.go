@@ -61,7 +61,7 @@ func TestSerialisationFilled(t *testing.T) {
 func TestSerialiseThenDeserialize(t *testing.T) {
 	node := NewFilledNode(0, 0, "something", "add")
 
-	deser, err := deserialize(node.Serialize())
+	deser, err := Deserialize(node.Serialize())
 
 	if err != nil || deser != node {
 		t.Fatal("Serializsing and deserialising failed")

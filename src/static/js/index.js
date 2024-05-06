@@ -206,8 +206,12 @@ function handleDragStart(event) {
 	dragged = event.target;
 }
 
-function handleDragEnd(event) {
+function handleDragEnd() {
 	console.log("Stopped dragging")
+
+	for (let i = 0; i < shoppingList.children.length; i++) {
+		shoppingList.children[i].classList.remove("hovered-over")
+	}
 	dragged = null
 }
 
@@ -227,6 +231,7 @@ function handleDropOn(event) {
 
 	if (dragged === null) return
 
+	console.log(`INDEX IN THE SHOPPING LIST WHERE IT WAS DROPPED MATE: ${indexInShoppingList(el)}`)
 	shopWebSocket.send(JSON.stringify({
 		"id": dragged.id,
 		"content": `${indexInShoppingList(el)}`,
@@ -235,7 +240,8 @@ function handleDropOn(event) {
 }
 
 function indexInShoppingList(element) {
-	for (let i = 0; i < shoppingList.children.length; i++) {
+	let len = shoppingList.children.length
+	for (let i = 0; i < len; i++) {
 		if (shoppingList.children[i] == element) {
 			return i;
 		}
@@ -247,21 +253,18 @@ function indexInShoppingList(element) {
 function insertInShoppingListAtIndex(id, index) {
 	let target = document.getElementById(id).cloneNode(true)
 	let to_remove = document.getElementById(id)
-
 	
 	target.addEventListener("dragstart", handleDragStart)
 	target.addEventListener("dragend", handleDragEnd)
-
 	target.addEventListener("dragenter", handleDragEnter)
 	target.addEventListener("dragleave", handleDragLeave)
 	target.addEventListener("dragover", function(ev){ ev.preventDefault() })
-
 	target.addEventListener("drop", handleDropOn)
 
 	if (index >= shoppingList.children.length) {
 		shoppingList.appendChild(target)
 	} else {
-		shoppingList.children[index].nextSibling.insertBefore(target, null)
+		shoppingList.insertBefore(target, shoppingList.children[index])
 	}
 	to_remove.remove()
 }
