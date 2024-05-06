@@ -73,20 +73,18 @@ func main() {
 	go shiftCalendarDaily()
 
 	if *paramDeploy {
-		// TODO:
-		// http.ListenAndServeTLS()
 		secure = "ssl"
 		fmt.Println("Began listening (SSL) on port: " + strconv.Itoa(*paramPort));
 		err = http.ListenAndServeTLS(":" + strconv.Itoa(*paramPort), *cert, *secret, nil)
-	} else {
 
+	} else {
 		secure = "none"
 		fmt.Println("Began listening on port: " + strconv.Itoa(*paramPort));
 		err = http.ListenAndServe(":" + strconv.Itoa(*paramPort), nil)
 	}
 
 	if err != nil {
-		fmt.Println(err);
+		ErrLog("Listen and serve failed with:", err)
 	}
 }
 
@@ -99,7 +97,7 @@ func IndexPage(writer http.ResponseWriter, request *http.Request) {
 	index := "src/static/templates/index.html"
 	tmpl, err := template.ParseFiles(index)
 	if err != nil {
-		fmt.Println(err)
+		ErrLog("Failed to parse index template", err)
 	}
 
 	var titleMsg string
@@ -118,7 +116,7 @@ func IndexPage(writer http.ResponseWriter, request *http.Request) {
 
 	err = tmpl.Execute(writer, MainPageStruct)
 	if err != nil {
-		fmt.Println(err)
+		ErrLog("Failed to execute index template", err)
 	}
 }
 
@@ -141,7 +139,7 @@ func GetPage(writer http.ResponseWriter, request *http.Request) {
 	pageLocation := "src/static/templates/" + page + ".html"
 	tmpl, err := template.ParseFiles(pageLocation)
 	if err != nil {
-		fmt.Println(err)
+		ErrLog("Could not parse template file for page", err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		http.ServeFile(
 			writer, request, "src/static/templates/500.html",
@@ -149,10 +147,10 @@ func GetPage(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	
-	fmt.Println(jsArguments)
+	fmt.Println("Javascript Arguments before Executing:", jsArguments)
 	err = tmpl.Execute(writer, jsArguments)
 	if err != nil {
-		fmt.Println(err)
+		ErrLog("Could not execute template file", err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		http.ServeFile(
 			writer, request, "src/static/templates/500.html",

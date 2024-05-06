@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"golang.org/x/net/websocket"
 )
 
@@ -17,7 +15,7 @@ func RemoveWebsocketFromPool(conn *websocket.Conn, list []*websocket.Conn) []*we
 	}
 
 	if i == -1 {
-		// TODO:
+		ErrLog("There was no matching websocket connection found, ignoring.", nil)
 		return nil
 	}
 	
@@ -25,12 +23,12 @@ func RemoveWebsocketFromPool(conn *websocket.Conn, list []*websocket.Conn) []*we
 }
 
 func BroadcastToConnections(message CalMessage) {
-	fmt.Println("[BROADCAST STARTING]")
+	infoLog.Println("Broadcasting Websocket")
 	for i := 0; i < len(webSocketDayConnections); i++ {
-		fmt.Println("[WS] Sending to: ", webSocketDayConnections[i])
+		infoLog.Println("Sending to: ", webSocketDayConnections[i])
 		err := websocket.JSON.Send(webSocketDayConnections[i], message)
 		if err != nil {
-			fmt.Println(err)
+			ErrLog("Failed to send JSON via websocket during broadcast", err)
 		}
 	}
 }

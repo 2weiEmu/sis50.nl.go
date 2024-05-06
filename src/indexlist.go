@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/csv"
-	"fmt"
 	"os"
 	"strconv"
 )
@@ -69,10 +68,8 @@ func (list *IndexList) EditMessageById(id int, newContent string) error {
 }
 
 func (list *IndexList) MoveToNewIndexById(id int, newIndex int) error {
-	fmt.Println("newIndex:", newIndex)
 	idx := list.IndexOfId(id)
 	oldIndex := list.indexList[idx].index
-	fmt.Println("idx:", idx, " oldIndex:", oldIndex)
 
 	if idx == -1 {
 		return ErrLog("Id not found when moving", nil)

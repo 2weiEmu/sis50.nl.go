@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -66,7 +65,6 @@ func InitCalendarDefault() Calendar {
 		}
 	}
 
-	fmt.Println("[INFO] InitCalendarDefault", newCal)
 	return newCal
 }
 
@@ -74,8 +72,7 @@ func ReadCalendar(cal Calendar) Calendar {
 	
 	calFile, err := os.Open(CalendarFile)
 	if err != nil {
-		// TODO:
-		fmt.Println(err)
+		ErrLog("Failed to open the calendar file", err)
 	}
 	defer calFile.Close()
 
@@ -88,15 +85,13 @@ func ReadCalendar(cal Calendar) Calendar {
 		for i := 0; i < UserCount; i++ {
 			cal.Day[d][i], err = strconv.Atoi(tState[i])
 			if err != nil {
-				// TODO:
-				fmt.Println(err)
+				ErrLog("Failed to convert state string when reading calendar", err)
 			}
 		}
 		d++
 	}
 
-	fmt.Println("[INFO] Calendar Read:", cal)
-
+	infoLog.Println("Calendar Read:", cal)
 	return cal
 }
 
@@ -125,17 +120,15 @@ func UpdateCalendar(cal Calendar, message CalMessage) string {
 }
 
 func WriteCalendar(cal Calendar) {
-	fmt.Println("Saving Calendar")
+	infoLog.Println("Saving Calendar")
 	err := os.Truncate(CalendarFile, 0)
 	if err != nil {
-		// TODO:
-		fmt.Println("[ERROR]", err)
+		ErrLog("Failed to truncate file // TODO: THIS SHOULD BE REMOVED", err)
 	}
 
 	file, err := os.OpenFile(CalendarFile, os.O_WRONLY, os.ModeAppend)
 	if err != nil {
-		// TODO:
-		fmt.Println("[ERROR]", err)
+		ErrLog("Failed to open calendar file", err)
 	}
 	defer file.Close()
 
@@ -147,26 +140,23 @@ func WriteCalendar(cal Calendar) {
 		f += "\n"
 		_, err := file.WriteString(f)
 		if err != nil {
-			fmt.Println("[ERROR] Writing to File", err)
+			ErrLog("Something went wrong writing to the calendar file", err)
 		}
 	}
 }
 
 func DayWebsocketHandler(conn *websocket.Conn) {
-	fmt.Println("Activating WebSocket handler...")
+	infoLog.Println("Activating WebSocket handler...")
 
 	webSocketDayConnections = append(webSocketDayConnections, conn)
-	fmt.Println(webSocketDayConnections)
-
 	var message CalMessage
 	for {
 		err := websocket.JSON.Receive(conn, &message)
 		if err != nil {
-			// TODO:
-			fmt.Println(err)
+			ErrLog("Failed to read the websocket message", err)
 			break
 		}
-		fmt.Println("Message received: ", message)
+		infoLog.Println("WebSocket Message Received:", message)
 
 		if message.State != "open-calendar" {
 			message.State = UpdateCalendar(stateCalendar, message)
@@ -175,8 +165,7 @@ func DayWebsocketHandler(conn *websocket.Conn) {
 			message := genOpenCalMessage()
 			err := websocket.JSON.Send(conn, &message)
 			if err != nil {
-				fmt.Println(err)
-				// TODO:
+				ErrLog("Failed to send a WebSocket message as JSON", err)
 			}
 		}
 	}

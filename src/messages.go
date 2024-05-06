@@ -4,7 +4,6 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"os"
 	"strconv"
@@ -74,14 +73,12 @@ func POSTMessage(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	fmt.Println(allMessagesList)
 	err = addMessageToList(msgPost)
 	if err != nil {
 		writer.Write([]byte("Failed to Add\n"))
 	} else {
 		writer.Write([]byte("Added\n"))
 	}
-	fmt.Println(allMessagesList)
 	saveMessages(allMessagesList)
 }
 
@@ -107,33 +104,29 @@ func addMessageToList(message string) error {
 func saveMessages(messageList MessageList) {
 	err := os.Truncate(MessageFile, 0)
 	if err != nil {
-		// TODO:
-		fmt.Println(err)
+		ErrLog("Failed to truncate message file", err)
 	}
 
 	file, err := os.OpenFile(
 		MessageFile, os.O_RDWR | os.O_APPEND, os.ModeAppend)
 	if err != nil {
-		// TODO:
-		fmt.Println(err)
+		ErrLog("Failed to open message file", err)
 	}
 	defer file.Close()
 
 	csvWriter := csv.NewWriter(file)
 
 	for _, page := range messageList.Pages {
-		fmt.Println("[INFO] Writing Page:", page)
+		infoLog.Println("Writing Page:", page)
 		err = csvWriter.Write(page.Message)
 		if err != nil {
-			// TODO:
-			fmt.Println(err)
+			ErrLog("CSV writer failed when writing a message", err)
 		}
 	}
 	csvWriter.Flush()
 	err = csvWriter.Error()
 	if err != nil {
-		// TODO:
-		fmt.Println(err)
+		ErrLog("The CSV writer errored in some way:", err)
 	}
 
 }
