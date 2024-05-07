@@ -20,7 +20,7 @@ var paramWebSocketConn *string
 var secure string
 var stateCalendar = ReadCalendar(InitCalendarDefault())
 var shopItemList, _ = ReadFromFile()
-var idCount int
+var idCount = getIdCount()
 var allMessagesList, _ = readMessages(MessageList{});
 var infoLog, requestLog, errorLog *log.Logger
 

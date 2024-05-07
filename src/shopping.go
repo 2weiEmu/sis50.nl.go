@@ -22,6 +22,23 @@ func (item *ShoppingItem) Serialize() []string {
 	return list
 }
 
+func getIdCount() int {
+	indexList, err := ReadFromFile()
+	if err != nil {
+		ErrLog("Failed reading from file when getting id count", err)
+	}
+
+	id := 0;
+
+	for _, item := range indexList.indexList {
+		if item.value.Id > id {
+			id = item.value.Id
+		}
+	}
+
+	return id
+}
+
 func ShoppingListWebsocketHandler(conn *websocket.Conn) {
 	infoLog.Println("Using Shopping Websocket Handler")
 	webSocketShopConnections = append(webSocketShopConnections, conn)
@@ -55,7 +72,7 @@ func ShoppingListWebsocketHandler(conn *websocket.Conn) {
 			switch keyword {
 			case ADD:
 				message.Id = idCount
-				idCount++
+				idCount += 1
 				shopItemList.add(message)
 
 			case REMOVE:
