@@ -32,7 +32,7 @@ func getIdCount() int {
 
 	for _, item := range indexList.indexList {
 		if item.value.Id > id {
-			id = item.value.Id
+			id = item.value.Id + 1
 		}
 	}
 
