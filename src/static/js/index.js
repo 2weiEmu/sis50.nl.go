@@ -257,18 +257,10 @@ function indexInShoppingList(element) {
 }
 
 function insertInShoppingListAtIndex(id, newIndex) {
-	let target = document.getElementById(id).cloneNode(true)
 	let to_remove = document.getElementById(id)
-
+	let target = newShoppingItem(to_remove.id, to_remove.children[0].innerText)
 	let oldIndex = indexInShoppingList(to_remove)
 	
-	target.addEventListener("dragstart", handleDragStart)
-	target.addEventListener("dragend", handleDragEnd)
-	target.addEventListener("dragenter", handleDragEnter)
-	target.addEventListener("dragleave", handleDragLeave)
-	target.addEventListener("dragover", function(ev){ ev.preventDefault() })
-	target.addEventListener("drop", handleDropOn)
-
 	if (newIndex >= shoppingList.children.length) {
 		shoppingList.appendChild(target)
 	} else if (oldIndex > newIndex) {
@@ -277,6 +269,41 @@ function insertInShoppingListAtIndex(id, newIndex) {
 		shoppingList.insertBefore(target, shoppingList.children[newIndex].nextSibling)
 	}
 	to_remove.remove()
+}
+
+function newShoppingItem(id, text) {
+	var shoppingItem = document.createElement("div")
+	shoppingItem.classList.add("shopping-item")
+	shoppingItem.id = id
+
+	shoppingItem.draggable = true
+
+	shoppingItem.addEventListener("dragstart", handleDragStart)
+	shoppingItem.addEventListener("dragend", handleDragEnd)
+
+	shoppingItem.addEventListener("dragenter", handleDragEnter)
+	shoppingItem.addEventListener("dragleave", handleDragLeave)
+	shoppingItem.addEventListener("dragover", function(ev){ ev.preventDefault() })
+
+	shoppingItem.addEventListener("drop", handleDropOn)
+
+	var item_desc = document.createElement("p")
+	item_desc.innerText = text
+
+	var edit_button = document.createElement("button")
+	edit_button.addEventListener("click", editItem)
+	edit_button.innerText = "Edit"
+
+	var remove_button = document.createElement("button")
+	remove_button.addEventListener("click", removeItem)
+	remove_button.innerText = "Remove"
+
+
+	shoppingItem.appendChild(item_desc)
+	shoppingItem.appendChild(edit_button)
+	shoppingItem.appendChild(remove_button)
+
+	return shoppingItem
 }
 
 shopWebSocket.onmessage = async (event) => {
