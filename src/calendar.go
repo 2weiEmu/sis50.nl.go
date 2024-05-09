@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -94,6 +95,17 @@ func ReadCalendar(cal Calendar) Calendar {
 	return cal
 }
 
+func IndexInStateList(state string) int {
+	for i, e := range getStateList() {
+		fmt.Println(e, state)
+		if e == state {
+			return i
+		}
+	}
+
+	return 0
+}
+
 func UpdateCalendar(cal Calendar, message CalMessage) string {
 
 	var dayIndex, personIndex int
@@ -112,7 +124,16 @@ func UpdateCalendar(cal Calendar, message CalMessage) string {
 		}
 	}
 
-	new_state := (cal.Day[dayIndex][personIndex] + 1) % len(getStateList())
+	var new_state int
+	setMsg := strings.Split(message.State, ":")
+	if setMsg[0] == "SET" {
+		new_state = IndexInStateList(string(setMsg[1]))
+		fmt.Println(setMsg, new_state)
+		cal.Day[dayIndex][personIndex] = new_state
+	} else {
+		new_state = (cal.Day[dayIndex][personIndex] + 1) % len(getStateList())
+	}
+
 	cal.Day[dayIndex][personIndex] = new_state
 
 	return getStateList()[new_state]

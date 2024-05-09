@@ -106,8 +106,18 @@
 		<button id="add-new-bg" data-selected="">Add</button>
 	</div>
 
+	<div id="right-click-menu" style="display: none; left: 0; top: 0;">
+		<button onclick="setDay(this)" state="SET:present">Present</button><br>
+		<button onclick="setDay(this)" state="SET:absent">Absent</button><br>
+		<button onclick="setDay(this)" state="SET:cooking">Cooking</button><br>
+		<button onclick="setDay(this)" state="SET:uncertain">Uncertain</button><br>
+		<button onclick="setDay(this)" state="SET:maybe-cooking">Maybe Cooking</button><br>
+		<button onclick="setDay(this)" state="SET:cant-cook">Can't Cook</button><br>
+	</div>
+
 	<script src="/js/wallpaper.js" args="{{ .Args }}"></script>
 	<script src="/js/messageformatting.js" args="{{ .Args }}"></script>
+	<script src="/js/calendar-context.js" args="{{ .Args }}"></script>
 	<script src="/js/index.js" args="{{ .Args }}"></script>
 </html>
 

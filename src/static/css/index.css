@@ -387,3 +387,7 @@ td, th {
 .hovered-over-low {
 	border-bottom: 2px solid blue;
 }
+
+#right-click-menu {
+	position: fixed;
+}

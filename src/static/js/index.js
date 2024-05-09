@@ -59,6 +59,9 @@ function setWeekday(date) {
 var stateList = ["present", "absent", "cooking", "uncertain", "maybe-cooking", "cant-cook"]
 var altTextList = ["Present", "Absent", "Cooking", "Uncertain if Present", "Maybe Cooking", "Can't Cook"]
 
+let clickedOnDay
+let clickedOnPerson
+
 var dayWebsocket = new WebSocket(`${secure}://${WS_BASE}/dayWS`, "echo-protocol")
 
 dayWebsocket.onopen = (_) => {
@@ -76,7 +79,7 @@ gridElList = gridElList.concat(Array.from(document.getElementsByClassName("milan
 console.log(gridElList)
 
 for (var i = 0; i < gridElList.length; i++) {
-	gridElList[i].addEventListener("click", function (_) {
+	gridElList[i].addEventListener("click", function (ev) {
 		var day, person, state
 
 		day = this.getAttribute("data-day")
@@ -90,6 +93,13 @@ for (var i = 0; i < gridElList.length; i++) {
 			"person": person,
 			"state": state,
 		}))
+	})
+
+	gridElList[i].addEventListener("contextmenu", function(ev) {
+		clickedOnDay = this.getAttribute("data-day")
+		clickedOnPerson = this.getAttribute("data-person")
+		openDialogAt(ev.clientX, ev.clientY)
+		ev.preventDefault()
 	})
 
 	gridElList[i].childNodes[0].setAttribute("draggable", false)
@@ -378,3 +388,19 @@ function cleanInput() {
 var notifNote = document.getElementsByClassName("message-notif")[0].children[1]
 notifNote.innerHTML = formatMessage(notifNote.innerText)
 console.log("Formatted.")
+
+function setDay(el) {
+	var day, person, state
+	day = clickedOnDay
+	person = clickedOnPerson
+	state = el.getAttribute("state")
+
+	console.log("Sending message...")
+	console.log(day, person, state)
+	dayWebsocket.send(JSON.stringify({
+		"day": day,
+		"person": person,
+		"state": state,
+	}))
+	closeDialog()
+}
