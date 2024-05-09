@@ -390,4 +390,15 @@ td, th {
 
 #right-click-menu {
 	position: fixed;
+	padding: 10px;
+	background-color: var(--sec-bg);
+	border-radius: 10px;
+}
+
+#right-click-menu button {
+	margin: 5px;
+}
+
+#right-click-menu button:hover {
+	background-color: var(--accent);
 }

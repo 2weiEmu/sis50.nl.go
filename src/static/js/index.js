@@ -96,9 +96,14 @@ for (var i = 0; i < gridElList.length; i++) {
 	})
 
 	gridElList[i].addEventListener("contextmenu", function(ev) {
-		clickedOnDay = this.getAttribute("data-day")
-		clickedOnPerson = this.getAttribute("data-person")
-		openDialogAt(ev.clientX, ev.clientY)
+		if (dialogOpen) {
+			closeDialog()
+		}
+		else {
+			clickedOnDay = this.getAttribute("data-day")
+			clickedOnPerson = this.getAttribute("data-person")
+			openDialogAt(ev.clientX, ev.clientY)
+		}
 		ev.preventDefault()
 	})
 
