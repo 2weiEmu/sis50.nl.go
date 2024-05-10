@@ -38,6 +38,7 @@ func main() {
 	logFile, err := os.OpenFile("./log/sis50.log", os.O_APPEND | os.O_RDWR, 664)
 	if err != nil {
 		fmt.Println("[LOGS] Failed to open main log file.")
+		os.Exit(-1)
 	}
 	defer logFile.Close()
 
@@ -53,12 +54,20 @@ func main() {
 	jsDir := http.Dir("src/static/js")
 	fontsDir := http.Dir("src/static/fonts")
 
+	if *paramDeploy {
+		secure = "ssl"
+	} else {
+		secure = "none"
+	}
+
+	HTMLctx, err := initHTMLContext(loggerFlags, logFile, secure, *paramWebSocketConn)
+
 	router := mux.NewRouter()
 	router.Handle("/dayWS", websocket.Handler(DayWebsocketHandler))
 	router.Handle("/shopWS", websocket.Handler(ShoppingListWebsocketHandler))
 	router.HandleFunc("/api/messages/{pageNumber}", GETMessages).Methods("GET")
 	router.HandleFunc("/api/messages", POSTMessage).Methods("POST")
-	router.HandleFunc("/", IndexPage)
+	router.HandleFunc("/", HTMLctx.HandleIndex)
 	router.HandleFunc("/{page}", GetPage)
 	router.HandleFunc("/admin", GetAdmin)
 	http.Handle("/", router)
@@ -91,33 +100,6 @@ func main() {
 type IndexPageStruct struct {
 	Message string
 	Args string
-}
-
-func IndexPage(writer http.ResponseWriter, request *http.Request) {
-	index := "src/static/templates/index.html"
-	tmpl, err := template.ParseFiles(index)
-	if err != nil {
-		ErrLog("Failed to parse index template", err)
-	}
-
-	var titleMsg string
-	pagesLength := len(allMessagesList.Pages)
-	if pagesLength == 0 {
-		titleMsg = "No messages."
-	} else {
-		titleMsg = allMessagesList.Pages[pagesLength - 1].Message[
-			len(allMessagesList.Pages[pagesLength - 1].Message) - 1]
-	}
-
-	MainPageStruct := IndexPageStruct{
-		Message: titleMsg,
-		Args: *paramWebSocketConn + " " + secure,
-	}
-
-	err = tmpl.Execute(writer, MainPageStruct)
-	if err != nil {
-		ErrLog("Failed to execute index template", err)
-	}
 }
 
 func GetAdmin(writer http.ResponseWriter, request *http.Request) {
