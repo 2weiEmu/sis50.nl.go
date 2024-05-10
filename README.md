@@ -19,6 +19,7 @@ This is a simple site created for the house Sis50 in the Netherlands to coordina
 (In-between stages I will wait for user feedback and add requested features)
 
 ### **Feature Set** (Replacement Stage)
+
 - [x] A basic calendar for each person in the house.
 - [x] The current day being highlighted on the calendar
 - [x] Each calendar cell has 6 possible stages:
@@ -38,6 +39,7 @@ This is a simple site created for the house Sis50 in the Netherlands to coordina
     - [x] Ability to have bold highlighting
     - [x] Ability to have italics
 - [x] Addition of a basic favicon for the website
+
 ~- [ ] A link to the local supermarket's site~
 - [x] Add mobile design (basic)
 - [x] There is a basic help page
@@ -54,11 +56,13 @@ This is a simple site created for the house Sis50 in the Netherlands to coordina
 - [ ] The ability to modify the basic colours of the page
 
 ### **Feature Set** (Shopping Streamling Stage)
+
 - [ ] CSV Download for Shopping and when it happened
 ... other things too
 
 ### **Feature Set** (Improved Calendar Stage)
-- [ ] The calendar will be focused on one day, where the days will be shifting, with you being able to see the 2 previous days and 4 of the upcoming days.
+
+- [x] The calendar will be focused on one day, where the days will be shifting, with you being able to see the 2 previous days and 4 of the upcoming days.
 - [ ] There will be dates associated with each calendar
 - [ ] Add the ability to add, edit and remove annotations from the calendar, on each cell
 - [ ] More advanced admin panel controls for the calendar
@@ -88,6 +92,8 @@ This is a simple site created for the house Sis50 in the Netherlands to coordina
 ## Technical Information
 
 ### Installing for Yourself
+
+This section is a todo. You can probably figure it out, there is a make file and the first thing in the go code are the flags you can use to pass things for SSL.
 
 Also I just want to thank this blog article:
 https://www.alexedwards.net/blog/working-with-cookies-in-go
