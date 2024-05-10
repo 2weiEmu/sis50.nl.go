@@ -1,10 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
 	"os"
+	"slices"
+
+	"github.com/gorilla/mux"
 )
 
 type HTMLContext struct {
@@ -36,9 +40,38 @@ func (ctx *HTMLContext) HandleIndex(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ctx *HTMLContext) HandlePage(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	page := vars["page"]
+	jsArguments := ctx.ConnectionLocation + " " + ctx.Secure
 
+	if !slices.Contains(getValidPages(), page) {
+		http.ServeFile(
+			w, r, "src/static/templates/404.html",
+		)
+		return
+	}
+
+	pageLocation := "src/static/templates/" + page + ".html"
+	tmpl, err := template.ParseFiles(pageLocation)
+	if err != nil {
+		ErrLog("Could not parse template file for page", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		http.ServeFile(
+			w, r, "src/static/templates/500.html",
+		)
+		return
+	}
+	
+	fmt.Println("Javascript Arguments before Executing:", jsArguments)
+	err = tmpl.Execute(w, jsArguments)
+	if err != nil {
+		ErrLog("Could not execute template file", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		http.ServeFile(
+			w, r, "src/static/templates/500.html",
+		)
+	}
 }
-
 
 func initHTMLContext(
 	loggerFlags int, logFile *os.File, secure string,

@@ -3,11 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"html/template"
 	"log"
 	"net/http"
 	"os"
-	"slices"
 	"strconv"
 
 	"github.com/gorilla/mux"
@@ -16,8 +14,6 @@ import (
 
 var webSocketDayConnections []*websocket.Conn
 var webSocketShopConnections []*websocket.Conn
-var paramWebSocketConn *string
-var secure string
 var stateCalendar = ReadCalendar(InitCalendarDefault())
 var shopItemList, _ = ReadFromFile()
 var idCount = getIdCount()
@@ -25,11 +21,13 @@ var allMessagesList, _ = readMessages(MessageList{});
 var infoLog, requestLog, errorLog *log.Logger
 
 func main() {
+
+	var secure string
 	paramDeploy := flag.Bool(
 		"d", false, "A flag specifying the deploy mode of the server.")
 	paramPort := flag.Int(
 		"p", 8000, "The port the server should be deployed on.")
-	paramWebSocketConn = flag.String(
+	paramWebSocketConn := flag.String(
 		"base", "localhost:8000", "Where websockets should connect.")
 	cert := flag.String("c", "", "State the certificate location")
 	secret := flag.String("k", "", "State the private key location")
@@ -68,8 +66,7 @@ func main() {
 	router.HandleFunc("/api/messages/{pageNumber}", GETMessages).Methods("GET")
 	router.HandleFunc("/api/messages", POSTMessage).Methods("POST")
 	router.HandleFunc("/", HTMLctx.HandleIndex)
-	router.HandleFunc("/{page}", GetPage)
-	router.HandleFunc("/admin", GetAdmin)
+	router.HandleFunc("/{page}", HTMLctx.HandlePage)
 	http.Handle("/", router)
 
 	// ok so apparently this doesn't work with router.Handle???
@@ -102,40 +99,3 @@ type IndexPageStruct struct {
 	Args string
 }
 
-func GetAdmin(writer http.ResponseWriter, request *http.Request) {
-}
-
-func GetPage(writer http.ResponseWriter, request *http.Request) {
-	vars := mux.Vars(request)
-	page := vars["page"]
-
-	jsArguments := *paramWebSocketConn + " " + secure
-
-	if !slices.Contains(getValidPages(), page) {
-		http.ServeFile(
-			writer, request, "src/static/templates/404.html",
-		)
-		return
-	}
-
-	pageLocation := "src/static/templates/" + page + ".html"
-	tmpl, err := template.ParseFiles(pageLocation)
-	if err != nil {
-		ErrLog("Could not parse template file for page", err)
-		writer.WriteHeader(http.StatusInternalServerError)
-		http.ServeFile(
-			writer, request, "src/static/templates/500.html",
-		)
-		return
-	}
-	
-	fmt.Println("Javascript Arguments before Executing:", jsArguments)
-	err = tmpl.Execute(writer, jsArguments)
-	if err != nil {
-		ErrLog("Could not execute template file", err)
-		writer.WriteHeader(http.StatusInternalServerError)
-		http.ServeFile(
-			writer, request, "src/static/templates/500.html",
-		)
-	}
-}
