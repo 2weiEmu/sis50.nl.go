@@ -18,15 +18,16 @@ func RemoveWebsocketFromPool(conn *websocket.Conn, list []*websocket.Conn) []*we
 		ErrLog("There was no matching websocket connection found, ignoring.", nil)
 		return nil
 	}
-	
+
+	conn.Close()
 	return append(list[:i], list[i+1:]...)
 }
 
-func BroadcastToConnections(message CalMessage) {
-	infoLog.Println("Broadcasting Websocket")
-	for i := 0; i < len(webSocketDayConnections); i++ {
-		infoLog.Println("Sending to: ", webSocketDayConnections[i])
-		err := websocket.JSON.Send(webSocketDayConnections[i], message)
+func (handler *CalendarHandler) BroadcastToConnections(message CalMessage) {
+	handler.InfoLog.Println("Broadcasting Websocket")
+	for i := 0; i < len(handler.Connections); i++ {
+		infoLog.Println("Sending to: ", handler.Connections[i])
+		err := websocket.JSON.Send(handler.Connections[i], message)
 		if err != nil {
 			ErrLog("Failed to send JSON via websocket during broadcast", err)
 		}

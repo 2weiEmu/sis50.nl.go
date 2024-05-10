@@ -12,7 +12,6 @@ import (
 	"golang.org/x/net/websocket"
 )
 
-var webSocketDayConnections []*websocket.Conn
 var webSocketShopConnections []*websocket.Conn
 var stateCalendar = ReadCalendar(InitCalendarDefault())
 var shopItemList, _ = ReadFromFile()
@@ -53,9 +52,10 @@ func main() {
 	} 
 
 	HTMLctx, err := initHTMLContext(loggerFlags, logFile, secure, *paramWebSocketConn)
+	calHdl := NewCalendarHandler(loggerFlags, logFile)
 
 	router := mux.NewRouter()
-	router.Handle("/dayWS", websocket.Handler(DayWebsocketHandler))
+	router.Handle("/dayWS", websocket.Handler(calHdl.HandleCalendarWebsocket))
 	router.Handle("/shopWS", websocket.Handler(ShoppingListWebsocketHandler))
 
 	router.HandleFunc("/api/messages/{pageNumber}", GETMessages).Methods("GET")
@@ -73,7 +73,7 @@ func main() {
 	http.Handle("/fonts/", http.StripPrefix("/fonts/", http.FileServer(fontsDir)))
 	
 	// go weeklyResetTimer()
-	go shiftCalendarDaily()
+	go calHdl.ShiftCalendarDaily()
 
 	listenPort := ":" + strconv.Itoa(*paramPort)
 	if *paramDeploy {

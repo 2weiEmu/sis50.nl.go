@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -12,7 +13,47 @@ import (
 )
 
 type CalendarHandler struct {
+	Connections []*websocket.Conn
+	// TODO: need to find some way to include loggers for everyone
+	InfoLog, RequestLog, ErrorLog *log.Logger 
+}
 
+func NewCalendarHandler(
+	loggerFlags int, logFile *os.File,
+) CalendarHandler {
+	return CalendarHandler { 
+		Connections: make([]*websocket.Conn, 0),
+		InfoLog: log.New(logFile, "[INFO] ", loggerFlags),
+		RequestLog: log.New(logFile, "[REQUEST] ", loggerFlags),
+		ErrorLog: log.New(logFile, "[ERROR] ", loggerFlags),
+	}
+}
+
+func (handler *CalendarHandler) HandleCalendarWebsocket(conn *websocket.Conn) {
+	handler.InfoLog.Println("Activating WebSocket handler...")
+
+	handler.Connections = append(handler.Connections, conn)
+	var message CalMessage
+	for {
+		err := websocket.JSON.Receive(conn, &message)
+		if err != nil {
+			// ErrLog("Failed to read the websocket message", err)
+			break
+		}
+
+		if message.State != "open-calendar" {
+			message.State = UpdateCalendar(stateCalendar, message)
+			handler.BroadcastToConnections(message)
+		} else {
+			message := genOpenCalMessage()
+			err := websocket.JSON.Send(conn, &message)
+			if err != nil {
+				// ErrLog("Failed to send a WebSocket message as JSON", err)
+			}
+		}
+	}
+	WriteCalendar(stateCalendar)
+	handler.Connections = RemoveWebsocketFromPool(conn, handler.Connections)
 }
 
 type CalMessage struct {
@@ -27,7 +68,7 @@ type Calendar struct {
 
 var calFileReady = make(chan bool)
 
-func shiftCalendarDaily() {
+func (handler *CalendarHandler) ShiftCalendarDaily() {
 	for {
 		t := time.Now().AddDate(0, 0, 1)
 		targetTime := time.Date(
@@ -39,7 +80,7 @@ func shiftCalendarDaily() {
 		stateCalendar = shiftCalendar()
 		WriteCalendar(stateCalendar)
 
-		BroadcastToConnections(genOpenCalMessage())
+		handler.BroadcastToConnections(genOpenCalMessage())
 	}
 }
 
@@ -169,34 +210,6 @@ func WriteCalendar(cal Calendar) {
 	}
 }
 
-func DayWebsocketHandler(conn *websocket.Conn) {
-	infoLog.Println("Activating WebSocket handler...")
-
-	webSocketDayConnections = append(webSocketDayConnections, conn)
-	var message CalMessage
-	for {
-		err := websocket.JSON.Receive(conn, &message)
-		if err != nil {
-			ErrLog("Failed to read the websocket message", err)
-			break
-		}
-		infoLog.Println("WebSocket Message Received:", message)
-
-		if message.State != "open-calendar" {
-			message.State = UpdateCalendar(stateCalendar, message)
-			BroadcastToConnections(message)
-		} else {
-			message := genOpenCalMessage()
-			err := websocket.JSON.Send(conn, &message)
-			if err != nil {
-				ErrLog("Failed to send a WebSocket message as JSON", err)
-			}
-		}
-	}
-	WriteCalendar(stateCalendar)
-	webSocketDayConnections = RemoveWebsocketFromPool(conn, webSocketDayConnections)
-}
-
 func resetCalendar() {
 	stateCalendar = InitCalendarDefault()
 	WriteCalendar(stateCalendar);
@@ -218,7 +231,7 @@ func genOpenCalMessage() CalMessage {
 	return message
 }
 
-func weeklyResetTimer() {
+func (handler *CalendarHandler) weeklyResetTimer() {
 	for {
 		// wait until Monday
 		currentWeekday := time.Now().Weekday()
@@ -230,6 +243,6 @@ func weeklyResetTimer() {
 		time.Sleep(timeUntilMonday)
 
 		resetCalendar()
-		BroadcastToConnections(genOpenCalMessage())
+		handler.BroadcastToConnections(genOpenCalMessage())
 	}
 }
