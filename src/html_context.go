@@ -78,7 +78,7 @@ func (ctx *HTMLContext) HandlePage(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func initHTMLContext(
+func NewHTMLContext(
 	loggerFlags int, logFile *os.File, secure string,
 	connectionLocation string,
 ) (HTMLContext, error) {

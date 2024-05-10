@@ -51,7 +51,12 @@ func main() {
 		secure = "ssl"
 	} 
 
-	HTMLctx, err := initHTMLContext(loggerFlags, logFile, secure, *paramWebSocketConn)
+	HTMLctx, err := NewHTMLContext(loggerFlags, logFile, secure, *paramWebSocketConn)
+	if err != nil {
+		fmt.Println("[ERROR] Could not create html context", err)
+		panic("Nope, no context")
+	}
+
 	calHdl := NewCalendarHandler(loggerFlags, logFile)
 
 	router := mux.NewRouter()
