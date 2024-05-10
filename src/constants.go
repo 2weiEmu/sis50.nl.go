@@ -4,6 +4,7 @@ const MessageFile = "./resources/messages"
 const ShoppingFile = "./resources/shopping"
 const CalendarFile = "./resources/calendar"
 const IndexFile = "src/static/templates/index.html"
+const MainLog = "./log/sis50.log"
 
 const DayCount = 7
 const UserCount = 4

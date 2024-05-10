@@ -11,6 +11,11 @@ import (
 	"github.com/gorilla/mux"
 )
 
+type IndexPageStruct struct {
+	Message string
+	Args string
+}
+
 type HTMLContext struct {
 	Secure string
 	ConnectionLocation string

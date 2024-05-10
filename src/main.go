@@ -21,8 +21,6 @@ var allMessagesList, _ = readMessages(MessageList{});
 var infoLog, requestLog, errorLog *log.Logger
 
 func main() {
-
-	var secure string
 	paramDeploy := flag.Bool(
 		"d", false, "A flag specifying the deploy mode of the server.")
 	paramPort := flag.Int(
@@ -33,10 +31,10 @@ func main() {
 	secret := flag.String("k", "", "State the private key location")
 	flag.Parse()
 
-	logFile, err := os.OpenFile("./log/sis50.log", os.O_APPEND | os.O_RDWR, 664)
+	logFile, err := os.OpenFile(MainLog, os.O_APPEND | os.O_RDWR, 664)
 	if err != nil {
-		fmt.Println("[LOGS] Failed to open main log file.")
-		os.Exit(-1)
+		fmt.Println("[ERROR] Failed to open main log file.")
+		panic("Could not open log file.")
 	}
 	defer logFile.Close()
 
@@ -44,29 +42,28 @@ func main() {
 	requestLog = log.New(logFile, "[REQUEST] ", loggerFlags)
 	errorLog = log.New(logFile, "[ERROR] ", loggerFlags)
 
-	// NOTE: consider changing this, to something like src/static and moving
-	// all the templates somewhere else so they can't be accessed... maybe a
-	// "public" folder?
 	cssDir := http.Dir("src/static/css")
 	imgDir := http.Dir("src/static/images")
 	jsDir := http.Dir("src/static/js")
 	fontsDir := http.Dir("src/static/fonts")
 
+	secure := "none"
 	if *paramDeploy {
 		secure = "ssl"
-	} else {
-		secure = "none"
-	}
+	} 
 
 	HTMLctx, err := initHTMLContext(loggerFlags, logFile, secure, *paramWebSocketConn)
 
 	router := mux.NewRouter()
 	router.Handle("/dayWS", websocket.Handler(DayWebsocketHandler))
 	router.Handle("/shopWS", websocket.Handler(ShoppingListWebsocketHandler))
+
 	router.HandleFunc("/api/messages/{pageNumber}", GETMessages).Methods("GET")
 	router.HandleFunc("/api/messages", POSTMessage).Methods("POST")
+
 	router.HandleFunc("/", HTMLctx.HandleIndex)
 	router.HandleFunc("/{page}", HTMLctx.HandlePage)
+
 	http.Handle("/", router)
 
 	// ok so apparently this doesn't work with router.Handle???
@@ -78,24 +75,18 @@ func main() {
 	// go weeklyResetTimer()
 	go shiftCalendarDaily()
 
+	listenPort := ":" + strconv.Itoa(*paramPort)
 	if *paramDeploy {
-		secure = "ssl"
-		fmt.Println("Began listening (SSL) on port: " + strconv.Itoa(*paramPort));
-		err = http.ListenAndServeTLS(":" + strconv.Itoa(*paramPort), *cert, *secret, nil)
+		fmt.Println("Began listening (SSL) on port:", listenPort);
+		err = http.ListenAndServeTLS(listenPort, *cert, *secret, nil)
 
 	} else {
-		secure = "none"
-		fmt.Println("Began listening on port: " + strconv.Itoa(*paramPort));
-		err = http.ListenAndServe(":" + strconv.Itoa(*paramPort), nil)
+		fmt.Println("Began listening on port:", listenPort);
+		err = http.ListenAndServe(listenPort, nil)
 	}
 
 	if err != nil {
 		ErrLog("Listen and serve failed with:", err)
 	}
-}
-
-type IndexPageStruct struct {
-	Message string
-	Args string
 }
 

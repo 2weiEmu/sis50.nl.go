@@ -11,6 +11,10 @@ import (
 	"golang.org/x/net/websocket"
 )
 
+type CalendarHandler struct {
+
+}
+
 type CalMessage struct {
 	Day string `json:"day"`
 	Person string `json:"person"`
