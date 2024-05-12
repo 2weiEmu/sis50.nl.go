@@ -19,6 +19,8 @@ var idCount = getIdCount()
 var allMessagesList, _ = readMessages(MessageList{});
 var infoLog, requestLog, errorLog *log.Logger
 
+var userAuthenticator = NewUserAuthenicator()
+
 func main() {
 	paramDeploy := flag.Bool(
 		"d", false, "A flag specifying the deploy mode of the server.")
