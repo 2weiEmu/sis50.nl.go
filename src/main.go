@@ -19,7 +19,7 @@ var idCount = getIdCount()
 var allMessagesList, _ = readMessages(MessageList{});
 var infoLog, requestLog, errorLog *log.Logger
 
-var userAuthenticator = NewUserAuthenicator()
+var Authenticator = NewUserAuthenticator()
 
 func main() {
 	paramDeploy := flag.Bool(

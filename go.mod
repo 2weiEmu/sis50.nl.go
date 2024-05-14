@@ -8,4 +8,7 @@ require (
 	golang.org/x/net v0.20.0
 )
 
-require github.com/BenLubar/htmlcleaner v3.1.0+incompatible // indirect
+require (
+	github.com/BenLubar/htmlcleaner v3.1.0+incompatible // indirect
+	github.com/mattn/go-sqlite3 v1.14.22 // indirect
+)

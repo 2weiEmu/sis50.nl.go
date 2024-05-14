@@ -6,9 +6,7 @@ type User struct {
 	HashedPassword string;
 }
 
-func NewUserAuthenticator() UserAuth {
-	return UserAuth{}
-}
+
 
 
 
