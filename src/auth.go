@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/mattn/go-sqlite3"
@@ -19,16 +20,21 @@ var conn sqlite3.SQLiteConn
 
 // TODO: this is super temp and should be read from a config file
 // that you set without any public knowledge
-var secretKey []byte = []byte("")
+var secretKey []byte = []byte("gb+V6PcZ8PC7oObI/kngTjBHrYsNKQ=")
 
 type UserAuthWrapper struct {
 	Db *sql.DB;
+	TokenStmt *sql.Stmt
 	handler http.Handler;
 }
 
 // method required to count as a handler itself
 func (u *UserAuthWrapper) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	err := u.VerifySessionCookie(ReadPrivate(r, "sis50session"))
+	sessionval, err := ReadPrivate(r, "sis50session")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+	}
+	err = u.VerifySessionToken(sessionval)
 	if err != nil {
 		http.Error(w, "Failed to verify the session", http.StatusUnauthorized)
 		return
@@ -37,24 +43,69 @@ func (u *UserAuthWrapper) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	u.handler.ServeHTTP(w, r)
 }
 
-func NewUserAuthenticator() UserAuthWrapper {
+func NewUserAuthenticator(handler http.Handler) UserAuthWrapper {
 	db, err := sql.Open("sqlite3", "./resources/centralDb")
 	if err != nil {
 		panic("Failed to open the db")
 	}
-	if err = db.Ping(); err != nil {
-		panic("Failed to ping the database")
+	tokenstmt, err := db.Prepare("SELECT session_token FROM sessions AS s WHERE s.user_id =	?")
+	if err != nil {
+		panic("Failed to set up prepared statement")
 	}
 	return UserAuthWrapper{
 		Db: db,
+		TokenStmt: tokenstmt,
+		handler: handler,
 	}
 }
 
 func (u *UserAuthWrapper) Close() {
+	u.TokenStmt.Close()
 	u.Db.Close()
 }
 
-func (u *UserAuthWrapper) VerifySessionCookie(value string) error {
+func (u *UserAuthWrapper) MakeSessionCookie(userId int) http.Cookie {
+	return http.Cookie{
+		Name: "sis50session",
+		Value: string(MakeRandomString(64)),
+		Path: "/",
+		MaxAge: 2629800,
+		HttpOnly: true, // cannot be modified with javascript
+		Secure: true,
+		SameSite: http.SameSiteLaxMode,
+	}
+}
+
+func (u *UserAuthWrapper) VerifySessionToken(value string) error {
+	vals := strings.Split(value, "$")
+	userId, err := strconv.Atoi(vals[0])
+	if err != nil {
+		return err
+	}
+
+	givenToken := vals[1]
+	// TODO: limit max amount of logins at the same time with different tokens
+	// TODO: use transactions
+	if err = u.Db.Ping(); err != nil {
+		return err
+	}
+	rows, err := u.TokenStmt.Query(userId)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var token string
+		err := rows.Scan(&token)
+		if err != nil {
+			return err
+		}
+		
+		if token == givenToken {
+			return nil
+		}
+	}
 	return errors.New("Failed to verify session cookie")
 }
 

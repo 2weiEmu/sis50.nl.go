@@ -10,5 +10,8 @@ require (
 
 require (
 	github.com/BenLubar/htmlcleaner v3.1.0+incompatible // indirect
+	github.com/matthewhartstonge/argon2 v1.0.0 // indirect
 	github.com/mattn/go-sqlite3 v1.14.22 // indirect
+	golang.org/x/crypto v0.18.0 // indirect
+	golang.org/x/sys v0.16.0 // indirect
 )
