@@ -11,10 +11,14 @@ const UserCount = 4
 
 // functions below here are stand-ins for constant arrays as these are not
 // a thing in go
+
+// TODO: i should probably find a better way to do this, and this will change
+// with user permissions as well of course but who knows for now this is fine
 func getValidPages() []string {
 	return []string{
 		"messages", 
 		"help",
+		"login",
 	}
 }
 

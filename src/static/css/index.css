@@ -402,3 +402,13 @@ td, th {
 #right-click-menu button:hover {
 	background-color: var(--accent);
 }
+
+#login-form {
+	display: flex;
+	flex-direction: column;
+	width: 30%;
+	height: 50%;
+	margin-top: 25vh;
+	margin-left: 35%;
+	align-items: center;
+}

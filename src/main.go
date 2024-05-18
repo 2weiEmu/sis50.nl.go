@@ -19,8 +19,6 @@ var idCount = getIdCount()
 var allMessagesList, _ = readMessages(MessageList{});
 var infoLog, requestLog, errorLog *log.Logger
 
-var Authenticator = NewUserAuthenticator()
-
 func main() {
 	paramDeploy := flag.Bool(
 		"d", false, "A flag specifying the deploy mode of the server.")
@@ -70,6 +68,7 @@ func main() {
 
 	router.HandleFunc("/", HTMLctx.HandleIndex)
 	router.HandleFunc("/{page}", HTMLctx.HandlePage)
+	// TODO: make above use file sever?
 
 	http.Handle("/", router)
 

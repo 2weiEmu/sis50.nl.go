@@ -1,22 +1,31 @@
 package main
 
 import (
-	"database/sql"
+	"encoding/json"
+	"io"
 	"net/http"
 )
 
-func LoginPageHandler(w http.ResponseWriter, r *http.Request) {
-	// i will open a db here, there is prob a better way to do this
-	db, err := sql.Open("sqlite3", "./resources/centralDb")
+type LoginData struct {
+	Username string `json:"username"`
+	Given_password string `json:"password"`
+}
+
+func LoginUserPost(w http.ResponseWriter, r *http.Request) {
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	
-}
+	loginData := LoginData{}
+	err = json.Unmarshal(body, &loginData)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-func LoginUserHandler(w http.ResponseWriter, r *http.Request) {
-		
+	// now we have to check the password
+	// if the password is right we give him a token and enter it in the db
 }
 
