@@ -44,16 +44,15 @@ func (ctx *HTMLContext) HandleIndex(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// could probably combine this with handlepage in a better way but rn idc, and
+// yes i do parse the templates each time i need to change that
 func (ctx *HTMLContext) HandleLogin(w http.ResponseWriter, r *http.Request) {
 	jsArguments := ctx.ConnectionLocation + " " + ctx.Secure
 	pageLocation := "src/static/templates/login.html"
 	tmpl, err := template.ParseFiles(pageLocation)
 	if err != nil {
 		ErrLog("Could not parse template file for page", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		http.ServeFile(
-			w, r, "src/static/templates/500.html",
-		)
+		WriteInternalServerError(w, r, "Failed to parse the login template file")
 		return
 	}
 	
@@ -61,10 +60,7 @@ func (ctx *HTMLContext) HandleLogin(w http.ResponseWriter, r *http.Request) {
 	err = tmpl.Execute(w, jsArguments)
 	if err != nil {
 		ErrLog("Could not execute template file", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		http.ServeFile(
-			w, r, "src/static/templates/500.html",
-		)
+		WriteInternalServerError(w, r, "Failed to execute the login template")
 	}
 }
 
@@ -74,9 +70,7 @@ func (ctx *HTMLContext) HandlePage(w http.ResponseWriter, r *http.Request) {
 	jsArguments := ctx.ConnectionLocation + " " + ctx.Secure
 
 	if !slices.Contains(getValidPages(), page) {
-		http.ServeFile(
-			w, r, "src/static/templates/404.html",
-		)
+		WriteNotFound(w, r, "This doesn't seem to be a valid page")
 		return
 	}
 
@@ -84,10 +78,7 @@ func (ctx *HTMLContext) HandlePage(w http.ResponseWriter, r *http.Request) {
 	tmpl, err := template.ParseFiles(pageLocation)
 	if err != nil {
 		ErrLog("Could not parse template file for page", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		http.ServeFile(
-			w, r, "src/static/templates/500.html",
-		)
+		WriteInternalServerError(w, r, "Failed to parse the page template file")
 		return
 	}
 	
@@ -95,10 +86,7 @@ func (ctx *HTMLContext) HandlePage(w http.ResponseWriter, r *http.Request) {
 	err = tmpl.Execute(w, jsArguments)
 	if err != nil {
 		ErrLog("Could not execute template file", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		http.ServeFile(
-			w, r, "src/static/templates/500.html",
-		)
+		WriteInternalServerError(w, r, "Failed to execute the page template")
 	}
 }
 

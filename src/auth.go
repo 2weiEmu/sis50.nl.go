@@ -33,12 +33,12 @@ type UserAuthWrapper struct {
 func (u UserAuthWrapper) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	sessionval, err := ReadPrivate(r, "sis50session")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnauthorized)
+		WriteUnauthorized(w, r, err.Error())
 		return
 	}
 	err = u.VerifySessionToken(sessionval)
 	if err != nil {
-		http.Error(w, "Failed to verify the session" + err.Error(), http.StatusUnauthorized)
+		WriteUnauthorized(w, r, "Failed to verify the session")
 		return
 	}
 

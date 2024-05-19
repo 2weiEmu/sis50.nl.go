@@ -22,5 +22,8 @@ async function login() {
 	if (response.status == 200) {
 		window.location.href = "/"
 	}
+	else {
+		alert(response.statusText)
+	}
 	console.log(response.status)
 }

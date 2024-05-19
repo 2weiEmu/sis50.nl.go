@@ -17,14 +17,14 @@ type LoginData struct {
 func LoginUserPost(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		WriteInternalServerError(w, r, err.Error() + " The body didn't provide good data")
 		return
 	}
 
 	loginData := LoginData{}
 	err = json.Unmarshal(body, &loginData)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		WriteInternalServerError(w, r, err.Error() + " The body could not be unmarshaled")
 		return
 	}
 
@@ -33,27 +33,27 @@ func LoginUserPost(w http.ResponseWriter, r *http.Request) {
 
 	db, err := sql.Open("sqlite3", "./resources/centralDb")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		WriteInternalServerError(w, r, err.Error() + " The db couldn't be opened")
 		return
 	}
 	defer db.Close()
 
 	result, err := db.Query("SELECT id, password_hash FROM users AS u WHERE u.username = ?", loginData.Username)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		WriteInternalServerError(w, r, err.Error() + " The query didn't work")
 		return
 	}
 
 	var encoded string
 	var userId int
 	if !result.Next() {
-		http.Error(w, "dont seem to be in the db buddy", http.StatusInternalServerError)
+		WriteUnauthorized(w, r, "Username not found")
 		return
 	}
 
 	err = result.Scan(&userId, &encoded)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		WriteInternalServerError(w, r, err.Error() + " Couldn't read query result for hash")
 		return
 	}
 	result.Close()
@@ -65,7 +65,8 @@ func LoginUserPost(w http.ResponseWriter, r *http.Request) {
 		sessionCookie := MakeSessionCookie(userId, string(sessionToken))
 		_, err = db.Exec("INSERT INTO sessions (user_id, session_token) VALUES (? , ?)", userId, string(sessionToken))
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			// im stupid we dont need the templates in the login post handler
+			WriteInternalServerError(w, r, err.Error() + " Could not insert token into db")
 			return
 		}
 		err = WritePrivate(w, sessionCookie)
