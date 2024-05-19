@@ -66,6 +66,9 @@ func main() {
 	router.HandleFunc("/api/messages/{pageNumber}", GETMessages).Methods("GET")
 	router.HandleFunc("/api/messages", POSTMessage).Methods("POST")
 	router.HandleFunc("/login", LoginUserPost).Methods("POST")
+	router.Handle("/logout", NewUserAuthenticator(HandleFuncAsHandle(LogoutUserPost))).Methods("POST")
+	// this has to be wrapped with an auth because otherwise if you do it right you
+	// can log out arbitrary users	
 
 	router.Handle("/", NewUserAuthenticator(HandleFuncAsHandle(HTMLctx.HandleIndex)))
 	router.HandleFunc("/login", HTMLctx.HandleLogin)

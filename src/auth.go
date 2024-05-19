@@ -217,3 +217,13 @@ func DeleteCookie(w http.ResponseWriter, name string) {
 		SameSite: http.SameSiteLaxMode,
 	})
 }
+
+func GetUserIdFromCookie(r *http.Request) (int, error) {
+	val, err := ReadPrivate(r, "sis50session")
+	if err != nil {
+		return 0, err
+	}
+
+	userId := strings.Split(val, "$")[0]
+	return strconv.Atoi(userId)
+}

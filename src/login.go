@@ -85,7 +85,22 @@ func LogoutUserPost(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	defer db.Close()
 
+	userId, err := GetUserIdFromCookie(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	_, err = db.Exec("DELETE FROM sessions AS s WHERE s.user_id = ?", userId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// i dont think we have to delete the cookie but its probably good practice
 	DeleteCookie(w, "sis50session")
+	w.WriteHeader(http.StatusOK)
 }
 
