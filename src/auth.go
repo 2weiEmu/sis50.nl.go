@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -21,7 +22,27 @@ var conn sqlite3.SQLiteConn
 
 // TODO: this is super temp and should be read from a config file
 // that you set without any public knowledge
-var secretKey []byte = []byte("gb+V6PcZ8PC7oObI/kngTjBHrYsNKQ==")
+var sercretKey []byte = ReadSecret()
+
+func ReadSecret() []byte {
+	file, err := os.OpenFile("secret.conf", os.O_RDONLY, os.ModeAppend)
+	if err != nil {
+		panic("failed to read secrets file")
+	}
+	defer file.Close()
+
+	secret := make([]byte, 32)
+	count, err := file.Read(secret)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	if count != 32 {
+		panic("key wrong length")
+	}
+
+	return secret
+}
 
 type UserAuthWrapper struct {
 	Db *sql.DB;
