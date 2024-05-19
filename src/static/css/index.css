@@ -412,3 +412,30 @@ td, th {
 	margin-left: 35%;
 	align-items: center;
 }
+
+#userprofile {
+	position: fixed;
+	display: flex;
+	top: 10px;
+	left: 10px;
+	flex-direction: column;
+}
+
+#userpicture {
+	height: 64px;
+	width: 64px;
+	border-radius: 32px;
+}
+
+#useractions {
+	display: none;
+	background-color: var(--second-lo);
+	margin: 5px;
+	padding: 5px;
+	border-radius: 5px;
+}
+
+#userprofile:hover #useractions {
+	display: flex;
+	flex-direction: column;
+}

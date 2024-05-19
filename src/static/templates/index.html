@@ -20,7 +20,6 @@
 		</div>
 
 		<div class="std-content">
-
 			<div class="message-notif">
 				<img src="/images/message-icon.png" class="msg-icon">
 				<p>{{ .Message }}</p>
@@ -90,10 +89,16 @@
 				</div>
 				-->
 			</div>
-
 		</div>
-
 	</body>
+
+	<!-- TODO: we need to make these useable componenets with go templ -->
+	<div id="userprofile">
+		<img id="userpicture">
+		<div id="useractions">
+			<button id="logoutButton">logout</button>
+		</div>
+	</div>
 
 	<div id="bg-menu" style="display: none;">
 		<h1>Select One of Your Saved Backgrounds</h1>
@@ -115,12 +120,13 @@
 		<button onclick="setDay(this)" state="SET:cant-cook">Can't Cook</button><br>
 	</div>
 
-	<script src="/js/deploy.js" args="{{ .Args }}"></script>
-	<script src="/js/wallpaper.js" args="{{ .Args }}"></script>
-	<script src="/js/messageformatting.js" args="{{ .Args }}"></script>
-	<script src="/js/calendar-context.js" args="{{ .Args }}"></script>
-	<script src="/js/calendarHandler.js" args="{{ .Args }}"></script>
-	<script src="/js/index.js" args="{{ .Args }}"></script>
+	<script defer src="/js/deploy.js" args="{{ .Args }}"></script>
+	<script defer src="/js/wallpaper.js" args="{{ .Args }}"></script>
+	<script defer src="/js/messageformatting.js" args="{{ .Args }}"></script>
+	<script defer src="/js/calendar-context.js" args="{{ .Args }}"></script>
+	<script defer src="/js/calendarHandler.js" args="{{ .Args }}"></script>
+	<script defer src="/js/index.js" args="{{ .Args }}"></script>
+	<script defer src="/js/logout.js" args="{{ . }}"></script>
 </html>
 
 
