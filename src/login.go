@@ -17,14 +17,14 @@ type LoginData struct {
 func LoginUserPost(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		WriteInternalServerError(w, r, err.Error() + " The body didn't provide good data")
+		http.Error(w, "You are not in the database", http.StatusInternalServerError)
 		return
 	}
 
 	loginData := LoginData{}
 	err = json.Unmarshal(body, &loginData)
 	if err != nil {
-		WriteInternalServerError(w, r, err.Error() + " The body could not be unmarshaled")
+		http.Error(w, "You are not in the database", http.StatusInternalServerError)
 		return
 	}
 
@@ -33,27 +33,27 @@ func LoginUserPost(w http.ResponseWriter, r *http.Request) {
 
 	db, err := sql.Open("sqlite3", "./resources/centralDb")
 	if err != nil {
-		WriteInternalServerError(w, r, err.Error() + " The db couldn't be opened")
+		http.Error(w, "You are not in the database", http.StatusInternalServerError)
 		return
 	}
 	defer db.Close()
 
 	result, err := db.Query("SELECT id, password_hash FROM users AS u WHERE u.username = ?", loginData.Username)
 	if err != nil {
-		WriteInternalServerError(w, r, err.Error() + " The query didn't work")
+		http.Error(w, "You are not in the database", http.StatusInternalServerError)
 		return
 	}
 
 	var encoded string
 	var userId int
 	if !result.Next() {
-		WriteUnauthorized(w, r, "Username not found")
+		http.Error(w, "You are not in the database", http.StatusInternalServerError)
 		return
 	}
 
 	err = result.Scan(&userId, &encoded)
 	if err != nil {
-		WriteInternalServerError(w, r, err.Error() + " Couldn't read query result for hash")
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	result.Close()
@@ -66,7 +66,7 @@ func LoginUserPost(w http.ResponseWriter, r *http.Request) {
 		_, err = db.Exec("INSERT INTO sessions (user_id, session_token) VALUES (? , ?)", userId, string(sessionToken))
 		if err != nil {
 			// im stupid we dont need the templates in the login post handler
-			WriteInternalServerError(w, r, err.Error() + " Could not insert token into db")
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		err = WritePrivate(w, sessionCookie)
