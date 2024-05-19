@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/mattn/go-sqlite3"
 )
@@ -20,7 +21,7 @@ var conn sqlite3.SQLiteConn
 
 // TODO: this is super temp and should be read from a config file
 // that you set without any public knowledge
-var secretKey []byte = []byte("gb+V6PcZ8PC7oObI/kngTjBHrYsNKQ=")
+var secretKey []byte = []byte("gb+V6PcZ8PC7oObI/kngTjBHrYsNKQ==")
 
 type UserAuthWrapper struct {
 	Db *sql.DB;
@@ -29,14 +30,15 @@ type UserAuthWrapper struct {
 }
 
 // method required to count as a handler itself
-func (u *UserAuthWrapper) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (u UserAuthWrapper) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	sessionval, err := ReadPrivate(r, "sis50session")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
 	}
 	err = u.VerifySessionToken(sessionval)
 	if err != nil {
-		http.Error(w, "Failed to verify the session", http.StatusUnauthorized)
+		http.Error(w, "Failed to verify the session" + err.Error(), http.StatusUnauthorized)
 		return
 	}
 
@@ -64,12 +66,12 @@ func (u *UserAuthWrapper) Close() {
 	u.Db.Close()
 }
 
-func (u *UserAuthWrapper) MakeSessionCookie(userId int) http.Cookie {
+func MakeSessionCookie(userId int, token string) http.Cookie {
 	return http.Cookie{
 		Name: "sis50session",
-		Value: string(MakeRandomString(64)),
+		Value: strconv.Itoa(userId) + "$" + token,
 		Path: "/",
-		MaxAge: 2629800,
+		MaxAge: 2629800, // apparently this may not be great???
 		HttpOnly: true, // cannot be modified with javascript
 		Secure: true,
 		SameSite: http.SameSiteLaxMode,
@@ -98,6 +100,7 @@ func (u *UserAuthWrapper) VerifySessionToken(value string) error {
 	for rows.Next() {
 		var token string
 		err := rows.Scan(&token)
+		fmt.Println(token, givenToken)
 		if err != nil {
 			return err
 		}
@@ -144,6 +147,7 @@ func WriteCookie(w http.ResponseWriter, cookie http.Cookie) error {
 	}
 
 	http.SetCookie(w, &cookie)
+	fmt.Println("wrote cookie")
 	return nil
 }
 
@@ -200,4 +204,16 @@ func ReadCookie(r *http.Request, name string) (string, error) {
 	}
 
 	return string(value), nil
+}
+
+func DeleteCookie(w http.ResponseWriter, name string) {
+	http.SetCookie(w, &http.Cookie{
+		Name: name,
+		Value: "",
+		Path: "/",
+		Expires: time.Unix(0, 0),
+		HttpOnly: true, // cannot be modified with javascript
+		Secure: true,
+		SameSite: http.SameSiteLaxMode,
+	})
 }

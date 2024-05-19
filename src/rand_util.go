@@ -8,7 +8,7 @@ func MakeRandomString(length int) []byte {
 	final := make([]byte, length)
 
 	for i := 0; i < length; i++ {
-		final[i] = byte(rand.IntN(len(chars)))
+		final[i] = chars[rand.IntN(len(chars))]
 	}
 	return final
 }

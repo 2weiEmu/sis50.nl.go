@@ -12,16 +12,18 @@
 
 	<body id="mbody">
 		<div id="login-form">
-			<input>
+			<input id="login-user">
 			<label>Login</label>
-			<input>
+			<input type="password" id="login-password">
 			<label>Password</label>
 
-			<button>Login</button>
+			<button onclick="login()">Login</button>
 		</div>
 	</body>
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+	<script src="/js/deploy.js" args="{{ . }}"></script>
+	<script src="/js/login.js" args="{{ . }}"></script>
 </html>
 
 

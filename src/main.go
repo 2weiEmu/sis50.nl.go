@@ -60,14 +60,16 @@ func main() {
 	calHdl := NewCalendarHandler(loggerFlags, logFile)
 
 	router := mux.NewRouter()
-	router.Handle("/dayWS", websocket.Handler(calHdl.HandleCalendarWebsocket))
-	router.Handle("/shopWS", websocket.Handler(ShoppingListWebsocketHandler))
+	router.Handle("/dayWS", NewUserAuthenticator(websocket.Handler(calHdl.HandleCalendarWebsocket)))
+	router.Handle("/shopWS", NewUserAuthenticator(websocket.Handler(ShoppingListWebsocketHandler)))
 
 	router.HandleFunc("/api/messages/{pageNumber}", GETMessages).Methods("GET")
 	router.HandleFunc("/api/messages", POSTMessage).Methods("POST")
+	router.HandleFunc("/login", LoginUserPost).Methods("POST")
 
-	router.HandleFunc("/", HTMLctx.HandleIndex)
-	router.HandleFunc("/{page}", HTMLctx.HandlePage)
+	router.Handle("/", NewUserAuthenticator(HandleFuncAsHandle(HTMLctx.HandleIndex)))
+	router.HandleFunc("/login", HTMLctx.HandleLogin)
+	router.Handle("/{page}", NewUserAuthenticator(HandleFuncAsHandle(HTMLctx.HandlePage)))
 	// TODO: make above use file sever?
 
 	http.Handle("/", router)

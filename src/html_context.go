@@ -44,6 +44,30 @@ func (ctx *HTMLContext) HandleIndex(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (ctx *HTMLContext) HandleLogin(w http.ResponseWriter, r *http.Request) {
+	jsArguments := ctx.ConnectionLocation + " " + ctx.Secure
+	pageLocation := "src/static/templates/login.html"
+	tmpl, err := template.ParseFiles(pageLocation)
+	if err != nil {
+		ErrLog("Could not parse template file for page", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		http.ServeFile(
+			w, r, "src/static/templates/500.html",
+		)
+		return
+	}
+	
+	fmt.Println("Javascript Arguments before Executing:", jsArguments)
+	err = tmpl.Execute(w, jsArguments)
+	if err != nil {
+		ErrLog("Could not execute template file", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		http.ServeFile(
+			w, r, "src/static/templates/500.html",
+		)
+	}
+}
+
 func (ctx *HTMLContext) HandlePage(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	page := vars["page"]
@@ -97,3 +121,16 @@ func NewHTMLContext(
 	}, nil
 }
 
+type HandleFuncWrapper struct {
+	HandleFunc func(http.ResponseWriter, *http.Request)
+}
+
+func HandleFuncAsHandle(handleFunc func(http.ResponseWriter, *http.Request)) HandleFuncWrapper {
+	return HandleFuncWrapper{
+		HandleFunc: handleFunc,
+	}
+}
+
+func (wrapper HandleFuncWrapper) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	wrapper.HandleFunc(w, r)
+}
