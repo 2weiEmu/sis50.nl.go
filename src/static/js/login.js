@@ -23,7 +23,7 @@ async function login() {
 		window.location.href = "/"
 	}
 	else {
-		alert(response.statusText)
+		alert(await response.text())
 	}
 	console.log(response.status)
 }
