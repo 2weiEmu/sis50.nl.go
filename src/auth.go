@@ -22,7 +22,7 @@ var conn sqlite3.SQLiteConn
 
 // TODO: this is super temp and should be read from a config file
 // that you set without any public knowledge
-var sercretKey []byte = ReadSecret()
+var secretKey []byte = ReadSecret()
 
 func ReadSecret() []byte {
 	file, err := os.OpenFile("secret.conf", os.O_RDONLY, os.ModeAppend)
