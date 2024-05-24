@@ -19,6 +19,7 @@ func getValidPages() []string {
 		"messages", 
 		"help",
 		"login",
+		"profile",
 	}
 }
 

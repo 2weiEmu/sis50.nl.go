@@ -47,7 +47,7 @@ This is a simple site created for the house Sis50 in the Netherlands to coordina
 ### **Feature Set** (User Customisation Stage)
 
 - [ ] The ability to register for new users
-- [ ] The ability to login to be a user
+- [x] The ability to login to be a user
 - [ ] The ability to post a message as that user
 - [ ] A basic admin account
 - [ ] A basic admin panel
