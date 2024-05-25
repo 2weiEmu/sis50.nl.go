@@ -3,3 +3,4 @@ resources/
 resources/*
 build/
 log/
+src/static/images/profiles/
