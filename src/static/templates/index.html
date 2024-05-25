@@ -29,7 +29,7 @@
 				<div class="header"><p>Rick</p></div>
 				<div class="header"><p>Youri</p></div>
 				<div class="header"><p>Robert</p></div>
-				<div class="header"><p>Milan</p></div>
+				<div class="header"><p>Yoop</p></div>
 				<div class="header"><p>Dag</p></div>
 				<div class="rick ma bg" data-person="rick" data-day="ma"><img data-state="present" src=""/></div>
 				<div class="youri ma bg" data-person="youri" data-day="ma"><img data-state="present" src=""/></div>
@@ -94,7 +94,7 @@
 
 	<!-- TODO: we need to make these useable componenets with go templ -->
 	<div id="userprofile">
-		<img id="userpicture">
+		<img id="userpicture" src="/images/profiles/{{ .ProfilePicture }}.png">
 		<div id="useractions">
 			<button id="logoutButton">logout</button>
 			<a href="/profile">Profile</a>
@@ -127,7 +127,7 @@
 	<script defer src="/js/calendar-context.js" args="{{ .Args }}"></script>
 	<script defer src="/js/calendarHandler.js" args="{{ .Args }}"></script>
 	<script defer src="/js/index.js" args="{{ .Args }}"></script>
-	<script defer src="/js/logout.js" args="{{ . }}"></script>
+	<script defer src="/js/logout.js" args="{{ .Args }}"></script>
 </html>
 
 

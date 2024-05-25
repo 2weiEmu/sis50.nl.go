@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"slices"
+	"strconv"
 
 	"github.com/gorilla/mux"
 )
@@ -14,6 +15,7 @@ import (
 type IndexPageStruct struct {
 	Message string
 	Args string
+	ProfilePicture string
 }
 
 type HTMLContext struct {
@@ -33,9 +35,16 @@ func (ctx *HTMLContext) HandleIndex(w http.ResponseWriter, r *http.Request) {
 			len(allMessagesList.Pages[pagesLength - 1].Message) - 1]
 	}
 
-	err := ctx.IndexTemplate.Execute(w, IndexPageStruct{
+	userId, err := GetUserIdFromCookie(r)
+	if err != nil {
+		WriteInternalServerError(w, r, err.Error())
+		return
+	}
+
+	err = ctx.IndexTemplate.Execute(w, IndexPageStruct{
 		Message: titleMsg,
 		Args: ctx.ConnectionLocation + " " + ctx.Secure,
+		ProfilePicture: strconv.Itoa(userId),
 	})
 	if err != nil {
 		// TODO: move around logging
@@ -81,9 +90,18 @@ func (ctx *HTMLContext) HandlePage(w http.ResponseWriter, r *http.Request) {
 		WriteInternalServerError(w, r, "Failed to parse the page template file")
 		return
 	}
+
+	userId, err := GetUserIdFromCookie(r)
+	if err != nil {
+		WriteInternalServerError(w, r, err.Error())
+		return
+	}
 	
 	fmt.Println("Javascript Arguments before Executing:", jsArguments)
-	err = tmpl.Execute(w, jsArguments)
+	err = tmpl.Execute(w, IndexPageStruct{
+		Args: jsArguments,
+		ProfilePicture: strconv.Itoa(userId),
+	})
 	if err != nil {
 		ErrLog("Could not execute template file", err)
 		WriteInternalServerError(w, r, "Failed to execute the page template")

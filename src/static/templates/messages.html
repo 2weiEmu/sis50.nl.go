@@ -44,7 +44,7 @@
 	</body>
 
 	<div id="userprofile">
-		<img id="userpicture">
+		<img id="userpicture" src="/images/profiles/{{ .ProfilePicture }}.png">
 		<div id="useractions">
 			<button id="logoutbutton">logout</button>
 			<a href="/profile">profile</a>
@@ -63,10 +63,10 @@
 	</div>
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-	<script src="/js/wallpaper.js" args="{{ . }}"></script>
-	<script src="/js/messages.js" args="{{ . }}"></script>
-	<script src="/js/messageformatting.js" args="{{ . }}"></script>
-	<script defer src="/js/logout.js" args="{{ . }}"></script>
+	<script src="/js/wallpaper.js" args="{{ .Args }}"></script>
+	<script src="/js/messages.js" args="{{ .Args }}"></script>
+	<script src="/js/messageformatting.js" args="{{ .Args }}"></script>
+	<script defer src="/js/logout.js" args="{{ .Args }}"></script>
 </html>
 
 

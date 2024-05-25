@@ -19,12 +19,16 @@
 		<div>
 			<h1>Profile Picture</h1>
 			<!-- TODO: the people need to be able to select already existing ones -->
-		</div>
 
+			<form action="/profile" method="post" enctype="multipart/form-data">
+				<input type="file" id="profile-image" name="profile-image" value="Upload Profile Image">
+				<button type="submit">Upload</button>
+			</form>
+		</div>
 	</body>
 
 	<div id="userprofile">
-		<img id="userpicture">
+		<img id="userpicture" src="/images/profiles/{{ .ProfilePicture }}.png">
 		<div id="useractions">
 			<button id="logoutbutton">logout</button>
 			<a href="/profile">profile</a>

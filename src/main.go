@@ -63,6 +63,7 @@ func main() {
 	router.Handle("/dayWS", NewUserAuthenticator(websocket.Handler(calHdl.HandleCalendarWebsocket)))
 	router.Handle("/shopWS", NewUserAuthenticator(websocket.Handler(ShoppingListWebsocketHandler)))
 
+	router.Handle("/profile", NewUserAuthenticator(HandleFuncAsHandle(ReceiveUserProfileImage))).Methods("POST")
 	router.HandleFunc("/api/messages/{pageNumber}", GETMessages).Methods("GET")
 	router.HandleFunc("/api/messages", POSTMessage).Methods("POST")
 	router.HandleFunc("/login", LoginUserPost).Methods("POST")

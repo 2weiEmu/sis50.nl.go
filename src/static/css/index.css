@@ -147,6 +147,11 @@ h1 {
 	text-decoration: underline;
 }
 
+form {
+	display: flex;
+	flex-direction: column;
+}
+
 .form {
 	font-size: 1.5rem;
 	display: flex;
