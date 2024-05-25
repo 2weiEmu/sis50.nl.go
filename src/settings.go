@@ -12,6 +12,7 @@ func ReceiveUserProfileImage(w http.ResponseWriter, r *http.Request) {
 	r.ParseMultipartForm(10 << 20) //10 MB
 	file, handle, err := r.FormFile("profile-image")
 	if err != nil {
+		fmt.Println(err.Error())
 		WriteInternalServerError(w, r, err.Error())
 		return
 	}
