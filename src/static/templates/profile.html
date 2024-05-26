@@ -21,7 +21,8 @@
 			<!-- TODO: the people need to be able to select already existing ones -->
 
 			<form id="profile-pic-form" onsubmit="uploadProfilePicture(event)" method="post" enctype="multipart/form-data">
-				<input type="file" id="profile-image" name="profile-image" value="Upload Profile Image">
+				<input type="file" id="profile-image" name="profile-image">
+				<p>Max Size: 16 MiB - Filetype: .png</p>
 				<button type="submit">Upload</button>
 			</form>
 		</div>
@@ -39,5 +40,4 @@
 	<script defer src="/js/deploy.js" args="{{ .Args }}"></script>
 	<script defer src="/js/profile.js" args="{{ .Args }}"></script>
 </html>
-
 
