@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"github.com/2weiEmu/sis50.nl.go/src"
 
 	"github.com/gorilla/mux"
 	"golang.org/x/net/websocket"

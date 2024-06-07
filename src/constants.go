@@ -1,4 +1,4 @@
-package main
+package src
 
 const MessageFile = "./resources/messages"
 const ShoppingFile = "./resources/shopping"
