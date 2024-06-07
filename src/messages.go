@@ -11,6 +11,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
+var AllMessagesList, _ = ReadMessages(MessageList{});
+
 type MessagePage struct {
 	Message []string `json:"messages"`
 }
@@ -22,9 +24,9 @@ type MessageList struct {
 // GET pages of Messages
 // POST a new message to a page, and save this
 func GETMessages(writer http.ResponseWriter, request *http.Request) {
-	infoLog.Println("Get Messages Request")
+	InfoLog.Println("Get Messages Request")
 
-	_, err := readMessages(allMessagesList)
+	_, err := ReadMessages(AllMessagesList)
 	if err != nil {
 		errorLogAndHttpStat(writer, err)
 		return
@@ -39,7 +41,7 @@ func GETMessages(writer http.ResponseWriter, request *http.Request) {
 
 	page := getMessageJson(pageNumber)
 	if page == nil {
-		infoLog.Println("messages.go: Could not get more messages")
+		InfoLog.Println("messages.go: Could not get more messages")
 		http.Error(
 			writer, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
@@ -48,19 +50,19 @@ func GETMessages(writer http.ResponseWriter, request *http.Request) {
 }
 
 func getMessageJson(pageNumber int) []byte {
-	if len(allMessagesList.Pages) <= pageNumber || pageNumber < 0 {
+	if len(AllMessagesList.Pages) <= pageNumber || pageNumber < 0 {
 		return nil;
 	}
 
 	// TODO: add check
-	page, _ := json.Marshal(allMessagesList.Pages[
-		len(allMessagesList.Pages) - pageNumber - 1])
+	page, _ := json.Marshal(AllMessagesList.Pages[
+		len(AllMessagesList.Pages) - pageNumber - 1])
 	return page
 }
 
 func POSTMessage(writer http.ResponseWriter, request *http.Request) {
-	infoLog.Println("POSTing message")
-	allMessagesList, err := readMessages(allMessagesList)
+	InfoLog.Println("POSTing message")
+	allMessagesList, err := ReadMessages(AllMessagesList)
 	if err != nil {
 		errorLogAndHttpStat(writer, err)
 		return
@@ -87,16 +89,16 @@ func addMessageToList(message string) error {
 		return errors.New("Empty Message")
 	}
 
-	if len(allMessagesList.Pages) == 0 {
-		allMessagesList.Pages = []MessagePage{{Message: []string{message}}}
-	} else if len(allMessagesList.Pages[len(allMessagesList.Pages) - 1].Message) >= 10 {
+	if len(AllMessagesList.Pages) == 0 {
+		AllMessagesList.Pages = []MessagePage{{Message: []string{message}}}
+	} else if len(AllMessagesList.Pages[len(AllMessagesList.Pages) - 1].Message) >= 10 {
 		var msgPage MessagePage
 		msgPage.Message = []string{message};
-		allMessagesList.Pages = append(allMessagesList.Pages, msgPage)
+		AllMessagesList.Pages = append(AllMessagesList.Pages, msgPage)
 	} else {
-		allMessagesList.Pages[len(allMessagesList.Pages) - 1].Message =
+		AllMessagesList.Pages[len(AllMessagesList.Pages) - 1].Message =
 			append(
-				allMessagesList.Pages[len(allMessagesList.Pages)-1].Message, message)
+				AllMessagesList.Pages[len(AllMessagesList.Pages)-1].Message, message)
 	} 
 	return nil
 }
@@ -117,7 +119,7 @@ func saveMessages(messageList MessageList) {
 	csvWriter := csv.NewWriter(file)
 
 	for _, page := range messageList.Pages {
-		infoLog.Println("Writing Page:", page)
+		InfoLog.Println("Writing Page:", page)
 		err = csvWriter.Write(page.Message)
 		if err != nil {
 			ErrLog("CSV writer failed when writing a message", err)
@@ -131,7 +133,7 @@ func saveMessages(messageList MessageList) {
 
 }
 
-func readMessages(messageList MessageList) (MessageList, error) {
+func ReadMessages(messageList MessageList) (MessageList, error) {
 	file, err := os.OpenFile(
 		MessageFile, os.O_RDWR | os.O_APPEND, os.ModeAppend)
 	if err != nil {

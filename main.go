@@ -13,12 +13,6 @@ import (
 	"golang.org/x/net/websocket"
 )
 
-var webSocketShopConnections []*websocket.Conn
-var stateCalendar = ReadCalendar(InitCalendarDefault())
-var shopItemList, _ = ReadFromFile()
-var idCount = getIdCount()
-var allMessagesList, _ = readMessages(MessageList{});
-var infoLog, requestLog, errorLog *log.Logger
 
 func main() {
 	paramDeploy := flag.Bool(
@@ -31,16 +25,16 @@ func main() {
 	secret := flag.String("k", "", "State the private key location")
 	flag.Parse()
 
-	logFile, err := os.OpenFile(MainLog, os.O_APPEND | os.O_RDWR, 664)
+	logFile, err := os.OpenFile(src.MainLog, os.O_APPEND | os.O_RDWR, 664)
 	if err != nil {
 		fmt.Println("[ERROR] Failed to open main log file.")
 		panic("Could not open log file.")
 	}
 	defer logFile.Close()
 
-	infoLog = log.New(logFile, "[INFO] ", loggerFlags)
-	requestLog = log.New(logFile, "[REQUEST] ", loggerFlags)
-	errorLog = log.New(logFile, "[ERROR] ", loggerFlags)
+	src.InfoLog = log.New(logFile, "[INFO] ", src.LoggerFlags)
+	src.RequestLog = log.New(logFile, "[REQUEST] ", src.LoggerFlags)
+	src.ErrorLog = log.New(logFile, "[ERROR] ", src.LoggerFlags)
 
 	cssDir := http.Dir("src/static/css")
 	imgDir := http.Dir("src/static/images")
@@ -52,38 +46,38 @@ func main() {
 		secure = "ssl"
 	} 
 
-	HTMLctx, err := NewHTMLContext(
-		loggerFlags, logFile, secure, *paramWebSocketConn)
+	HTMLctx, err := src.NewHTMLContext(
+		src.LoggerFlags, logFile, secure, *paramWebSocketConn)
 	if err != nil {
 		fmt.Println("[ERROR] Could not create html context", err)
 		panic("Nope, no context")
 	}
 
-	calHdl := NewCalendarHandler(loggerFlags, logFile)
+	calHdl := src.NewCalendarHandler(src.LoggerFlags, logFile)
 
 	router := mux.NewRouter()
 	router.Handle("/dayWS",
-		NewUserAuthenticator(websocket.Handler(calHdl.HandleCalendarWebsocket)))
+		src.NewUserAuthenticator(websocket.Handler(calHdl.HandleCalendarWebsocket)))
 	router.Handle("/shopWS",
-		NewUserAuthenticator(websocket.Handler(ShoppingListWebsocketHandler)))
+		src.NewUserAuthenticator(websocket.Handler(src.ShoppingListWebsocketHandler)))
 
 	router.Handle("/profile",
-		NewUserAuthenticator(HandleFuncAsHandle(ReceiveUserProfileImage))).
+		src.NewUserAuthenticator(src.HandleFuncAsHandle(src.ReceiveUserProfileImage))).
 		Methods("POST")
-	router.HandleFunc("/api/messages/{pageNumber}", GETMessages).Methods("GET")
-	router.HandleFunc("/api/messages", POSTMessage).Methods("POST")
-	router.HandleFunc("/login", LoginUserPost).Methods("POST")
+	router.HandleFunc("/api/messages/{pageNumber}", src.GETMessages).Methods("GET")
+	router.HandleFunc("/api/messages", src.POSTMessage).Methods("POST")
+	router.HandleFunc("/login", src.LoginUserPost).Methods("POST")
 	router.Handle("/logout", 
-		NewUserAuthenticator(HandleFuncAsHandle(LogoutUserPost))).
+		src.NewUserAuthenticator(src.HandleFuncAsHandle(src.LogoutUserPost))).
 		Methods("POST")
 	// this has to be wrapped with an auth because otherwise if you do it 
 	// right you can log out arbitrary users	
 
 	router.Handle("/", 
-		NewUserAuthenticator(HandleFuncAsHandle(HTMLctx.HandleIndex)))
+		src.NewUserAuthenticator(src.HandleFuncAsHandle(HTMLctx.HandleIndex)))
 	router.HandleFunc("/login", HTMLctx.HandleLogin)
 	router.Handle("/{page}",
-		NewUserAuthenticator(HandleFuncAsHandle(HTMLctx.HandlePage)))
+		src.NewUserAuthenticator(src.HandleFuncAsHandle(HTMLctx.HandlePage)))
 	// TODO: make above use file sever?
 
 	http.Handle("/", router)
@@ -110,7 +104,7 @@ func main() {
 	}
 
 	if err != nil {
-		ErrLog("Listen and serve failed with:", err)
+		src.ErrLog("Listen and serve failed with:", err)
 	}
 }
 

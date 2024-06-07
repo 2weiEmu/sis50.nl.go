@@ -1,4 +1,4 @@
-OBJECTS = ./src
+OBJECTS = .
 CMD = go
 TARGET = build/sis50.nl
 

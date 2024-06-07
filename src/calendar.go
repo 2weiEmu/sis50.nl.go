@@ -12,6 +12,8 @@ import (
 	"golang.org/x/net/websocket"
 )
 
+var StateCalendar = ReadCalendar(InitCalendarDefault())
+
 type CalendarHandler struct {
 	Connections []*websocket.Conn
 	// TODO: need to find some way to include loggers for everyone
@@ -42,7 +44,7 @@ func (handler *CalendarHandler) HandleCalendarWebsocket(conn *websocket.Conn) {
 		}
 
 		if message.State != "open-calendar" {
-			message.State = UpdateCalendar(stateCalendar, message)
+			message.State = UpdateCalendar(StateCalendar, message)
 			handler.BroadcastToConnections(message)
 		} else {
 			message := genOpenCalMessage()
@@ -52,7 +54,7 @@ func (handler *CalendarHandler) HandleCalendarWebsocket(conn *websocket.Conn) {
 			}
 		}
 	}
-	WriteCalendar(stateCalendar)
+	WriteCalendar(StateCalendar)
 	handler.Connections = RemoveWebsocketFromPool(conn, handler.Connections)
 }
 
@@ -76,9 +78,9 @@ func (handler *CalendarHandler) ShiftCalendarDaily() {
 		timeUntilTmr := time.Until(targetTime)
 		time.Sleep(timeUntilTmr)
 
-		WriteCalendar(stateCalendar)
-		stateCalendar = shiftCalendar()
-		WriteCalendar(stateCalendar)
+		WriteCalendar(StateCalendar)
+		StateCalendar = shiftCalendar()
+		WriteCalendar(StateCalendar)
 
 		handler.BroadcastToConnections(genOpenCalMessage())
 	}
@@ -185,7 +187,7 @@ func UpdateCalendar(cal Calendar, message CalMessage) string {
 }
 
 func WriteCalendar(cal Calendar) {
-	infoLog.Println("Saving Calendar")
+	InfoLog.Println("Saving Calendar")
 	err := os.Truncate(CalendarFile, 0)
 	if err != nil {
 		ErrLog("Failed to truncate file // TODO: THIS SHOULD BE REMOVED", err)
@@ -211,13 +213,13 @@ func WriteCalendar(cal Calendar) {
 }
 
 func resetCalendar() {
-	stateCalendar = InitCalendarDefault()
-	WriteCalendar(stateCalendar);
+	StateCalendar = InitCalendarDefault()
+	WriteCalendar(StateCalendar);
 }
 
 func genOpenCalMessage() CalMessage {
 	m := ""
-	for _, s := range stateCalendar.Day {
+	for _, s := range StateCalendar.Day {
 		for _, k := range s {
 			m += strconv.Itoa(k)
 		}

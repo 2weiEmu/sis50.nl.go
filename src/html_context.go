@@ -27,12 +27,12 @@ type HTMLContext struct {
 
 func (ctx *HTMLContext) HandleIndex(w http.ResponseWriter, r *http.Request) {
 	var titleMsg string
-	pagesLength := len(allMessagesList.Pages)
+	pagesLength := len(AllMessagesList.Pages)
 	if pagesLength == 0 {
 		titleMsg = "No messages."
 	} else {
-		titleMsg = allMessagesList.Pages[pagesLength - 1].Message[
-			len(allMessagesList.Pages[pagesLength - 1].Message) - 1]
+		titleMsg = AllMessagesList.Pages[pagesLength - 1].Message[
+			len(AllMessagesList.Pages[pagesLength - 1].Message) - 1]
 	}
 
 	userId, err := GetUserIdFromCookie(r)

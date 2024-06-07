@@ -14,11 +14,11 @@ type LocalErr struct {
 }
 
 func ErrLog(text string, err error) LocalErr {
-	if errorLog == nil {
+	if ErrorLog == nil {
 		return LocalErr{}
 	}
 	_, file, no, _ := runtime.Caller(1)
-	errorLog.Println("[IN ", file, ":", no, "]", text)
+	ErrorLog.Println("[IN ", file, ":", no, "]", text)
 
 	if err == nil {
 		err = errors.New(text)
@@ -35,7 +35,7 @@ func (err LocalErr) Error() string {
 }
 
 func errorLogAndHttpStat(writer http.ResponseWriter, err error) {
-	errorLog.Println(err)
+	ErrorLog.Println(err)
 	http.Error(
 		writer, err.Error(), http.StatusInternalServerError)
 }
