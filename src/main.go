@@ -51,7 +51,8 @@ func main() {
 		secure = "ssl"
 	} 
 
-	HTMLctx, err := NewHTMLContext(loggerFlags, logFile, secure, *paramWebSocketConn)
+	HTMLctx, err := NewHTMLContext(
+		loggerFlags, logFile, secure, *paramWebSocketConn)
 	if err != nil {
 		fmt.Println("[ERROR] Could not create html context", err)
 		panic("Nope, no context")
@@ -60,29 +61,39 @@ func main() {
 	calHdl := NewCalendarHandler(loggerFlags, logFile)
 
 	router := mux.NewRouter()
-	router.Handle("/dayWS", NewUserAuthenticator(websocket.Handler(calHdl.HandleCalendarWebsocket)))
-	router.Handle("/shopWS", NewUserAuthenticator(websocket.Handler(ShoppingListWebsocketHandler)))
+	router.Handle("/dayWS",
+		NewUserAuthenticator(websocket.Handler(calHdl.HandleCalendarWebsocket)))
+	router.Handle("/shopWS",
+		NewUserAuthenticator(websocket.Handler(ShoppingListWebsocketHandler)))
 
-	router.Handle("/profile", NewUserAuthenticator(HandleFuncAsHandle(ReceiveUserProfileImage))).Methods("POST")
+	router.Handle("/profile",
+		NewUserAuthenticator(HandleFuncAsHandle(ReceiveUserProfileImage))).
+		Methods("POST")
 	router.HandleFunc("/api/messages/{pageNumber}", GETMessages).Methods("GET")
 	router.HandleFunc("/api/messages", POSTMessage).Methods("POST")
 	router.HandleFunc("/login", LoginUserPost).Methods("POST")
-	router.Handle("/logout", NewUserAuthenticator(HandleFuncAsHandle(LogoutUserPost))).Methods("POST")
-	// this has to be wrapped with an auth because otherwise if you do it right you
-	// can log out arbitrary users	
+	router.Handle("/logout", 
+		NewUserAuthenticator(HandleFuncAsHandle(LogoutUserPost))).
+		Methods("POST")
+	// this has to be wrapped with an auth because otherwise if you do it 
+	// right you can log out arbitrary users	
 
-	router.Handle("/", NewUserAuthenticator(HandleFuncAsHandle(HTMLctx.HandleIndex)))
+	router.Handle("/", 
+		NewUserAuthenticator(HandleFuncAsHandle(HTMLctx.HandleIndex)))
 	router.HandleFunc("/login", HTMLctx.HandleLogin)
-	router.Handle("/{page}", NewUserAuthenticator(HandleFuncAsHandle(HTMLctx.HandlePage)))
+	router.Handle("/{page}",
+		NewUserAuthenticator(HandleFuncAsHandle(HTMLctx.HandlePage)))
 	// TODO: make above use file sever?
 
 	http.Handle("/", router)
 
 	// ok so apparently this doesn't work with router.Handle???
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(cssDir)))
-	http.Handle("/images/", http.StripPrefix("/images/", http.FileServer(imgDir)))
+	http.Handle("/images/",
+		http.StripPrefix("/images/", http.FileServer(imgDir)))
 	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(jsDir)))
-	http.Handle("/fonts/", http.StripPrefix("/fonts/", http.FileServer(fontsDir)))
+	http.Handle("/fonts/", 
+		http.StripPrefix("/fonts/", http.FileServer(fontsDir)))
 	
 	// go weeklyResetTimer()
 	go calHdl.ShiftCalendarDaily()

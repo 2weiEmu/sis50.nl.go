@@ -1,6 +1,6 @@
 module github.com/2weiEmu/sis50.nl.go
 
-go 1.20
+go 1.22.3
 
 require (
 	github.com/benlubar/htmlcleaner v3.1.0+incompatible

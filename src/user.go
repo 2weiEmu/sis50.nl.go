@@ -6,4 +6,3 @@ type User struct {
 	HashedPassword string;
 }
 
-
