@@ -9,6 +9,8 @@ import (
 	"slices"
 	"strconv"
 
+	"github.com/2weiEmu/sis50.nl.go/pkg/auth"
+	"github.com/2weiEmu/sis50.nl.go/pkg/lerror"
 	"github.com/gorilla/mux"
 )
 
@@ -35,9 +37,9 @@ func (ctx *HTMLContext) HandleIndex(w http.ResponseWriter, r *http.Request) {
 			len(AllMessagesList.Pages[pagesLength - 1].Message) - 1]
 	}
 
-	userId, err := GetUserIdFromCookie(r)
+	userId, err := auth.GetUserIdFromCookie(r)
 	if err != nil {
-		WriteInternalServerError(w, r, err.Error())
+		lerror.WriteInternalServerError(w, r, err.Error())
 		return
 	}
 
@@ -48,7 +50,7 @@ func (ctx *HTMLContext) HandleIndex(w http.ResponseWriter, r *http.Request) {
 	})
 	if err != nil {
 		// TODO: move around logging
-		// ErrLog("Failed to execute index template", err)
+		// lerror.ErrLog("Failed to execute index template", err)
 		ctx.ErrorLog.Println("Failed to execute index template")
 	}
 }
@@ -60,16 +62,16 @@ func (ctx *HTMLContext) HandleLogin(w http.ResponseWriter, r *http.Request) {
 	pageLocation := "src/static/templates/login.html"
 	tmpl, err := template.ParseFiles(pageLocation)
 	if err != nil {
-		ErrLog("Could not parse template file for page", err)
-		WriteInternalServerError(w, r, "Failed to parse the login template file")
+		lerror.ErrLog("Could not parse template file for page", err)
+		lerror.WriteInternalServerError(w, r, "Failed to parse the login template file")
 		return
 	}
 	
 	fmt.Println("Javascript Arguments before Executing:", jsArguments)
 	err = tmpl.Execute(w, jsArguments)
 	if err != nil {
-		ErrLog("Could not execute template file", err)
-		WriteInternalServerError(w, r, "Failed to execute the login template")
+		lerror.ErrLog("Could not execute template file", err)
+		lerror.WriteInternalServerError(w, r, "Failed to execute the login template")
 	}
 }
 
@@ -78,22 +80,22 @@ func (ctx *HTMLContext) HandlePage(w http.ResponseWriter, r *http.Request) {
 	page := vars["page"]
 	jsArguments := ctx.ConnectionLocation + " " + ctx.Secure
 
-	if !slices.Contains(getValidPages(), page) {
-		WriteNotFound(w, r, "This doesn't seem to be a valid page")
+	if !slices.Contains(GetValidPages(), page) {
+		lerror.WriteNotFound(w, r, "This doesn't seem to be a valid page")
 		return
 	}
 
 	pageLocation := "src/static/templates/" + page + ".html"
 	tmpl, err := template.ParseFiles(pageLocation)
 	if err != nil {
-		ErrLog("Could not parse template file for page", err)
-		WriteInternalServerError(w, r, "Failed to parse the page template file")
+		lerror.ErrLog("Could not parse template file for page", err)
+		lerror.WriteInternalServerError(w, r, "Failed to parse the page template file")
 		return
 	}
 
-	userId, err := GetUserIdFromCookie(r)
+	userId, err := auth.GetUserIdFromCookie(r)
 	if err != nil {
-		WriteInternalServerError(w, r, err.Error())
+		lerror.WriteInternalServerError(w, r, err.Error())
 		return
 	}
 	
@@ -103,8 +105,8 @@ func (ctx *HTMLContext) HandlePage(w http.ResponseWriter, r *http.Request) {
 		ProfilePicture: strconv.Itoa(userId),
 	})
 	if err != nil {
-		ErrLog("Could not execute template file", err)
-		WriteInternalServerError(w, r, "Failed to execute the page template")
+		lerror.ErrLog("Could not execute template file", err)
+		lerror.WriteInternalServerError(w, r, "Failed to execute the page template")
 	}
 }
 

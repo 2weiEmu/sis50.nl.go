@@ -1,4 +1,4 @@
-package src
+package auth
 
 import (
 	"crypto/aes"
@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/mattn/go-sqlite3"
+	"github.com/2weiEmu/sis50.nl.go/pkg/lerror"
 )
 
 var conn sqlite3.SQLiteConn
@@ -54,12 +55,12 @@ type UserAuthWrapper struct {
 func (u UserAuthWrapper) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	sessionval, err := ReadPrivate(r, "sis50session")
 	if err != nil {
-		WriteUnauthorized(w, r, err.Error())
+		lerror.WriteUnauthorized(w, r, err.Error())
 		return
 	}
 	err = u.VerifySessionToken(sessionval)
 	if err != nil {
-		WriteUnauthorized(w, r, "Failed to verify the session")
+		lerror.WriteUnauthorized(w, r, "Failed to verify the session")
 		return
 	}
 

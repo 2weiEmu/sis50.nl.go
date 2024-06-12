@@ -4,6 +4,8 @@ import (
 	"strconv"
 
 	"github.com/benlubar/htmlcleaner"
+	"github.com/2weiEmu/sis50.nl.go/pkg/lerror"
+	"github.com/2weiEmu/sis50.nl.go/pkg/logger"
 	"golang.org/x/net/websocket"
 )
 
@@ -28,7 +30,7 @@ func (item *ShoppingItem) Serialize() []string {
 func GetIdCount() int {
 	indexList, err := ReadFromFile()
 	if err != nil {
-		ErrLog("Failed reading from file when getting id count", err)
+		lerror.ErrLog("Failed reading from file when getting id count", err)
 	}
 
 	id := 0;
@@ -43,7 +45,7 @@ func GetIdCount() int {
 }
 
 func ShoppingListWebsocketHandler(conn *websocket.Conn) {
-	InfoLog.Println("Using Shopping Websocket Handler")
+	logger.InfoLog.Println("Using Shopping Websocket Handler")
 	webSocketShopConnections = append(webSocketShopConnections, conn)
 
 	var message ShoppingItem
@@ -51,23 +53,23 @@ func ShoppingListWebsocketHandler(conn *websocket.Conn) {
 	for {
 		err := websocket.JSON.Receive(conn, &message)
 		if err != nil {
-			ErrLog("Failed to read websocket JSON", err)
+			lerror.ErrLog("Failed to read websocket JSON", err)
 			break
 		}
 
-		InfoLog.Println("Message received:", message)
+		logger.InfoLog.Println("Message received:", message)
 		ShopItemList, err = ReadFromFile()
 		if err != nil {
-			ErrLog("Failed to re-read shopping list from file", err)
+			lerror.ErrLog("Failed to re-read shopping list from file", err)
 			break
 		}
 
 		message.Content = htmlcleaner.Clean(nil, message.Content)
 
-		keyword, prs := shoppingActionMap[message.Action]
+		keyword, prs := ShoppingActionMap[message.Action]
 
 		if !prs {
-			ErrLog("Action wasn't valid", nil)
+			lerror.ErrLog("Action wasn't valid", nil)
 			break
 		}
 
@@ -81,34 +83,34 @@ func ShoppingListWebsocketHandler(conn *websocket.Conn) {
 			case REMOVE:
 				err := ShopItemList.RemoveByItemId(message.Id)
 				if err != nil {
-					ErrLog("Failed to remove shopping item by id", err)
+					lerror.ErrLog("Failed to remove shopping item by id", err)
 					break
 				}
 				
 			case EDIT:
 				err = ShopItemList.EditMessageById(message.Id, message.Content)
 				if err != nil {
-					ErrLog("Could not edit message by id", err)
+					lerror.ErrLog("Could not edit message by id", err)
 					break
 				}
 
 			case REARRANGE:
 				newIdx, err := strconv.Atoi(message.Content)
 				if err != nil {
-					ErrLog("Failed to convert message content when rearranging", err)
+					lerror.ErrLog("Failed to convert message content when rearranging", err)
 					break
 				}
 
 				err = ShopItemList.MoveToNewIndexById(message.Id, newIdx)
 				if err != nil {
-					ErrLog("Failed to move to new index", err)
+					lerror.ErrLog("Failed to move to new index", err)
 					break
 				}
 			}
 
 			err = ShopItemList.WriteToFile()
 			if err != nil {
-				ErrLog("Failed to write shopping list to file", err)
+				lerror.ErrLog("Failed to write shopping list to file", err)
 				break
 			}
 
@@ -116,21 +118,21 @@ func ShoppingListWebsocketHandler(conn *websocket.Conn) {
 				err = websocket.JSON.Send(wsConn, message)
 			}
 			if err != nil {
-				ErrLog("Failed to broadcast to other connections", err)
+				lerror.ErrLog("Failed to broadcast to other connections", err)
 				break
 			}
 
 		} else {
-			InfoLog.Println("Sending new opening websocket")
+			logger.InfoLog.Println("Sending new opening websocket")
 
 			for _, item := range ShopItemList.Ordered() {
 				err := websocket.JSON.Send(conn, item)
 				if err != nil {
-					ErrLog("Failed to send opening shopping list statement", err)
+					lerror.ErrLog("Failed to send opening shopping list statement", err)
 					break
 				}
 			}
-			InfoLog.Println("Completed sending opening")
+			logger.InfoLog.Println("Completed sending opening")
 		}
 
 	}

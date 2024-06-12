@@ -7,8 +7,12 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"github.com/2weiEmu/sis50.nl.go/src"
 
+	"github.com/2weiEmu/sis50.nl.go/pkg/calendar"
+	"github.com/2weiEmu/sis50.nl.go/pkg/auth"
+	"github.com/2weiEmu/sis50.nl.go/pkg/logger"
+	"github.com/2weiEmu/sis50.nl.go/pkg/lerror"
+	"github.com/2weiEmu/sis50.nl.go/src"
 	"github.com/gorilla/mux"
 	"golang.org/x/net/websocket"
 )
@@ -32,9 +36,9 @@ func main() {
 	}
 	defer logFile.Close()
 
-	src.InfoLog = log.New(logFile, "[INFO] ", src.LoggerFlags)
-	src.RequestLog = log.New(logFile, "[REQUEST] ", src.LoggerFlags)
-	src.ErrorLog = log.New(logFile, "[ERROR] ", src.LoggerFlags)
+	logger.InfoLog = log.New(logFile, "[INFO] ", logger.LoggerFlags)
+	logger.RequestLog = log.New(logFile, "[REQUEST] ", logger.LoggerFlags)
+	logger.ErrorLog = log.New(logFile, "[ERROR] ", logger.LoggerFlags)
 
 	cssDir := http.Dir("src/static/css")
 	imgDir := http.Dir("src/static/images")
@@ -47,37 +51,37 @@ func main() {
 	} 
 
 	HTMLctx, err := src.NewHTMLContext(
-		src.LoggerFlags, logFile, secure, *paramWebSocketConn)
+		logger.LoggerFlags, logFile, secure, *paramWebSocketConn)
 	if err != nil {
 		fmt.Println("[ERROR] Could not create html context", err)
 		panic("Nope, no context")
 	}
 
-	calHdl := src.NewCalendarHandler(src.LoggerFlags, logFile)
+	calHdl := calendar.NewCalendarHandler(logger.LoggerFlags, logFile)
 
 	router := mux.NewRouter()
 	router.Handle("/dayWS",
-		src.NewUserAuthenticator(websocket.Handler(calHdl.HandleCalendarWebsocket)))
+		auth.NewUserAuthenticator(websocket.Handler(calHdl.HandleCalendarWebsocket)))
 	router.Handle("/shopWS",
-		src.NewUserAuthenticator(websocket.Handler(src.ShoppingListWebsocketHandler)))
+		auth.NewUserAuthenticator(websocket.Handler(src.ShoppingListWebsocketHandler)))
 
-	router.Handle("/profile",
-		src.NewUserAuthenticator(src.HandleFuncAsHandle(src.ReceiveUserProfileImage))).
+	router.Handle("/calendar",
+		auth.NewUserAuthenticator(src.HandleFuncAsHandle(src.ReceiveUserProfileImage))).
 		Methods("POST")
 	router.HandleFunc("/api/messages/{pageNumber}", src.GETMessages).Methods("GET")
 	router.HandleFunc("/api/messages", src.POSTMessage).Methods("POST")
 	router.HandleFunc("/login", src.LoginUserPost).Methods("POST")
 	router.Handle("/logout", 
-		src.NewUserAuthenticator(src.HandleFuncAsHandle(src.LogoutUserPost))).
+		auth.NewUserAuthenticator(src.HandleFuncAsHandle(src.LogoutUserPost))).
 		Methods("POST")
 	// this has to be wrapped with an auth because otherwise if you do it 
 	// right you can log out arbitrary users	
 
 	router.Handle("/", 
-		src.NewUserAuthenticator(src.HandleFuncAsHandle(HTMLctx.HandleIndex)))
+		auth.NewUserAuthenticator(src.HandleFuncAsHandle(HTMLctx.HandleIndex)))
 	router.HandleFunc("/login", HTMLctx.HandleLogin)
 	router.Handle("/{page}",
-		src.NewUserAuthenticator(src.HandleFuncAsHandle(HTMLctx.HandlePage)))
+		auth.NewUserAuthenticator(src.HandleFuncAsHandle(HTMLctx.HandlePage)))
 	// TODO: make above use file sever?
 
 	http.Handle("/", router)
@@ -104,7 +108,7 @@ func main() {
 	}
 
 	if err != nil {
-		src.ErrLog("Listen and serve failed with:", err)
+		lerror.ErrLog("Listen and serve failed with:", err)
 	}
 }
 

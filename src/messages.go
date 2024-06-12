@@ -9,6 +9,8 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/2weiEmu/sis50.nl.go/pkg/lerror"
+	"github.com/2weiEmu/sis50.nl.go/pkg/logger"
 )
 
 var AllMessagesList, _ = ReadMessages(MessageList{});
@@ -24,24 +26,24 @@ type MessageList struct {
 // GET pages of Messages
 // POST a new message to a page, and save this
 func GETMessages(writer http.ResponseWriter, request *http.Request) {
-	InfoLog.Println("Get Messages Request")
+	logger.InfoLog.Println("Get Messages Request")
 
 	_, err := ReadMessages(AllMessagesList)
 	if err != nil {
-		errorLogAndHttpStat(writer, err)
+		lerror.ErrorLogAndHttpStat(writer, err)
 		return
 	}
 
 	vars := mux.Vars(request)
 	pageNumber, err := strconv.Atoi(vars["pageNumber"])
 	if err != nil {
-		errorLogAndHttpStat(writer, err)
+		lerror.ErrorLogAndHttpStat(writer, err)
 		return
 	}
 
 	page := getMessageJson(pageNumber)
 	if page == nil {
-		InfoLog.Println("messages.go: Could not get more messages")
+		logger.InfoLog.Println("messages.go: Could not get more messages")
 		http.Error(
 			writer, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
@@ -61,17 +63,17 @@ func getMessageJson(pageNumber int) []byte {
 }
 
 func POSTMessage(writer http.ResponseWriter, request *http.Request) {
-	InfoLog.Println("POSTing message")
+	logger.InfoLog.Println("POSTing message")
 	allMessagesList, err := ReadMessages(AllMessagesList)
 	if err != nil {
-		errorLogAndHttpStat(writer, err)
+		lerror.ErrorLogAndHttpStat(writer, err)
 		return
 	}
 
 	var msgPost string
 	err = json.NewDecoder(request.Body).Decode(&msgPost)
 	if err != nil {
-		errorLogAndHttpStat(writer, err)
+		lerror.ErrorLogAndHttpStat(writer, err)
 		return
 	}
 
@@ -106,29 +108,29 @@ func addMessageToList(message string) error {
 func saveMessages(messageList MessageList) {
 	err := os.Truncate(MessageFile, 0)
 	if err != nil {
-		ErrLog("Failed to truncate message file", err)
+		lerror.ErrLog("Failed to truncate message file", err)
 	}
 
 	file, err := os.OpenFile(
 		MessageFile, os.O_RDWR | os.O_APPEND, os.ModeAppend)
 	if err != nil {
-		ErrLog("Failed to open message file", err)
+		lerror.ErrLog("Failed to open message file", err)
 	}
 	defer file.Close()
 
 	csvWriter := csv.NewWriter(file)
 
 	for _, page := range messageList.Pages {
-		InfoLog.Println("Writing Page:", page)
+		logger.InfoLog.Println("Writing Page:", page)
 		err = csvWriter.Write(page.Message)
 		if err != nil {
-			ErrLog("CSV writer failed when writing a message", err)
+			lerror.ErrLog("CSV writer failed when writing a message", err)
 		}
 	}
 	csvWriter.Flush()
 	err = csvWriter.Error()
 	if err != nil {
-		ErrLog("The CSV writer errored in some way:", err)
+		lerror.ErrLog("The CSV writer errored in some way:", err)
 	}
 
 }
@@ -137,7 +139,7 @@ func ReadMessages(messageList MessageList) (MessageList, error) {
 	file, err := os.OpenFile(
 		MessageFile, os.O_RDWR | os.O_APPEND, os.ModeAppend)
 	if err != nil {
-		return MessageList{}, ErrLog("Could not open message file", err)
+		return MessageList{}, lerror.ErrLog("Could not open message file", err)
 	}
 	defer file.Close()
 
@@ -145,7 +147,7 @@ func ReadMessages(messageList MessageList) (MessageList, error) {
 	csvr.FieldsPerRecord = -1
 	records, err := csvr.ReadAll()
 	if err != nil {
-		return MessageList{}, ErrLog("Failed with record err", err)
+		return MessageList{}, lerror.ErrLog("Failed with record err", err)
 	}
 
 	messageList.Pages = []MessagePage{}

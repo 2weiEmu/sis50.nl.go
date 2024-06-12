@@ -4,6 +4,8 @@ import (
 	"encoding/csv"
 	"os"
 	"strconv"
+
+	"github.com/2weiEmu/sis50.nl.go/pkg/lerror"
 )
 
 type IndexNode struct {
@@ -33,7 +35,7 @@ func (list *IndexList) Length() int {
 func (list *IndexList) RemoveByItemId(id int) error {
 	idx := list.IndexOfId(id)
 	if idx == -1 {
-		return ErrLog("Couldn't remove item", nil)
+		return lerror.ErrLog("Couldn't remove item", nil)
 	}
 
 	ridx := list.indexList[idx].index
@@ -60,7 +62,7 @@ func (list *IndexList) IndexOfId(id int) int {
 func (list *IndexList) EditMessageById(id int, newContent string) error {
 	idx := list.IndexOfId(id)
 	if idx == -1 {
-		return ErrLog("Could not edit message using Id, id not found", nil)
+		return lerror.ErrLog("Could not edit message using Id, id not found", nil)
 	}
 
 	list.indexList[idx].value.Content = newContent
@@ -72,7 +74,7 @@ func (list *IndexList) MoveToNewIndexById(id int, newIndex int) error {
 	oldIndex := list.indexList[idx].index
 
 	if idx == -1 {
-		return ErrLog("Id not found when moving", nil)
+		return lerror.ErrLog("Id not found when moving", nil)
 	}
 
 	// if the old index was at the top of the list, we have to shift things up
@@ -97,13 +99,13 @@ func (list *IndexList) MoveToNewIndexById(id int, newIndex int) error {
 func (list *IndexList) WriteToFile() error {
 	err := os.Truncate(ShoppingFile, 0)
 	if err != nil {
-		return ErrLog("Failed to truncate shopping file", err)
+		return lerror.ErrLog("Failed to truncate shopping file", err)
 	}
 
 	file, err := os.OpenFile(
 		ShoppingFile, os.O_RDWR | os.O_APPEND, os.ModeAppend)
 	if err != nil {
-		return ErrLog("Failed to open shopping file for writing", err)
+		return lerror.ErrLog("Failed to open shopping file for writing", err)
 	}
 	defer file.Close()
 
@@ -112,14 +114,14 @@ func (list *IndexList) WriteToFile() error {
 	for _, item := range list.indexList {
 		err := writer.Write(item.Serialize())
 		if err != nil {
-			return ErrLog("Something went wrong writing to the file", err)
+			return lerror.ErrLog("Something went wrong writing to the file", err)
 		}
 	}
 
 	writer.Flush()
 	err = writer.Error()
 	if err != nil {
-		return ErrLog("The writer experienced an error when writing", err)
+		return lerror.ErrLog("The writer experienced an error when writing", err)
 	}
 	return nil
 }
@@ -135,7 +137,7 @@ func ReadFromFile() (IndexList, error) {
 		ShoppingFile, os.O_RDWR | os.O_APPEND, os.ModeAppend)
 	if err != nil {
 		return IndexList{}, 
-			ErrLog(
+			lerror.ErrLog(
 				"Something went wrong when opening the file for reading", err)
 	}
 	defer file.Close()
@@ -145,7 +147,7 @@ func ReadFromFile() (IndexList, error) {
 
 	records, err := reader.ReadAll()
 	if err != nil {
-		return IndexList{}, ErrLog("Reader failed reading all records", err)
+		return IndexList{}, lerror.ErrLog("Reader failed reading all records", err)
 	}
 
 	list := NewIndexList()
@@ -153,7 +155,7 @@ func ReadFromFile() (IndexList, error) {
 	for _, record := range records {
 		deserialized, err := Deserialize(record)
 		if err != nil {
-			return IndexList{}, ErrLog("Failed to deserialize record", err)
+			return IndexList{}, lerror.ErrLog("Failed to deserialize record", err)
 		}
 
 		list.indexList = append(list.indexList, deserialized)
@@ -178,12 +180,12 @@ func (list *IndexList) Ordered() []ShoppingItem {
 func Deserialize(serial []string) (IndexNode, error) {
 	index, err := strconv.Atoi(serial[3])
 	if err != nil {
-		return IndexNode{}, ErrLog("Failed to convert index from file", err)
+		return IndexNode{}, lerror.ErrLog("Failed to convert index from file", err)
 	}
 
 	itemId, err := strconv.Atoi(serial[0])
 	if err != nil {
-		return IndexNode{}, ErrLog("Failed to convert item id from file", err)
+		return IndexNode{}, lerror.ErrLog("Failed to convert item id from file", err)
 	}
 
 	return IndexNode {

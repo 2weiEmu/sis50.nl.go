@@ -1,4 +1,4 @@
-package src
+package lerror
 
 import (
 	"errors"
@@ -6,6 +6,8 @@ import (
 	"html/template"
 	"net/http"
 	"runtime"
+
+	"github.com/2weiEmu/sis50.nl.go/pkg/logger"
 )
 
 type LocalErr struct {
@@ -14,11 +16,8 @@ type LocalErr struct {
 }
 
 func ErrLog(text string, err error) LocalErr {
-	if ErrorLog == nil {
-		return LocalErr{}
-	}
 	_, file, no, _ := runtime.Caller(1)
-	ErrorLog.Println("[IN ", file, ":", no, "]", text)
+	logger.ErrorLog.Println("[IN ", file, ":", no, "]", text)
 
 	if err == nil {
 		err = errors.New(text)
@@ -34,8 +33,8 @@ func (err LocalErr) Error() string {
 	return fmt.Sprintf("MessagesError %s, with: %v", err.Message, err.Err)
 }
 
-func errorLogAndHttpStat(writer http.ResponseWriter, err error) {
-	ErrorLog.Println(err)
+func ErrorLogAndHttpStat(writer http.ResponseWriter, err error) {
+	logger.ErrorLog.Println(err)
 	http.Error(
 		writer, err.Error(), http.StatusInternalServerError)
 }

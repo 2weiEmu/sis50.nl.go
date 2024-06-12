@@ -14,7 +14,7 @@ const UserCount = 4
 
 // TODO: i should probably find a better way to do this, and this will change
 // with user permissions as well of course but who knows for now this is fine
-func getValidPages() []string {
+func GetValidPages() []string {
 	return []string{
 		"messages", 
 		"help",
@@ -23,7 +23,7 @@ func getValidPages() []string {
 	}
 }
 
-func getStateList() []string {
+func GetStateList() []string {
 	return []string{
 		"present", 
 		"absent",
@@ -34,7 +34,7 @@ func getStateList() []string {
 	}
 }
 
-func getPersonList() []string {
+func GetPersonList() []string {
 	return []string{
 		"rick",
 		"youri", 
@@ -43,7 +43,7 @@ func getPersonList() []string {
 	}
 }
 
-func getDayList() []string {
+func GetDayList() []string {
 	return []string{
 		"ma",
 		"di",
@@ -64,7 +64,7 @@ const (
 	REARRANGE
 )
 
-var shoppingActionMap = map[string]int{
+var ShoppingActionMap = map[string]int{
 	"add": ADD,
 	"open-shopping": OPEN,
 	"remove": REMOVE,

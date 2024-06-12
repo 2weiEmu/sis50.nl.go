@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/matthewhartstonge/argon2"
+	"github.com/2weiEmu/sis50.nl.go/pkg/auth"
 )
 
 type LoginData struct {
@@ -62,14 +63,14 @@ func LoginUserPost(w http.ResponseWriter, r *http.Request) {
 	
 	if ok {
 		sessionToken := MakeRandomString(64)
-		sessionCookie := MakeSessionCookie(userId, string(sessionToken))
+		sessionCookie := auth.MakeSessionCookie(userId, string(sessionToken))
 		_, err = db.Exec("INSERT INTO sessions (user_id, session_token) VALUES (? , ?)", userId, string(sessionToken))
 		if err != nil {
 			// im stupid we dont need the templates in the login post handler
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		err = WritePrivate(w, sessionCookie)
+		err = auth.WritePrivate(w, sessionCookie)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -88,7 +89,7 @@ func LogoutUserPost(w http.ResponseWriter, r *http.Request) {
 	}
 	defer db.Close()
 
-	userId, err := GetUserIdFromCookie(r)
+	userId, err := auth.GetUserIdFromCookie(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -101,7 +102,7 @@ func LogoutUserPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// i dont think we have to delete the cookie but its probably good practice
-	DeleteCookie(w, "sis50session")
+	auth.DeleteCookie(w, "sis50session")
 	w.WriteHeader(http.StatusOK)
 }
 

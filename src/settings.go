@@ -5,6 +5,9 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+
+	"github.com/2weiEmu/sis50.nl.go/pkg/lerror"
+	"github.com/2weiEmu/sis50.nl.go/pkg/auth"
 )
 
 func ReceiveUserProfileImage(w http.ResponseWriter, r *http.Request) {
@@ -13,7 +16,7 @@ func ReceiveUserProfileImage(w http.ResponseWriter, r *http.Request) {
 	file, handle, err := r.FormFile("profile-image")
 	if err != nil {
 		fmt.Println(err.Error())
-		WriteInternalServerError(w, r, err.Error())
+		lerror.WriteInternalServerError(w, r, err.Error())
 		return
 	}
 	defer file.Close()
@@ -21,7 +24,7 @@ func ReceiveUserProfileImage(w http.ResponseWriter, r *http.Request) {
 	mimeType := handle.Header.Get("Content-Type")
 	if mimeType != "image/png" {
 		fmt.Println("bad file type")
-		WriteInternalServerError(w, r, "incorrect file type")
+		lerror.WriteInternalServerError(w, r, "incorrect file type")
 		return
 	}
 	
@@ -30,21 +33,21 @@ func ReceiveUserProfileImage(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(readCount)
 	if err != nil {
 		fmt.Println(err.Error())
-		WriteInternalServerError(w, r, err.Error())
+		lerror.WriteInternalServerError(w, r, err.Error())
 		return
 	}
 
-	id, err := GetUserIdFromCookie(r)
+	id, err := auth.GetUserIdFromCookie(r)
 	if err != nil {
 		fmt.Println(err.Error())
-		WriteInternalServerError(w, r, err.Error())
+		lerror.WriteInternalServerError(w, r, err.Error())
 		return
 	}
 
 	f, err := os.Create("./src/static/images/profiles/" + strconv.Itoa(id) + ".png")
 	if err != nil {
 		fmt.Println(err.Error())
-		WriteInternalServerError(w, r, err.Error())
+		lerror.WriteInternalServerError(w, r, err.Error())
 		return
 	}
 	defer f.Close()
@@ -52,7 +55,7 @@ func ReceiveUserProfileImage(w http.ResponseWriter, r *http.Request) {
 	f.Sync()
 	if err != nil {
 		fmt.Println(err.Error())
-		WriteInternalServerError(w, r, err.Error())
+		lerror.WriteInternalServerError(w, r, err.Error())
 		return
 	}
 
