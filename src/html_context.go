@@ -12,6 +12,8 @@ import (
 	"github.com/2weiEmu/sis50.nl.go/pkg/auth"
 	c "github.com/2weiEmu/sis50.nl.go/pkg/constants"
 	"github.com/2weiEmu/sis50.nl.go/pkg/lerror"
+	"github.com/2weiEmu/sis50.nl.go/pkg/lformatting"
+	"github.com/2weiEmu/sis50.nl.go/pkg/calendar"
 	"github.com/gorilla/mux"
 )
 
@@ -19,6 +21,7 @@ type IndexPageStruct struct {
 	Message string
 	Args string
 	ProfilePicture string
+	OuterCookTable template.HTML
 }
 
 type HTMLContext struct {
@@ -45,6 +48,7 @@ func (ctx *HTMLContext) HandleIndex(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = ctx.IndexTemplate.Execute(w, IndexPageStruct{
+		OuterCookTable: template.HTML(lformatting.IndexPageTable(&calendar.StateCalendar)),
 		Message: titleMsg,
 		Args: ctx.ConnectionLocation + " " + ctx.Secure,
 		ProfilePicture: strconv.Itoa(userId),

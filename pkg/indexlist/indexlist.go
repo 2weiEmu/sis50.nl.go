@@ -310,7 +310,7 @@ func ShoppingListWebsocketHandler(conn *websocket.Conn) {
 		}
 
 	}
-	src.WebSocketShopConnections = src.RemoveWebsocketFromPool(
+	src.WebSocketShopConnections = n.RemoveWebsocketFromPool(
 		conn, src.WebSocketShopConnections)
 	conn.Close()
 }

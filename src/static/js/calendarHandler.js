@@ -22,14 +22,10 @@ function makeCalMsg(day, person, state) {
 	})
 }
 
-dayWebsocket.onopen = () => {
-	dayWebsocket.send(makeCalMsg("", "", "open-calendar"))
-}
-
 function handleGridClick() {
 	let day = this.getAttribute("data-day")
 	let person = this.getAttribute("data-person")
-	let state = this.childNodes[0].getAttribute("data-state")
+	let state = this.children[0].getAttribute("data-state")
 	dayWebsocket.send(makeCalMsg(day, person, state))
 }
 
@@ -48,7 +44,8 @@ function handleGridMenu(event) {
 for (var i = 0; i < gridElList.length; i++) {
 	gridElList[i].addEventListener("click", handleGridClick)
 	gridElList[i].addEventListener("contextmenu", handleGridMenu)
-	gridElList[i].childNodes[0].setAttribute("draggable", false)
+	gridElList[i].children[0].setAttribute("draggable", false)
+	console.log(gridElList[i])
 }
 
 dayWebsocket.onmessage = async function(event) {
@@ -57,7 +54,7 @@ dayWebsocket.onmessage = async function(event) {
 	if (message.state != "open-calendar") {
 		// Update the day's state
 		var el = document.getElementsByClassName(`${message.person} ${message.day}`)[0]
-		let state_image = el.childNodes[0]
+		let state_image = el.children[0]
 
 		// TODO: move this to CSS
 		state_image.style.width = "0"
@@ -95,9 +92,9 @@ dayWebsocket.onmessage = async function(event) {
 				var el = document.getElementsByClassName(`${person} ${day}`)[0]
 				console.log(el)
 				console.log(`[INFO] day_states[j] ${day_states[j]}`)
-				el.childNodes[0].setAttribute("data-state", newState) 
-				el.childNodes[0].src = "/images/" + newState + ".svg"
-				el.childNodes[0].title = altTextList[day_states[j]]
+				el.children[0].setAttribute("data-state", newState) 
+				el.children[0].src = "/images/" + newState + ".svg"
+				el.children[0].title = altTextList[day_states[j]]
 			}
 		}
 	}
