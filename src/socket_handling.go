@@ -5,7 +5,7 @@ import (
 	"github.com/2weiEmu/sis50.nl.go/pkg/lerror"
 )
 
-var webSocketShopConnections []*websocket.Conn
+var WebSocketShopConnections []*websocket.Conn
 
 func RemoveWebsocketFromPool(conn *websocket.Conn, list []*websocket.Conn) []*websocket.Conn {
 	i := -1

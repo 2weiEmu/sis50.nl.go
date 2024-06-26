@@ -12,6 +12,7 @@ import (
 	"golang.org/x/net/websocket"
 	"github.com/2weiEmu/sis50.nl.go/src"
 	"github.com/2weiEmu/sis50.nl.go/pkg/logger"
+	c "github.com/2weiEmu/sis50.nl.go/pkg/constants"
 	"github.com/2weiEmu/sis50.nl.go/pkg/lerror"
 )
 
@@ -92,14 +93,14 @@ func (handler *CalendarHandler) ShiftCalendarDaily() {
 func shiftCalendar() Calendar {
 	cal := ReadCalendar(InitCalendarDefault())
 
-	for d := 0; d < len(src.GetDayList()) - 1; d++ {
-		for s := 0; s < len(src.GetPersonList()); s++ {
+	for d := 0; d < len(c.GetDayList()) - 1; d++ {
+		for s := 0; s < len(c.GetPersonList()); s++ {
 			cal.Day[d][s] = cal.Day[d+1][s];
 		}
 	}
 
-	lastDay := len(src.GetDayList()) - 1
-	for s := 0; s < len(src.GetPersonList()); s++ {
+	lastDay := len(c.GetDayList()) - 1
+	for s := 0; s < len(c.GetPersonList()); s++ {
 		cal.Day[lastDay][s] = 0;
 	}
 
@@ -108,9 +109,9 @@ func shiftCalendar() Calendar {
 
 func InitCalendarDefault() Calendar {
 	var newCal Calendar
-	newCal.Day = make([][]int, src.DayCount)
-	for i := 0; i < src.DayCount; i++ {
-		newCal.Day[i] = make([]int, src.UserCount)
+	newCal.Day = make([][]int, c.DayCount)
+	for i := 0; i < c.DayCount; i++ {
+		newCal.Day[i] = make([]int, c.UserCount)
 		for j := range newCal.Day[i] {
 			newCal.Day[i][j] = 0
 		}
@@ -121,7 +122,7 @@ func InitCalendarDefault() Calendar {
 
 func ReadCalendar(cal Calendar) Calendar {
 	
-	calFile, err := os.Open(src.CalendarFile)
+	calFile, err := os.Open(c.CalendarFile)
 	if err != nil {
 		lerror.ErrLog("Failed to open the calendar file", err)
 	}
@@ -133,7 +134,7 @@ func ReadCalendar(cal Calendar) Calendar {
 	d := 0
 	for fileScanner.Scan() {
 		tState := strings.Split(fileScanner.Text(), "")
-		for i := 0; i < src.UserCount; i++ {
+		for i := 0; i < c.UserCount; i++ {
 			cal.Day[d][i], err = strconv.Atoi(tState[i])
 			if err != nil {
 				lerror.ErrLog("Failed to convert state string when reading calendar", err)
@@ -146,7 +147,7 @@ func ReadCalendar(cal Calendar) Calendar {
 }
 
 func IndexInStateList(state string) int {
-	for i, e := range src.GetStateList() {
+	for i, e := range c.GetStateList() {
 		fmt.Println(e, state)
 		if e == state {
 			return i
@@ -160,14 +161,14 @@ func UpdateCalendar(cal Calendar, message CalMessage) string {
 
 	var dayIndex, personIndex int
 
-	for i, d := range src.GetDayList() {
+	for i, d := range c.GetDayList() {
 		if d == message.Day {
 			dayIndex = i 
 			break
 		}
 	}
 
-	for i, p := range src.GetPersonList() {
+	for i, p := range c.GetPersonList() {
 		if p == message.Person {
 			personIndex = i 
 			break
@@ -181,22 +182,22 @@ func UpdateCalendar(cal Calendar, message CalMessage) string {
 		fmt.Println(setMsg, new_state)
 		cal.Day[dayIndex][personIndex] = new_state
 	} else {
-		new_state = (cal.Day[dayIndex][personIndex] + 1) % len(src.GetStateList())
+		new_state = (cal.Day[dayIndex][personIndex] + 1) % len(c.GetStateList())
 	}
 
 	cal.Day[dayIndex][personIndex] = new_state
 
-	return src.GetStateList()[new_state]
+	return c.GetStateList()[new_state]
 }
 
 func WriteCalendar(cal Calendar) {
 	logger.InfoLog.Println("Saving Calendar")
-	err := os.Truncate(src.CalendarFile, 0)
+	err := os.Truncate(c.CalendarFile, 0)
 	if err != nil {
 		lerror.ErrLog("Failed to truncate file // TODO: THIS SHOULD BE REMOVED", err)
 	}
 
-	file, err := os.OpenFile(src.CalendarFile, os.O_WRONLY, os.ModeAppend)
+	file, err := os.OpenFile(c.CalendarFile, os.O_WRONLY, os.ModeAppend)
 	if err != nil {
 		lerror.ErrLog("Failed to open calendar file", err)
 	}

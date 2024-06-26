@@ -10,6 +10,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/2weiEmu/sis50.nl.go/pkg/lerror"
+	c "github.com/2weiEmu/sis50.nl.go/pkg/constants"
 	"github.com/2weiEmu/sis50.nl.go/pkg/logger"
 )
 
@@ -106,13 +107,13 @@ func addMessageToList(message string) error {
 }
 
 func saveMessages(messageList MessageList) {
-	err := os.Truncate(MessageFile, 0)
+	err := os.Truncate(c.MessageFile, 0)
 	if err != nil {
 		lerror.ErrLog("Failed to truncate message file", err)
 	}
 
 	file, err := os.OpenFile(
-		MessageFile, os.O_RDWR | os.O_APPEND, os.ModeAppend)
+		c.MessageFile, os.O_RDWR | os.O_APPEND, os.ModeAppend)
 	if err != nil {
 		lerror.ErrLog("Failed to open message file", err)
 	}
@@ -137,7 +138,7 @@ func saveMessages(messageList MessageList) {
 
 func ReadMessages(messageList MessageList) (MessageList, error) {
 	file, err := os.OpenFile(
-		MessageFile, os.O_RDWR | os.O_APPEND, os.ModeAppend)
+		c.MessageFile, os.O_RDWR | os.O_APPEND, os.ModeAppend)
 	if err != nil {
 		return MessageList{}, lerror.ErrLog("Could not open message file", err)
 	}

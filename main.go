@@ -8,10 +8,12 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/2weiEmu/sis50.nl.go/pkg/calendar"
 	"github.com/2weiEmu/sis50.nl.go/pkg/auth"
-	"github.com/2weiEmu/sis50.nl.go/pkg/logger"
+	"github.com/2weiEmu/sis50.nl.go/pkg/calendar"
+	"github.com/2weiEmu/sis50.nl.go/pkg/constants"
+	"github.com/2weiEmu/sis50.nl.go/pkg/indexlist"
 	"github.com/2weiEmu/sis50.nl.go/pkg/lerror"
+	"github.com/2weiEmu/sis50.nl.go/pkg/logger"
 	"github.com/2weiEmu/sis50.nl.go/src"
 	"github.com/gorilla/mux"
 	"golang.org/x/net/websocket"
@@ -29,7 +31,7 @@ func main() {
 	secret := flag.String("k", "", "State the private key location")
 	flag.Parse()
 
-	logFile, err := os.OpenFile(src.MainLog, os.O_APPEND | os.O_RDWR, 664)
+	logFile, err := os.OpenFile(constants.MainLog, os.O_APPEND | os.O_RDWR, 664)
 	if err != nil {
 		fmt.Println("[ERROR] Failed to open main log file.")
 		panic("Could not open log file.")
@@ -63,7 +65,7 @@ func main() {
 	router.Handle("/dayWS",
 		auth.NewUserAuthenticator(websocket.Handler(calHdl.HandleCalendarWebsocket)))
 	router.Handle("/shopWS",
-		auth.NewUserAuthenticator(websocket.Handler(src.ShoppingListWebsocketHandler)))
+		auth.NewUserAuthenticator(websocket.Handler(indexlist.ShoppingListWebsocketHandler)))
 
 	router.Handle("/calendar",
 		auth.NewUserAuthenticator(src.HandleFuncAsHandle(src.ReceiveUserProfileImage))).

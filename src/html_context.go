@@ -10,6 +10,7 @@ import (
 	"strconv"
 
 	"github.com/2weiEmu/sis50.nl.go/pkg/auth"
+	c "github.com/2weiEmu/sis50.nl.go/pkg/constants"
 	"github.com/2weiEmu/sis50.nl.go/pkg/lerror"
 	"github.com/gorilla/mux"
 )
@@ -80,7 +81,7 @@ func (ctx *HTMLContext) HandlePage(w http.ResponseWriter, r *http.Request) {
 	page := vars["page"]
 	jsArguments := ctx.ConnectionLocation + " " + ctx.Secure
 
-	if !slices.Contains(GetValidPages(), page) {
+	if !slices.Contains(c.GetValidPages(), page) {
 		lerror.WriteNotFound(w, r, "This doesn't seem to be a valid page")
 		return
 	}
@@ -114,7 +115,7 @@ func NewHTMLContext(
 	loggerFlags int, logFile *os.File, secure string,
 	connectionLocation string,
 ) (HTMLContext, error) {
-	tmpl, err := template.ParseFiles(IndexFile)
+	tmpl, err := template.ParseFiles(c.IndexFile)
 	if err != nil {
 		return HTMLContext{}, err
 	}

@@ -1,13 +1,16 @@
-package src
+package indexlist_test
 
 import (
 	"math/rand/v2"
 	"reflect"
 	"testing"
+
+	"github.com/2weiEmu/sis50.nl.go/pkg/shopping"
+	"github.com/2weiEmu/sis50.nl.go/pkg/indexlist"
 )
 
-func NewShoppingItem(id int, content string, action string) ShoppingItem {
-	return ShoppingItem {
+func NewShoppingItem(id int, content string, action string) shopping.ShoppingItem {
+	return shopping.ShoppingItem {
 		Id: id,
 		Content: content,
 		Action: action,
@@ -25,8 +28,8 @@ func MakeRandomStringLen(length int) string {
 	return string(b)
 }
 
-func CreateRandomShoppingItems(count int) []ShoppingItem {
-	itemList := make([]ShoppingItem, count)
+func CreateRandomShoppingItems(count int) []shopping.ShoppingItem {
+	itemList := make([]shopping.ShoppingItem, count)
 
 	for i := 0; i < count; i++ {
 		itemList[i] = NewShoppingItem(rand.IntN(100), MakeRandomStringLen(randLength), MakeRandomStringLen(randLength))
@@ -35,8 +38,8 @@ func CreateRandomShoppingItems(count int) []ShoppingItem {
 	return itemList
 }
 
-func NewFilledNode(index int, id int, content string, action string) IndexNode {
-	return IndexNode {
+func NewFilledNode(index int, id int, content string, action string) indexlist.IndexList {
+	return indexlist.IndexList {
 		index: index,
 		value: NewShoppingItem(id, content, action),
 	}
