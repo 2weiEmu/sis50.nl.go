@@ -51,52 +51,32 @@ for (var i = 0; i < gridElList.length; i++) {
 dayWebsocket.onmessage = async function(event) {
 	var message = JSON.parse(event.data)
 
-	if (message.state != "open-calendar") {
-		// Update the day's state
-		var el = document.getElementsByClassName(`${message.person} ${message.day}`)[0]
-		let state_image = el.children[0]
+	// Update the day's state
+	var el = document.getElementsByClassName(`${message.person} ${message.day}`)[0]
+	let state_image = el.children[0]
 
-		// TODO: move this to CSS
-		state_image.style.width = "0"
-		state_image.style.height = "0"
-		state_image.style.marginRight = "50%"
-		state_image.style.marginLeft = "50%"
-		state_image.style.marginTop = "30%"
-		state_image.style.marginBottom = "50%"
-		await sleep(300)
+	// TODO: move this to CSS
+	state_image.style.width = "0"
+	state_image.style.height = "0"
+	state_image.style.marginRight = "50%"
+	state_image.style.marginLeft = "50%"
+	state_image.style.marginTop = "30%"
+	state_image.style.marginBottom = "50%"
+	await sleep(300)
 
-		state_image.setAttribute("data-state", message.state) 
-		state_image.src = "/images/" + message.state + ".svg"
+	state_image.setAttribute("data-state", message.state) 
+	state_image.src = "/images/" + message.state + ".svg"
 
-		state_image.style.width = "100%"
-		state_image.style.marginRight = "0"
-		state_image.style.marginLeft = "0"
-		state_image.style.marginTop = "8px"
-		state_image.style.marginBottom = "0"
-		state_image.style.height = "80%"
-		await sleep(300)
+	state_image.style.width = "100%"
+	state_image.style.marginRight = "0"
+	state_image.style.marginLeft = "0"
+	state_image.style.marginTop = "8px"
+	state_image.style.marginBottom = "0"
+	state_image.style.height = "80%"
+	await sleep(300)
 
-		console.log(`[INFO] message.state: ${message.state}`)
-		var i = stateList.findIndex((item) => { return item == message.state })
-		state_image.title = altTextList[i]
-		
-	} else {
-		var days = message.day.split("/")
-		for (var i = 0; i < days.length; i++) {
-			day_states = days[i].split("")
-			var day = weekdayList[((i + 1) % 7)]
-			console.log("Open day:", day)
-			for (var j = 0; j < day_states.length; j++) {
-				var person = personList[j]
-				var newState = stateList[day_states[j]]
-				var el = document.getElementsByClassName(`${person} ${day}`)[0]
-				console.log(el)
-				console.log(`[INFO] day_states[j] ${day_states[j]}`)
-				el.children[0].setAttribute("data-state", newState) 
-				el.children[0].src = "/images/" + newState + ".svg"
-				el.children[0].title = altTextList[day_states[j]]
-			}
-		}
-	}
+	console.log(`[INFO] message.state: ${message.state}`)
+	var i = stateList.findIndex((item) => { return item == message.state })
+	state_image.title = altTextList[i]
 }
 

@@ -37,7 +37,7 @@ func IndexPageTable(cal *calendar.Calendar) string {
 		dayCount := "day" + strconv.Itoa(i + 1)
 		dayCapitalised := strings.Title(d) + "."
 		start += fmt.Sprintf(`
-			<div class="%s %s %s %s"><p>%s</p></div>
+			<div class="%s %s %s %s day"><p>%s</p></div>
 		`, pers, d, bg, dayCount, dayCapitalised)
 	}
 	start += "</div>"

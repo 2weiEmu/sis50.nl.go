@@ -47,16 +47,8 @@ func (handler *CalendarHandler) HandleCalendarWebsocket(conn *websocket.Conn) {
 			break
 		}
 
-		if message.State != "open-calendar" {
-			message.State = UpdateCalendar(StateCalendar, message)
-			handler.BroadcastToConnections(message)
-		} else {
-			message := genOpenCalMessage()
-			err := websocket.JSON.Send(conn, &message)
-			if err != nil {
-				// ErrLog("Failed to send a WebSocket message as JSON", err)
-			}
-		}
+		message.State = UpdateCalendar(StateCalendar, message)
+		handler.BroadcastToConnections(message)
 	}
 	WriteCalendar(StateCalendar)
 	handler.Connections = n.RemoveWebsocketFromPool(conn, handler.Connections)

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"net/http"
 	"os"
+	"fmt"
 	"strconv"
 
 	"github.com/gorilla/mux"
@@ -81,6 +82,7 @@ func POSTMessage(writer http.ResponseWriter, request *http.Request) {
 	err = addMessageToList(msgPost)
 	if err != nil {
 		writer.Write([]byte("Failed to Add\n"))
+		writer.WriteHeader(http.StatusInternalServerError)
 	} else {
 		writer.Write([]byte("Added\n"))
 	}
@@ -107,6 +109,7 @@ func addMessageToList(message string) error {
 }
 
 func saveMessages(messageList MessageList) {
+	fmt.Println("writing:", messageList)
 	err := os.Truncate(c.MessageFile, 0)
 	if err != nil {
 		lerror.ErrLog("Failed to truncate message file", err)
