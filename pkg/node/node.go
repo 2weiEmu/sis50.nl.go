@@ -3,8 +3,8 @@ package node
 import (
 	"strconv"
 
-	"github.com/2weiEmu/sis50.nl.go/pkg/lerror"
-	s "github.com/2weiEmu/sis50.nl.go/pkg/shopping"
+	"sis50.nl.go/pkg/lerror"
+	s "sis50.nl.go/pkg/shopping"
 	"golang.org/x/net/websocket"
 )
 

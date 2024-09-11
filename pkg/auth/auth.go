@@ -16,7 +16,7 @@ import (
 	"time"
 
 	"github.com/mattn/go-sqlite3"
-	"github.com/2weiEmu/sis50.nl.go/pkg/lerror"
+	"sis50.nl.go/pkg/lerror"
 )
 
 var conn sqlite3.SQLiteConn

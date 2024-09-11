@@ -5,8 +5,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/2weiEmu/sis50.nl.go/pkg/shopping"
-	"github.com/2weiEmu/sis50.nl.go/pkg/indexlist"
+	"sis50.nl.go/pkg/shopping"
+	"sis50.nl.go/pkg/indexlist"
 )
 
 func NewShoppingItem(id int, content string, action string) shopping.ShoppingItem {

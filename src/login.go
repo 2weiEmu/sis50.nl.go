@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"github.com/matthewhartstonge/argon2"
-	"github.com/2weiEmu/sis50.nl.go/pkg/auth"
+	"sis50.nl.go/pkg/auth"
 )
 
 type LoginData struct {

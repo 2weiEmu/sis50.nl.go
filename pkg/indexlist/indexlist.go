@@ -5,12 +5,12 @@ import (
 	"os"
 	"strconv"
 
-	c "github.com/2weiEmu/sis50.nl.go/pkg/constants"
-	"github.com/2weiEmu/sis50.nl.go/pkg/lerror"
-	"github.com/2weiEmu/sis50.nl.go/pkg/logger"
-	n "github.com/2weiEmu/sis50.nl.go/pkg/node"
-	s "github.com/2weiEmu/sis50.nl.go/pkg/shopping"
-	"github.com/2weiEmu/sis50.nl.go/src"
+	c "sis50.nl.go/pkg/constants"
+	"sis50.nl.go/pkg/lerror"
+	"sis50.nl.go/pkg/logger"
+	n "sis50.nl.go/pkg/node"
+	s "sis50.nl.go/pkg/shopping"
+	"sis50.nl.go/src"
 	"github.com/BenLubar/htmlcleaner"
 	"golang.org/x/net/websocket"
 )

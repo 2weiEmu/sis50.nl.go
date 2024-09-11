@@ -10,10 +10,10 @@ import (
 	"time"
 
 	"golang.org/x/net/websocket"
-	"github.com/2weiEmu/sis50.nl.go/pkg/logger"
-	n "github.com/2weiEmu/sis50.nl.go/pkg/node"
-	c "github.com/2weiEmu/sis50.nl.go/pkg/constants"
-	"github.com/2weiEmu/sis50.nl.go/pkg/lerror"
+	"sis50.nl.go/pkg/logger"
+	n "sis50.nl.go/pkg/node"
+	c "sis50.nl.go/pkg/constants"
+	"sis50.nl.go/pkg/lerror"
 )
 
 var StateCalendar = ReadCalendar(InitCalendarDefault())

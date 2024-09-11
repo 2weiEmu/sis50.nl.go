@@ -9,11 +9,11 @@ import (
 	"slices"
 	"strconv"
 
-	"github.com/2weiEmu/sis50.nl.go/pkg/auth"
-	c "github.com/2weiEmu/sis50.nl.go/pkg/constants"
-	"github.com/2weiEmu/sis50.nl.go/pkg/lerror"
-	"github.com/2weiEmu/sis50.nl.go/pkg/lformatting"
-	"github.com/2weiEmu/sis50.nl.go/pkg/calendar"
+	"sis50.nl.go/pkg/auth"
+	c "sis50.nl.go/pkg/constants"
+	"sis50.nl.go/pkg/lerror"
+	"sis50.nl.go/pkg/lformatting"
+	"sis50.nl.go/pkg/calendar"
 	"github.com/gorilla/mux"
 )
 

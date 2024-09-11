@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/2weiEmu/sis50.nl.go/pkg/calendar"
-	"github.com/2weiEmu/sis50.nl.go/pkg/constants"
+	"sis50.nl.go/pkg/calendar"
+	"sis50.nl.go/pkg/constants"
 )
 
 func IndexPageTable(cal *calendar.Calendar) string {

@@ -10,9 +10,9 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"github.com/2weiEmu/sis50.nl.go/pkg/lerror"
-	c "github.com/2weiEmu/sis50.nl.go/pkg/constants"
-	"github.com/2weiEmu/sis50.nl.go/pkg/logger"
+	"sis50.nl.go/pkg/lerror"
+	c "sis50.nl.go/pkg/constants"
+	"sis50.nl.go/pkg/logger"
 )
 
 var AllMessagesList, _ = ReadMessages(MessageList{});

@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"runtime"
 
-	"github.com/2weiEmu/sis50.nl.go/pkg/logger"
+	"sis50.nl.go/pkg/logger"
 )
 
 type LocalErr struct {
