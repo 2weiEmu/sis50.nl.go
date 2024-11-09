@@ -12,7 +12,59 @@ console.log(gridElList)
 let clickedOnDay
 let clickedOnPerson
 
-var dayWebsocket = new WebSocket(`${secure}://${WS_BASE}/dayWS`, "echo-protocol")
+var dayWebsocket
+
+function connect() {
+	console.log("connect")
+	dayWebsocket = new WebSocket(`${secure}://${WS_BASE}/dayWS`, "echo-protocol")
+
+	dayWebsocket.onopen = () => {
+		clearInterval(this.timerId)
+
+		// TODO: need to check the integrity of the state here theoretically
+
+		dayWebsocket.onclose = (event) => {
+			this.timerId = setInterval(() => {
+				connect()
+			}, 300);
+		}
+	}
+
+	dayWebsocket.onmessage = async function(event) {
+		var message = JSON.parse(event.data)
+
+		// Update the day's state
+		var el = document.getElementsByClassName(`${message.person} ${message.day}`)[0]
+		let state_image = el.children[0]
+
+		// TODO: move this to CSS
+		state_image.style.width = "0"
+		state_image.style.height = "0"
+		state_image.style.marginRight = "50%"
+		state_image.style.marginLeft = "50%"
+		state_image.style.marginTop = "30%"
+		state_image.style.marginBottom = "50%"
+		await sleep(300)
+
+		state_image.setAttribute("data-state", message.state) 
+		state_image.src = "/images/" + message.state + ".svg"
+
+		state_image.style.width = "100%"
+		state_image.style.marginRight = "0"
+		state_image.style.marginLeft = "0"
+		state_image.style.marginTop = "8px"
+		state_image.style.marginBottom = "0"
+		state_image.style.height = "80%"
+		await sleep(300)
+
+		console.log(`[INFO] message.state: ${message.state}`)
+		var i = stateList.findIndex((item) => { return item == message.state })
+		state_image.title = altTextList[i]
+	}
+}
+
+connect()
+
 
 function makeCalMsg(day, person, state) {
 	return JSON.stringify({
@@ -46,37 +98,5 @@ for (var i = 0; i < gridElList.length; i++) {
 	gridElList[i].addEventListener("contextmenu", handleGridMenu)
 	gridElList[i].children[0].setAttribute("draggable", false)
 	console.log(gridElList[i])
-}
-
-dayWebsocket.onmessage = async function(event) {
-	var message = JSON.parse(event.data)
-
-	// Update the day's state
-	var el = document.getElementsByClassName(`${message.person} ${message.day}`)[0]
-	let state_image = el.children[0]
-
-	// TODO: move this to CSS
-	state_image.style.width = "0"
-	state_image.style.height = "0"
-	state_image.style.marginRight = "50%"
-	state_image.style.marginLeft = "50%"
-	state_image.style.marginTop = "30%"
-	state_image.style.marginBottom = "50%"
-	await sleep(300)
-
-	state_image.setAttribute("data-state", message.state) 
-	state_image.src = "/images/" + message.state + ".svg"
-
-	state_image.style.width = "100%"
-	state_image.style.marginRight = "0"
-	state_image.style.marginLeft = "0"
-	state_image.style.marginTop = "8px"
-	state_image.style.marginBottom = "0"
-	state_image.style.height = "80%"
-	await sleep(300)
-
-	console.log(`[INFO] message.state: ${message.state}`)
-	var i = stateList.findIndex((item) => { return item == message.state })
-	state_image.title = altTextList[i]
 }
 
