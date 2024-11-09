@@ -7,7 +7,93 @@
 
 var shoppingList = document.getElementById("shop-list")
 
-var shopWebSocket = new WebSocket(`${secure}://${WS_BASE}/shopWS`, "echo-protocol")
+var shopWebSocket
+
+function connectShop() {
+	console.log("connectShop")
+	shopWebSocket = new WebSocket(`${secure}://${WS_BASE}/shopWS`, "echo-protocol")
+	shopWebSocket.onopen = () => {
+		clearInterval(this.timerId)
+		console.log("[INFO] Opening Shop Socket")
+		shoppingList.innerHTML = ""
+		shopWebSocket.send(JSON.stringify({
+			"id": "0",
+			"content": "",
+			"action": "open-shopping"
+		}))
+		shopWebSocket.onclose = (event) => {
+			this.timerId = setInterval(() => {
+				connectShop()
+			}, 200);
+		}
+	}
+
+	shopWebSocket.onmessage = async (event) => {
+		console.log("[INFO] Received Shop Message")
+		var message = JSON.parse(event.data)
+		console.log(message)
+
+		if (message.action == "add") {
+			var shoppingItem = document.createElement("div")
+			shoppingItem.classList.add("shopping-item")
+			shoppingItem.id = message.id
+
+			shoppingItem.draggable = true
+			shoppingItem.addEventListener("dragstart", handleDragStart)
+			shoppingItem.addEventListener("dragend", handleDragEnd)
+
+			shoppingItem.addEventListener("dragenter", handleDragEnter)
+			shoppingItem.addEventListener("dragleave", handleDragLeave)
+			shoppingItem.addEventListener("dragover", function(ev){ ev.preventDefault() })
+
+			shoppingItem.addEventListener("drop", handleDropOn)
+
+			var item_desc = document.createElement("p")
+			item_desc.innerText = message.content
+
+			var edit_button = document.createElement("button")
+			edit_button.addEventListener("click", editItem)
+			edit_button.innerText = "Edit"
+
+			var remove_button = document.createElement("button")
+			remove_button.addEventListener("click", removeItem)
+			remove_button.innerText = "Remove"
+
+
+			shoppingItem.appendChild(item_desc)
+			shoppingItem.appendChild(edit_button)
+			shoppingItem.appendChild(remove_button)
+			shoppingList.appendChild(shoppingItem)
+
+		} else if (message.action == "edit") {
+			for (var i = 0; i < shoppingList.children.length; i++) {
+				if (shoppingList.children[i].id == message.id) {
+					shoppingList.children[i].children[0].innerText = message.content
+				}
+			}
+		} else if (message.action == "rearrange") {
+			insertInShoppingListAtIndex(message.id, message.content)
+		} else {
+			// remove the item by id
+			for (var i = 0; i < shoppingList.children.length; i++) {
+				if (shoppingList.children[i].id == message.id) {
+					var h = shoppingList.children[i].clientHeight
+					shoppingList.children[i].style.height = h + "px";
+					await new Promise(r => setTimeout(r, 10));
+					for (var j = 0; j < shoppingList.children[i].children.length; j++) {
+						shoppingList.children[i].children[j].innerText = ""
+					}
+					shoppingList.children[i].style.height = "1px";
+					await new Promise(r => setTimeout(r, 200));
+					shoppingList.children[i].remove()
+					break
+				}
+			}
+		}
+	}
+}
+
+connectShop()
 
 function addItem() {
 	var content = document.getElementById("item-name-add").value
@@ -37,15 +123,6 @@ function removeItem(_) {
 		"id": `${id}`, 
 		"content": "",
 		"action": "remove"
-	}))
-}
-
-shopWebSocket.onopen = () => {
-	console.log("[INFO] Opening Shop Socket")
-	shopWebSocket.send(JSON.stringify({
-		"id": "0",
-		"content": "",
-		"action": "open-shopping"
 	}))
 }
 
@@ -156,69 +233,6 @@ function newShoppingItem(id, text) {
 	return shoppingItem
 }
 
-shopWebSocket.onmessage = async (event) => {
-	console.log("[INFO] Received Shop Message")
-	var message = JSON.parse(event.data)
-	console.log(message)
-
-	if (message.action == "add") {
-		var shoppingItem = document.createElement("div")
-		shoppingItem.classList.add("shopping-item")
-		shoppingItem.id = message.id
-
-		shoppingItem.draggable = true
-		shoppingItem.addEventListener("dragstart", handleDragStart)
-		shoppingItem.addEventListener("dragend", handleDragEnd)
-
-		shoppingItem.addEventListener("dragenter", handleDragEnter)
-		shoppingItem.addEventListener("dragleave", handleDragLeave)
-		shoppingItem.addEventListener("dragover", function(ev){ ev.preventDefault() })
-
-		shoppingItem.addEventListener("drop", handleDropOn)
-
-		var item_desc = document.createElement("p")
-		item_desc.innerText = message.content
-
-		var edit_button = document.createElement("button")
-		edit_button.addEventListener("click", editItem)
-		edit_button.innerText = "Edit"
-
-		var remove_button = document.createElement("button")
-		remove_button.addEventListener("click", removeItem)
-		remove_button.innerText = "Remove"
-
-
-		shoppingItem.appendChild(item_desc)
-		shoppingItem.appendChild(edit_button)
-		shoppingItem.appendChild(remove_button)
-		shoppingList.appendChild(shoppingItem)
-
-	} else if (message.action == "edit") {
-		for (var i = 0; i < shoppingList.children.length; i++) {
-			if (shoppingList.children[i].id == message.id) {
-				shoppingList.children[i].children[0].innerText = message.content
-			}
-		}
-	} else if (message.action == "rearrange") {
-		insertInShoppingListAtIndex(message.id, message.content)
-	} else {
-		// remove the item by id
-		for (var i = 0; i < shoppingList.children.length; i++) {
-			if (shoppingList.children[i].id == message.id) {
-				var h = shoppingList.children[i].clientHeight
-				shoppingList.children[i].style.height = h + "px";
-				await new Promise(r => setTimeout(r, 10));
-				for (var j = 0; j < shoppingList.children[i].children.length; j++) {
-					shoppingList.children[i].children[j].innerText = ""
-				}
-				shoppingList.children[i].style.height = "1px";
-				await new Promise(r => setTimeout(r, 200));
-				shoppingList.children[i].remove()
-				break
-			}
-		}
-	}
-}
 
 function cleanInput() {
 	document.getElementById("item-name-add").value = ""
