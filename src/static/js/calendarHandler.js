@@ -100,11 +100,15 @@ function connect() {
 		state_image.title = altTextList[i]
 	}
 
+
 	dayWebsocket.onopen = () => {
 		dayWebsocket.onclose = (event) => {
 			this.timerId = setInterval(() => {
 				connect()
 			}, 300);
+		}
+		dayWebsocket.onerror = (event) => {
+			this.close()
 		}
 
 		clearInterval(this.timerId)

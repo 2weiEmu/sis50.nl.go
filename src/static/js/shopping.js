@@ -26,6 +26,9 @@ function connectShop() {
 				connectShop()
 			}, 200);
 		}
+		shopWebSocket.onerror = (event) => {
+			this.close()
+		}
 	}
 
 	shopWebSocket.onmessage = async (event) => {
