@@ -30,22 +30,8 @@ console.log(`WS_BASE: ${WS_BASE}`)
 
 // NOTE: weekday section
 //       ---------------
-const weekdayList = ["zo", "ma", "di", "wo", "do", "vr", "za"]
 const personList = ["rick", "youri", "robert", "milan"]
-const date = new Date()
 
 let day = weekdayList[date.getDay()]
 let yesterday = weekdayList[(date.getDay() + 6) % weekdayList.length]
-
-setWeekday(date)
-// 600_000 = 10 minutes
-setInterval(setWeekday(date), 600_000);
-function setWeekday(date) {
-	let days = document.getElementsByClassName("day")
-	for (let i = 0; i < 7; i++) {
-		let set = weekdayList[(date.getDay() + 4 + i) % weekdayList.length]
-		set = set[0].toUpperCase() + set[1] + "."
-		days[i].innerHTML = `<p>${set}</p>`
-	}
-}
 

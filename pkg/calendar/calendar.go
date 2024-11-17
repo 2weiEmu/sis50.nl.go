@@ -47,8 +47,12 @@ func (handler *CalendarHandler) HandleCalendarWebsocket(conn *websocket.Conn) {
 			break
 		}
 
-		message.State = UpdateCalendar(StateCalendar, message)
-		handler.BroadcastToConnections(message)
+		if message.State == "OPEN" {
+
+		} else {
+			message.State = UpdateCalendar(StateCalendar, message)
+			handler.BroadcastToConnections(message)
+		}
 	}
 	WriteCalendar(StateCalendar)
 	handler.Connections = n.RemoveWebsocketFromPool(conn, handler.Connections)

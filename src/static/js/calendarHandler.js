@@ -12,6 +12,21 @@ console.log(gridElList)
 let clickedOnDay
 let clickedOnPerson
 
+const weekdayList = ["zo", "ma", "di", "wo", "do", "vr", "za"]
+const date = new Date()
+setWeekday(date)
+// 600_000 = 10 minutes
+setInterval(setWeekday(date), 600_000);
+function setWeekday(date) {
+	let days = document.getElementsByClassName("day")
+	for (let i = 0; i < 7; i++) {
+		let set = weekdayList[(date.getDay() + 4 + i) % weekdayList.length]
+		set = set[0].toUpperCase() + set[1] + "."
+		days[i].innerHTML = `<p>${set}</p>`
+	}
+}
+
+
 var dayWebsocket
 
 function connect() {
@@ -20,6 +35,8 @@ function connect() {
 
 	dayWebsocket.onopen = () => {
 		clearInterval(this.timerId)
+		dayWebsocket.iFrame()
+		setWeekday(new Date())
 
 		// TODO: need to check the integrity of the state here theoretically
 
@@ -29,6 +46,11 @@ function connect() {
 			}, 300);
 		}
 	}
+
+	dayWebsocket.iFrame = () => {
+		// fetch all of the new grid elements and display them
+	}
+
 
 	dayWebsocket.onmessage = async function(event) {
 		var message = JSON.parse(event.data)
@@ -49,6 +71,7 @@ function connect() {
 		state_image.setAttribute("data-state", message.state) 
 		state_image.src = "/images/" + message.state + ".svg"
 
+		// some CSS stuff
 		state_image.style.width = "100%"
 		state_image.style.marginRight = "0"
 		state_image.style.marginLeft = "0"
