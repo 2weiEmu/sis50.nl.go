@@ -6,7 +6,6 @@ import (
 	"errors"
 	"net/http"
 	"os"
-	"fmt"
 	"strconv"
 
 	"github.com/gorilla/mux"
@@ -28,9 +27,9 @@ type MessageList struct {
 // GET pages of Messages
 // POST a new message to a page, and save this
 func GETMessages(writer http.ResponseWriter, request *http.Request) {
-	logger.InfoLog.Println("Get Messages Request")
+	logger.InfoLog.Println("Get Messages Request", AllMessagesList)
 
-	_, err := ReadMessages(AllMessagesList)
+	AllMessagesList, err := ReadMessages(AllMessagesList)
 	if err != nil {
 		lerror.ErrorLogAndHttpStat(writer, err)
 		return
@@ -43,7 +42,7 @@ func GETMessages(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	page := getMessageJson(pageNumber)
+	page := getMessageJson(pageNumber, AllMessagesList)
 	if page == nil {
 		logger.InfoLog.Println("messages.go: Could not get more messages")
 		http.Error(
@@ -53,20 +52,20 @@ func GETMessages(writer http.ResponseWriter, request *http.Request) {
 	writer.Write(page)
 }
 
-func getMessageJson(pageNumber int) []byte {
-	if len(AllMessagesList.Pages) <= pageNumber || pageNumber < 0 {
+func getMessageJson(pageNumber int, messageList MessageList) []byte {
+	if len(messageList.Pages) <= pageNumber || pageNumber < 0 {
 		return nil;
 	}
 
 	// TODO: add check
-	page, _ := json.Marshal(AllMessagesList.Pages[
-		len(AllMessagesList.Pages) - pageNumber - 1])
+	page, _ := json.Marshal(messageList.Pages[
+		len(messageList.Pages) - pageNumber - 1])
 	return page
 }
 
 func POSTMessage(writer http.ResponseWriter, request *http.Request) {
 	logger.InfoLog.Println("POSTing message")
-	allMessagesList, err := ReadMessages(AllMessagesList)
+	AllMessagesList, err := ReadMessages(AllMessagesList)
 	if err != nil {
 		lerror.ErrorLogAndHttpStat(writer, err)
 		return
@@ -79,37 +78,49 @@ func POSTMessage(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	err = addMessageToList(msgPost)
+	err = addMessageToList(msgPost, AllMessagesList)
 	if err != nil {
 		writer.Write([]byte("Failed to Add\n"))
 		writer.WriteHeader(http.StatusInternalServerError)
 	} else {
 		writer.Write([]byte("Added\n"))
 	}
-	saveMessages(allMessagesList)
+	logger.InfoLog.Println(AllMessagesList)
+	saveMessages(AllMessagesList)
 }
 
-func addMessageToList(message string) error {
+func addMessageToList(message string, messageList MessageList) error {
 	if message == "" {
 		return errors.New("Empty Message")
 	}
 
-	if len(AllMessagesList.Pages) == 0 {
-		AllMessagesList.Pages = []MessagePage{{Message: []string{message}}}
-	} else if len(AllMessagesList.Pages[len(AllMessagesList.Pages) - 1].Message) >= 10 {
+	pagesLen := len(messageList.Pages)
+	logger.InfoLog.Println(messageList.Pages)
+	
+
+	if len(messageList.Pages) == 0 {
+		logger.InfoLog.Println("There are no pages...")
+		messageList.Pages = []MessagePage{{Message: []string{message}}}
+
+	} else if len(messageList.Pages[pagesLen - 1].Message) >= 10 {
+		logger.InfoLog.Println("Page is full")
 		var msgPage MessagePage
 		msgPage.Message = []string{message};
-		AllMessagesList.Pages = append(AllMessagesList.Pages, msgPage)
+		messageList.Pages = append(messageList.Pages, msgPage)
+
 	} else {
-		AllMessagesList.Pages[len(AllMessagesList.Pages) - 1].Message =
+		logger.InfoLog.Println("Adding to page")
+		messageList.Pages[pagesLen - 1].Message =
 			append(
-				AllMessagesList.Pages[len(AllMessagesList.Pages)-1].Message, message)
+				messageList.Pages[pagesLen-1].Message, message)
+
 	} 
+	logger.InfoLog.Println(messageList.Pages)
 	return nil
 }
 
 func saveMessages(messageList MessageList) {
-	fmt.Println("writing:", messageList)
+	logger.InfoLog.Println("writing:", messageList)
 	err := os.Truncate(c.MessageFile, 0)
 	if err != nil {
 		lerror.ErrLog("Failed to truncate message file", err)
