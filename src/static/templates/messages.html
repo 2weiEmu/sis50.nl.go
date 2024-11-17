@@ -62,11 +62,11 @@
 		<button id="add-new-bg" data-selected="">Add</button>
 	</div>
 
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-	<script src="/js/wallpaper.js" args="{{ .Args }}"></script>
-	<script src="/js/messages.js" args="{{ .Args }}"></script>
-	<script src="/js/messageformatting.js" args="{{ .Args }}"></script>
-	<script defer src="/js/logout.js" args="{{ .Args }}"></script>
+	<script asp-append-version="true" src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+	<script asp-append-version="true" src="/js/wallpaper.js" args="{{ .Args }}"></script>
+	<script asp-append-version="true" src="/js/messages.js" args="{{ .Args }}"></script>
+	<script asp-append-version="true" src="/js/messageformatting.js" args="{{ .Args }}"></script>
+	<script defer asp-append-version="true" src="/js/logout.js" args="{{ .Args }}"></script>
 </html>
 
 
