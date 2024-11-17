@@ -107,9 +107,6 @@ function connect() {
 				connect()
 			}, 300);
 		}
-		dayWebsocket.onerror = (event) => {
-			this.close()
-		}
 
 		clearInterval(this.timerId)
 		dayWebsocket.iFrame()
