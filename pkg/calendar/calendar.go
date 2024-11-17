@@ -48,6 +48,12 @@ func (handler *CalendarHandler) HandleCalendarWebsocket(conn *websocket.Conn) {
 		}
 
 		if message.State == "OPEN" {
+			serial := SerialiseCalendarForWebsocket(StateCalendar)
+			message.Person = serial
+			err := websocket.JSON.Send(conn, message)
+			if err != nil {
+				lerror.ErrLog("Failed to send JSON via websocket during OPEN statement", err)
+			}
 
 		} else {
 			message.State = UpdateCalendar(StateCalendar, message)
@@ -65,7 +71,7 @@ type CalMessage struct {
 }
 
 type Calendar struct {
-	Day [][]int
+	Day [][]int // ordered so that each 'row' is a day
 }
 
 var calFileReady = make(chan bool)
@@ -140,6 +146,18 @@ func ReadCalendar(cal Calendar) Calendar {
 	}
 
 	return cal
+}
+
+func SerialiseCalendarForWebsocket(cal Calendar) string {
+	returnString := ""
+	for _, r := range cal.Day {
+		for _, d := range r {
+			returnString += strconv.Itoa(d)
+		}
+		returnString += "|"
+	}
+
+	return returnString
 }
 
 func IndexInStateList(state string) int {

@@ -52,8 +52,8 @@ function connect() {
 				const element = gridElList[i]
 				const state_image = element.children[0]
 
-				const current_day_index = Math.floor(i / 7)
-				const offset_index = i % 7
+				const current_day_index = Math.floor(i / 6)
+				const offset_index = i % 6
 
 				const new_state_index = Number(serialList[offset_index][current_day_index])
 				const new_state = stateList[new_state_index]

@@ -22,7 +22,6 @@ func IndexPageTable(cal *calendar.Calendar) string {
 		if i % 2 != 0 {
 			bg = ""
 		}
-		var pers string
 
 		for personIndex, p := range constants.GetPersonList() {
 			state := constants.GetStateList()[cal.Day[i][personIndex]]
@@ -31,14 +30,13 @@ func IndexPageTable(cal *calendar.Calendar) string {
 			start += fmt.Sprintf(`<div class="%s %s %s" data-person="%s" data-day="%s">
 				<img data-state="%s" src="%s"/></div>
 			`, p, d, bg, p, d, state, imageSource)
-			pers = p
 		}
 
 		dayCount := "day" + strconv.Itoa(i + 1)
 		dayCapitalised := strings.Title(d) + "."
 		start += fmt.Sprintf(`
 			<div class="%s %s %s %s day"><p>%s</p></div>
-		`, pers, d, bg, dayCount, dayCapitalised)
+		`, "temp", d, bg, dayCount, dayCapitalised)
 	}
 	start += "</div>"
 
