@@ -34,4 +34,3 @@ const personList = ["rick", "youri", "robert", "milan"]
 
 let day = weekdayList[date.getDay()]
 let yesterday = weekdayList[(date.getDay() + 6) % weekdayList.length]
-
