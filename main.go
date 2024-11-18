@@ -31,7 +31,7 @@ func main() {
 	secret := flag.String("k", "", "State the private key location")
 	flag.Parse()
 
-	logFile, err := os.OpenFile(constants.MainLog, os.O_APPEND | os.O_RDWR, 664)
+	logFile, err := os.OpenFile(constants.MainLog, os.O_APPEND | os.O_RDWR, 0664)
 	if err != nil {
 		fmt.Println("[ERROR] Failed to open main log file.")
 		panic("Could not open log file.")
