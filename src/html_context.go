@@ -9,11 +9,11 @@ import (
 	"slices"
 	"strconv"
 
-	"sis50.nl.go/pkg/auth"
-	c "sis50.nl.go/pkg/constants"
-	"sis50.nl.go/pkg/lerror"
-	"sis50.nl.go/pkg/lformatting"
-	"sis50.nl.go/pkg/calendar"
+	"sis50/pkg/auth"
+	c "sis50/pkg/constants"
+	"sis50/pkg/lerror"
+	"sis50/pkg/lformatting"
+	"sis50/pkg/calendar"
 	"github.com/gorilla/mux"
 )
 

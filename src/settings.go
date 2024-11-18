@@ -6,8 +6,8 @@ import (
 	"os"
 	"strconv"
 
-	"sis50.nl.go/pkg/lerror"
-	"sis50.nl.go/pkg/auth"
+	"sis50/pkg/lerror"
+	"sis50/pkg/auth"
 )
 
 func ReceiveUserProfileImage(w http.ResponseWriter, r *http.Request) {

@@ -9,9 +9,9 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"sis50.nl.go/pkg/lerror"
-	c "sis50.nl.go/pkg/constants"
-	"sis50.nl.go/pkg/logger"
+	"sis50/pkg/lerror"
+	c "sis50/pkg/constants"
+	"sis50/pkg/logger"
 )
 
 var AllMessagesList, _ = ReadMessages(MessageList{});
