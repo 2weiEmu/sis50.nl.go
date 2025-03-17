@@ -36,19 +36,22 @@ func NewCalendarHandler(
 }
 
 func (handler *CalendarHandler) HandleCalendarWebsocket(conn *websocket.Conn) {
-	handler.InfoLog.Println("Activating WebSocket handler...")
+	handler.InfoLog.Println("HandleCalendarWebsocket starting...")
 
 	handler.Connections = append(handler.Connections, conn)
 	var message CalMessage
+
 	for {
 		err := websocket.JSON.Receive(conn, &message)
 		if err != nil {
-			// ErrLog("Failed to read the websocket message", err)
+			lerror.ErrLog("Failed to read the websocket message", err)
 			break
 		}
 
 		if message.State == "OPEN" {
 			serial := SerialiseCalendarForWebsocket(StateCalendar)
+			handler.InfoLog.Println("Serial for OPEN:", serial)
+
 			message.Person = serial
 			err := websocket.JSON.Send(conn, message)
 			if err != nil {
@@ -57,6 +60,7 @@ func (handler *CalendarHandler) HandleCalendarWebsocket(conn *websocket.Conn) {
 
 		} else {
 			message.State = UpdateCalendar(StateCalendar, message)
+			handler.InfoLog.Println("Updated Calendar State:", message.State)
 			handler.BroadcastToConnections(message)
 		}
 	}

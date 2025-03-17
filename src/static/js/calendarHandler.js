@@ -153,3 +153,21 @@ for (var i = 0; i < gridElList.length; i++) {
 	console.log(gridElList[i])
 }
 
+// now granted when the window goes to sleep this will be once per sec anyway
+const DELAY = 1000
+
+(function loop() {
+	setTimeout(() => {
+
+		try {
+			// check if websocket is connected
+			// if not connected => connect
+			// if connected => leave
+
+		} catch {
+			// something went wrong - inform the user, keep trying
+
+		}
+		loop();
+	}, DELAY);
+})();
