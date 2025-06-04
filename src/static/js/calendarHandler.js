@@ -153,12 +153,28 @@ for (var i = 0; i < gridElList.length; i++) {
 	console.log(gridElList[i])
 }
 
-
 // recursive timeout check, I guess is something we are gonna be trying
-
 (function loop() {
 	setTimeout(() => {
 		console.log("called from the loop")
 		loop()
 	}, 1000)
 })()
+// now granted when the window goes to sleep this will be once per sec anyway
+const DELAY = 1000
+
+//(function loop() {
+	//setTimeout(() => {
+//
+		//try {
+			//// check if websocket is connected
+			//// if not connected => connect
+			//// if connected => leave
+//
+		//} catch {
+			//// something went wrong - inform the user, keep trying
+//
+		//}
+		//loop();
+	//}, DELAY);
+//})();
