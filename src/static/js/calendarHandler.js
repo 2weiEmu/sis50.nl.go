@@ -153,3 +153,12 @@ for (var i = 0; i < gridElList.length; i++) {
 	console.log(gridElList[i])
 }
 
+
+// recursive timeout check, I guess is something we are gonna be trying
+
+(function loop() {
+	setTimeout(() => {
+		console.log("called from the loop")
+		loop()
+	}, 1000)
+})()
