@@ -57,7 +57,11 @@ func (handler *CalendarHandler) HandleCalendarWebsocket(conn *websocket.Conn) {
 			if err != nil {
 				lerror.ErrLog("Failed to send JSON via websocket during OPEN statement", err)
 			}
-
+		} else if message.State == "PING" {
+			err := websocket.JSON.Send(conn, message)
+			if err != nil {
+				lerror.ErrLog("Failed to return a PING", err);
+			}
 		} else {
 			message.State = UpdateCalendar(StateCalendar, message)
 			handler.InfoLog.Println("Updated Calendar State:", message.State)

@@ -161,7 +161,7 @@ for (var i = 0; i < gridElList.length; i++) {
 	}, 1000)
 })()
 // now granted when the window goes to sleep this will be once per sec anyway
-const DELAY = 1000
+const DELAY = 5000
 
 //(function loop() {
 	//setTimeout(() => {
@@ -178,3 +178,14 @@ const DELAY = 1000
 		//loop();
 	//}, DELAY);
 //})();
+
+// okay let's do this nice and simple
+// just check like once per like 5 seconds and then things you know should be better
+
+setInterval(() => {
+	try {
+
+	} catch (error) {
+		connect()
+	}
+}, DELAY)
