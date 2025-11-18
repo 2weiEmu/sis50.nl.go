@@ -32,6 +32,10 @@ function setWeekday(date) {
 
 var dayWebsocket
 
+function setPonged() {
+	Calponged = true
+}
+
 function connect() {
 	console.log("connect")
 	dayWebsocket = new WebSocket(`${secure}://${WS_BASE}/dayWS`, "echo-protocol")
@@ -44,8 +48,9 @@ function connect() {
 	dayWebsocket.onmessage = async function(event) {
 		const message = JSON.parse(event.data)
 
-		if (message.State == "PONG") {
-			Calponged = true
+		if (message.state == "PONG") {
+			console.log("GOT A PONG!")
+			setPonged()
 		}
 		
 		if (message.state == "OPEN") {
@@ -191,11 +196,15 @@ const DELAY = 5000
 // and thank you to browsers for being so jank about websockets:
 // Idea, send a ping - expect a pong. If no PONG, well then - reload?
 setInterval(() => {
-	if (!Calponged) {
+	console.log("NEW SET INTERVAL: calPonged: " + Calponged)
+	if (Calponged == false) {
+		console.log("failed to get PONG - reloading")
+		Calponged = true
 		location.reload() // reload the website if during this time the PONG was not received.
 	} else {
 		Calponged = false
 		// send the ping
+		console.log("PINGING")
 		dayWebsocket.send(makeCalMsg("", "", "PING"))
 	}
 }, DELAY)
