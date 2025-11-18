@@ -1,5 +1,8 @@
 console.log("Loaded calendarHandler.js")
 
+// used for manual keepAlive
+let Calponged = true // starts as true as otherwise the first check would fail and website would just keep reloading oops :)
+
 const stateList = ["present", "absent", "cooking", "uncertain", "maybe-cooking", "cant-cook"]
 const altTextList = ["Present", "Absent", "Cooking", "Uncertain if Present", "Maybe Cooking", "Can't Cook"]
 
@@ -40,6 +43,10 @@ function connect() {
 
 	dayWebsocket.onmessage = async function(event) {
 		const message = JSON.parse(event.data)
+
+		if (message.State == "PONG") {
+			Calponged = true
+		}
 		
 		if (message.state == "OPEN") {
 			// here the serial will be in "person"
@@ -179,13 +186,16 @@ const DELAY = 5000
 	//}, DELAY);
 //})();
 
-// okay let's do this nice and simple
-// just check like once per like 5 seconds and then things you know should be better
-
+// https://websockets.readthedocs.io/en/stable/topics/keepalive.html
+// thank you for this quick informative thing
+// and thank you to browsers for being so jank about websockets:
+// Idea, send a ping - expect a pong. If no PONG, well then - reload?
 setInterval(() => {
-	try {
-
-	} catch (error) {
-		connect()
+	if (!Calponged) {
+		location.reload() // reload the website if during this time the PONG was not received.
+	} else {
+		Calponged = false
+		// send the ping
+		dayWebsocket.send(makeCalMsg("", "", "PING"))
 	}
 }, DELAY)
