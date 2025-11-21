@@ -20,7 +20,7 @@ async function login() {
 			},
 			body: JSON.stringify({
 				username: username,
-				password: password
+				password: password // me omw to be omega stupid and just send this over SSL (not guaranteed safe I just assumed - there is definitely something that I should be doing here)
 			})
 		}
 	)
