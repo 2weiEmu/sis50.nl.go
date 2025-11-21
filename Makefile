@@ -36,3 +36,13 @@ required_files: $(OBJECTS)
 
 	# adding a random secret to a secret.conf file
 	head -c 32 /dev/random > secret.conf
+
+clean_all: $(OBJECTS)
+	rm -rf resources
+	rm -rf log
+	rm -rf build
+	rm secret.conf
+
+test_account: $(OBJECTS)
+	go run util/argon_password_generate.go
+

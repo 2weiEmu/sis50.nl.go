@@ -97,3 +97,5 @@ This section is a todo. You can probably figure it out, there is a make file and
 
 Also I just want to thank this blog article:
 https://www.alexedwards.net/blog/working-with-cookies-in-go
+
+Another note: the secret key is used for the cookies (i.e. making the sessions - not password-related things - thank you!)
