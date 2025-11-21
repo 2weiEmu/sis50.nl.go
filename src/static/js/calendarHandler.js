@@ -80,36 +80,37 @@ function connect() {
 			
 
 			return
+		} else {
+
+			// Update the day's state
+			var el = document.getElementsByClassName(`${message.person} ${message.day}`)[0]
+			let state_image = el.children[0]
+
+			// TODO: move this to CSS
+			state_image.style.width = "0"
+			state_image.style.height = "0"
+			state_image.style.marginRight = "50%"
+			state_image.style.marginLeft = "50%"
+			state_image.style.marginTop = "30%"
+			state_image.style.marginBottom = "50%"
+			await sleep(300)
+
+			state_image.setAttribute("data-state", message.state) 
+			state_image.src = "/images/" + message.state + ".svg"
+
+			// some CSS stuff
+			state_image.style.width = "100%"
+			state_image.style.marginRight = "0"
+			state_image.style.marginLeft = "0"
+			state_image.style.marginTop = "8px"
+			state_image.style.marginBottom = "0"
+			state_image.style.height = "80%"
+			await sleep(300)
+
+			console.log(`[INFO] message.state: ${message.state}`)
+			var i = stateList.findIndex((item) => { return item == message.state })
+			state_image.title = altTextList[i]
 		}
-
-		// Update the day's state
-		var el = document.getElementsByClassName(`${message.person} ${message.day}`)[0]
-		let state_image = el.children[0]
-
-		// TODO: move this to CSS
-		state_image.style.width = "0"
-		state_image.style.height = "0"
-		state_image.style.marginRight = "50%"
-		state_image.style.marginLeft = "50%"
-		state_image.style.marginTop = "30%"
-		state_image.style.marginBottom = "50%"
-		await sleep(300)
-
-		state_image.setAttribute("data-state", message.state) 
-		state_image.src = "/images/" + message.state + ".svg"
-
-		// some CSS stuff
-		state_image.style.width = "100%"
-		state_image.style.marginRight = "0"
-		state_image.style.marginLeft = "0"
-		state_image.style.marginTop = "8px"
-		state_image.style.marginBottom = "0"
-		state_image.style.height = "80%"
-		await sleep(300)
-
-		console.log(`[INFO] message.state: ${message.state}`)
-		var i = stateList.findIndex((item) => { return item == message.state })
-		state_image.title = altTextList[i]
 	}
 
 
