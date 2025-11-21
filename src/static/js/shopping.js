@@ -9,6 +9,8 @@ var shoppingList = document.getElementById("shop-list")
 
 var shopWebSocket
 
+var shopPonged = true
+
 function connectShop() {
 	console.log("connectShop")
 	shopWebSocket = new WebSocket(`${secure}://${WS_BASE}/shopWS`, "echo-protocol")
@@ -64,7 +66,9 @@ function connectShop() {
 			shoppingItem.appendChild(edit_button)
 			shoppingItem.appendChild(remove_button)
 			shoppingList.appendChild(shoppingItem)
-
+		} else if (message.action == "pong") {
+			console.log("received PONG in the shop")
+			shopPonged = true
 		} else if (message.action == "edit") {
 			for (var i = 0; i < shoppingList.children.length; i++) {
 				if (shoppingList.children[i].id == message.id) {
@@ -274,4 +278,19 @@ function setDay(el) {
 	closeDialog()
 }
 
-
+const SHOPPING_PING_DELAY = 20000
+setInterval(() => {
+	console.log("new set interval: shopPonged: " + shopPonged)
+	if (shopPonged == false) {
+		console.log("failed to receive a PONG for Shop, reloading!")
+		location.reload()
+	} else {
+		shopPonged = false
+		console.log("PINGING FOR SHOP")
+		shopWebSocket.send(JSON.stringify({
+			"id": "0",
+			"content": "something",
+			"action": "ping"
+		}))
+	}
+}, SHOPPING_PING_DELAY)

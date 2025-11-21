@@ -62,6 +62,7 @@ const (
 	REMOVE
 	EDIT
 	REARRANGE
+	PING
 )
 
 var ShoppingActionMap = map[string]int{
@@ -70,4 +71,5 @@ var ShoppingActionMap = map[string]int{
 	"remove": REMOVE,
 	"edit": EDIT,
 	"rearrange": REARRANGE,
+	"ping": PING,
 }

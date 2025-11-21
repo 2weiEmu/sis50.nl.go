@@ -173,23 +173,7 @@ for (var i = 0; i < gridElList.length; i++) {
 	}, 1000)
 })()
 // now granted when the window goes to sleep this will be once per sec anyway
-const DELAY = 5000
-
-//(function loop() {
-	//setTimeout(() => {
-//
-		//try {
-			//// check if websocket is connected
-			//// if not connected => connect
-			//// if connected => leave
-//
-		//} catch {
-			//// something went wrong - inform the user, keep trying
-//
-		//}
-		//loop();
-	//}, DELAY);
-//})();
+const DELAY = 20000
 
 // https://websockets.readthedocs.io/en/stable/topics/keepalive.html
 // thank you for this quick informative thing

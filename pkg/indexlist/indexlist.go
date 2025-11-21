@@ -227,14 +227,14 @@ func ShoppingListWebsocketHandler(conn *websocket.Conn) {
 	for {
 		err := websocket.JSON.Receive(conn, &message)
 		if err != nil {
-			lerror.ErrLog("Failed to read websocket JSON", err)
+			lerror.ErrLog("Failed to read websocket JSON" + err.Error(), err)
 			break
 		}
 
 		logger.InfoLog.Println("Message received:", message)
 		ShopItemList, err = ReadFromFile()
 		if err != nil {
-			lerror.ErrLog("Failed to re-read shopping list from file", err)
+			lerror.ErrLog("Failed to re-read shopping list from file" + err.Error(), err)
 			break
 		}
 
@@ -258,6 +258,15 @@ func ShoppingListWebsocketHandler(conn *websocket.Conn) {
 				err := ShopItemList.RemoveByItemId(message.Id)
 				if err != nil {
 					lerror.ErrLog("Failed to remove shopping item by id", err)
+					break
+				}
+
+			case c.PING:
+				message.Action = "pong"
+				logger.InfoLog.Println("pong sent")
+				err := websocket.JSON.Send(conn, message)
+				if err != nil {
+					lerror.ErrLog("Failed to return a pong to the shopping websocket", err)
 					break
 				}
 				
