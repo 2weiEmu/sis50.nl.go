@@ -28,7 +28,7 @@ var secretKey []byte = ReadSecret()
 func ReadSecret() []byte {
 	file, err := os.OpenFile("secret.conf", os.O_RDONLY, os.ModeAppend)
 	if err != nil {
-		panic("failed to read secrets file")
+		panic("The program failed to read the file 'secret.conf', this is required. The error: " + err.Error())
 	}
 	defer file.Close()
 
@@ -39,7 +39,7 @@ func ReadSecret() []byte {
 	}
 
 	if count != 32 {
-		panic("key wrong length")
+		panic("The key given in the file is the wrong length (it does not seem to be 32 bytes).")
 	}
 
 	return secret
