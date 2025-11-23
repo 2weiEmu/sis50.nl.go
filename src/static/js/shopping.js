@@ -283,7 +283,8 @@ setInterval(() => {
 	console.log("new set interval: shopPonged: " + shopPonged)
 	if (shopPonged == false) {
 		console.log("failed to receive a PONG for Shop, reloading!")
-		location.reload()
+		shopPonged = true
+		//location.reload()
 	} else {
 		shopPonged = false
 		console.log("PINGING FOR SHOP")

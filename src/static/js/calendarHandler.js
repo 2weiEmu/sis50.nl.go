@@ -185,7 +185,7 @@ setInterval(() => {
 	if (Calponged == false) {
 		console.log("failed to get PONG - reloading")
 		Calponged = true
-		location.reload() // reload the website if during this time the PONG was not received.
+		// location.reload() // reload the website if during this time the PONG was not received.
 	} else {
 		Calponged = false
 		// send the ping
