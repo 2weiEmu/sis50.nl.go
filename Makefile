@@ -8,6 +8,10 @@ DEPLOY_BASE = "sis50.nl"
 default: $(OBJECTS)
 	$(CMD) run $(OBJECTS)
 
+run_docker: $(OBJECTS)
+	docker run -it -v ./:/app -v go:/go -v go-build:/root/.cache/go-build --rm -p 8000:8000 docker-sis50-image:latest make # I am sure I am doing something improper here and I could fix this with a restart of the container instead?
+	# that is fixable for next time, I need to sleep now
+
 build: $(OBJECTS)
 	$(CMD) build -o $(TARGET) $(OBJECTS) 
 
@@ -37,6 +41,8 @@ required_files: $(OBJECTS)
 	# adding a random secret to a secret.conf file
 	head -c 32 /dev/random > secret.conf
 
+	docker build . -t docker-sis50-image
+
 clean_all: $(OBJECTS)
 	rm -rf resources
 	rm -rf log
@@ -46,3 +52,5 @@ clean_all: $(OBJECTS)
 test_account: $(OBJECTS)
 	go run util/argon_password_generate.go
 
+docker_build: $(OBJECTS)
+	docker build . -t docker-sis50-image
