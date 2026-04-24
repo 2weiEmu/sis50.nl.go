@@ -11,6 +11,7 @@ var shopWebSocket
 
 var shopPonged = true
 
+
 function connectShop() {
 	console.log("connectShop")
 	shopWebSocket = new WebSocket(`${secure}://${WS_BASE}/shopWS`, "echo-protocol")
@@ -99,9 +100,21 @@ function connectShop() {
 
 connectShop()
 
+function shopSendWithReconnect(val) {
+	if (shopWebSocket.readyState == WebSocket.CLOSED || shopWebSocket.readyState == WebSocket.CLOSING) {
+		console.log("Websocket tried to send Value but was closed... reopening...")
+		shopWebSocket = connectShop()
+		shopWebSocket.send(val)
+	}
+	else {
+		console.log("Sending data with websocket connection that was open")
+		shopWebSocket.send(val)
+	}
+}
+
 function addItem() {
 	var content = document.getElementById("item-name-add").value
-	shopWebSocket.send(JSON.stringify({
+	shopSendWithReconnect(JSON.stringify({
 		"id": "-1",
 		"content": content,
 		"action": "add"
@@ -113,7 +126,7 @@ function editItem(_) {
 	var new_content = window.prompt("Edit the name", `${old_content}`)
 	var id = this.parentElement.id
 	console.log("[INFO] ID to remove:", id)
-	shopWebSocket.send(JSON.stringify({
+	shopSendWithReconnect(JSON.stringify({
 		"id": `${id}`, 
 		"content": new_content,
 		"action": "edit"
@@ -123,7 +136,7 @@ function editItem(_) {
 function removeItem(_) {
 	var id = this.parentElement.id
 	console.log("[INFO] ID to remove:", id)
-	shopWebSocket.send(JSON.stringify({
+	shopSendWithReconnect(JSON.stringify({
 		"id": `${id}`, 
 		"content": "",
 		"action": "remove"
@@ -169,7 +182,7 @@ function handleDropOn(event) {
 	if (dragged === null) return
 
 	console.log(`INDEX IN THE SHOPPING LIST WHERE IT WAS DROPPED MATE: ${indexInShoppingList(el)}`)
-	shopWebSocket.send(JSON.stringify({
+	shopSendWithReconnect(JSON.stringify({
 		"id": dragged.id,
 		"content": `${indexInShoppingList(el)}`,
 		"action": "rearrange"
@@ -277,21 +290,3 @@ function setDay(el) {
 	}))
 	closeDialog()
 }
-
-const SHOPPING_PING_DELAY = 20000
-setInterval(() => {
-	console.log("new set interval: shopPonged: " + shopPonged)
-	if (shopPonged == false) {
-		console.log("failed to receive a PONG for Shop, reloading!")
-		shopPonged = true
-		//location.reload()
-	} else {
-		shopPonged = false
-		console.log("PINGING FOR SHOP")
-		shopWebSocket.send(JSON.stringify({
-			"id": "0",
-			"content": "something",
-			"action": "ping"
-		}))
-	}
-}, SHOPPING_PING_DELAY)
